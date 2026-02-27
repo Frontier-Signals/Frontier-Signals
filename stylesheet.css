@@ -107,6 +107,9 @@
 
         /* ===== Mobile Styles + Smooth Transition ===== */
         @media (max-width: 768px) {
+            /* include padding/border in width calculations everywhere */
+            *, *::before, *::after { box-sizing: border-box; }
+
             /* reduce global font size and spacing for better readability on small screens */
             body {
                 font-size: 14px;
@@ -114,6 +117,7 @@
                 line-height: 1.5;
                 text-shadow: none; /* remove heavy neon glow on small devices */
                 animation: none; /* disable background animation */
+                overflow-x: hidden; /* prevent horizontal scrolling */
             }
 
             header img, #banner {
@@ -123,9 +127,10 @@
 
             section {
                 width: 100%;
-                padding: 0px;
+                padding: 15px;
                 margin: 0 0 20px;
                 border-radius: 0;
+                box-sizing: border-box;
             }
 
             /* ensure map container expands fully on narrow screens */
@@ -138,6 +143,11 @@
                 max-width: 100% !important;
                 width: 100% !important;
                 height: auto !important;
+            }
+
+            /* stack table/chart containers vertically */
+            .table-chart-container {
+                flex-direction: column;
             }
 
             /* increase tappable area for links and buttons */

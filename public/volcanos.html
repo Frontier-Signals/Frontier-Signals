@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Real-time volcano monitoring and hazard maps.">
+    <meta name="keywords" content="volcanoes, volcanic activity, real-time monitoring">
+    <meta name="author" content="BraveCat">
+    <meta name="theme-color" content="#00ffff">
+    
+    <!-- Open Graph for social sharing -->
+    <meta property="og:title" content="Volcano Monitoring - Frontier Signals">
+    <meta property="og:description" content="Real-time volcano monitoring and hazard maps.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://frontier-signals.com/volcanos">
+    <link rel="canonical" href="https://frontier-signals.com/volcanos">
+    <meta property="og:image" content="https://frontier-signals.com/images/FrontierSignalsBanner.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Volcano Monitoring - Frontier Signals">
+    <meta name="twitter:description" content="Real-time volcano monitoring and hazard maps.">
+    <meta name="twitter:image" content="https://frontier-signals.com/images/FrontierSignalsBanner.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    
+    <title>Volcano Monitoring - Frontier Signals</title>
+	
+	<link rel="stylesheet" href="stylesheet.css">
+
+    <style>
+
+    </style>
+</head>
+<body>
+
+    <!-- ===== Header ===== -->
+    <header>
+        <center><img id="banner" class="bordered-image" src="images/FrontierSignalsBanner.png" alt="Frontier Signals Official Banner"></center>
+		<p style="text-align: center; color: #ff00ff; font-weight: bold; margin: 5px 0;">Beta</p>
+		<hr>
+        <p>Volcano Monitoring - Real-time Volcanic Activity</p>
+    </header>
+
+    <!-- ===== Navigation ===== -->
+    <nav>
+        <!-- Mobile Hamburger Menu -->
+        <div class="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <!-- Navigation Links -->
+        <ul class="nav-links">
+            <li><a href="index.html">Home Page</a></li>
+			<li><a href="historydata.html">Historical Data & Archives</a></li>
+			<li><a href="peerpapers.html">Frontier Science Articles</a></li>
+      <li><a href="ancienthistory.html">Ancient History</a></li>
+            <li><a href="extras.html">Multimedia & Resource Links</a></li>
+			<li><a href="about.html">About/Contact</a></li>
+        </ul>
+        <hr>
+        <!-- Live Feeds Submenu -->
+        <ul class="nav-links">
+            <li><a href="spaceweather.html">Space Weather Feeds</a></li>
+            <li><a href="earthquakes.html">Earthquake Monitoring</a></li>
+            <li><a href="volcanos.html">Volcano Monitoring</a></li>
+        </ul>
+        <br>
+    </nav>
+
+    <!-- ===== Main Content ===== -->
+    <main>
+        <br><br>
+	<!-- ===== Section One ===== -->
+        <section>
+            <h2 style="text-align:center">Volcano Monitoring</h2><hr>
+            <p>&emsp;This page is dedicated to real-time volcano monitoring and volcanic activity tracking.</p>
+        </section>
+        <br><br>
+        <!-- ===== Section - Volcano Discovery ===== -->
+		<section>
+            <h2 style="text-align:center">Volcano Discovery Static Updated Map</h2><hr>
+		<center><div style="position:relative;margin:10px 0"><div style="position:absolute;right:5px;top:5px;width:16px;height:16px"><a href="https://volcanodiscovery.de/maps/active-volcano-map2l.jpg" title="View this image in new window" target="_blank"><img class="bordered-image" src="https://volcanodiscovery.de/fileadmin/voldis/png/zoom_in.png" alt="" width="16" height="16"/></a></div><img class="bordered-image" style="max-width:900px;width:100%;height:auto;margin:auto" src="https://volcanodiscovery.de/maps/active-volcano-map2l.jpg" alt="Currently active volcanoes in the world" /><div style="height:15px;font:10px Verdana,sans-serif;color:#999;text-align:right;vertical-align:middle;overflow:hidden">Source: <a style="color:#999;text-decoration:none;" href="https://www.volcanodiscovery.com/daily-map-of-active-volcanoes.html" target="_blank">VolcanoDiscovery</a></div></div></center>
+		</section>
+        <br><br>
+        <section>
+            <h2 style="text-align:center">Interactive Live Volcano Map</h2><hr>
+        <!-- begin VolcanoWidget -->
+    <center><iframe id="VW_iframe" width="80%" height="600px" scrolling="no" frameborder="0" marginwidth="0" marginheight="0" src="https://earthquakes.volcanodiscovery.com?hideQuakes=1&minMag=0"></iframe></center>
+<!-- end VolcanoWidget / http://www.volcano-news.com/active-volcanoes-map/get-widget.html -->
+        </section>
+        <br><br>
+
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer>
+        <p>&copy; 2026 Frontier Signals. All rights reserved.</p>
+        <p style="font-size: 12px; margin-top: 10px;">
+            <a href="privacy-policy.html" style="color: #00ffff; text-decoration: none;">Privacy Policy</a> | 
+            <a href="terms-of-service.html" style="color: #00ffff; text-decoration: none;">Terms of Service</a>
+        </p>
+    </footer>
+
+    <script>
+    
+    </script>
+    <script src="script.js"></script>
+
+</body>
+</html>

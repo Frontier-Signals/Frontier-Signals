@@ -1,0 +1,514 @@
+        /* ===== Global Styles ===== */
+        body {
+        margin: 0;
+		font-family: 'Lucida Console', monospace;
+		font-weight: 700; /* Heavier */
+		letter-spacing: 3px;
+        line-height: 1.7;
+        text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #ff00ff;
+        min-height: 100vh;
+		
+        /* Initial background color */
+        background: linear-gradient(270deg, #2d1846, #363417);
+        background-size: 400% 400%;
+        animation: colorShift 10s ease infinite;
+    }
+
+    /* Keyframes to animate gradient movement and color change */
+    @keyframes colorShift {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+        /* ===== Header ===== */
+        header {
+            background-color: #202029;
+            color: #fcf2dc;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* ===== Navigation Base ===== */
+        nav {
+            background-color: #131736;
+            position: relative;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links li {
+            margin: 0;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 14px 20px;
+            color: #fcf2dc;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: #555;
+        }
+
+        /* ===== Hamburger Icon ===== */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 14px 20px;
+            background-color: #444;
+        }
+
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 4px 0;
+            transition: all 0.3s ease;
+        }
+
+        /* ===== Main Content ===== */
+        main {
+            padding: 20px;
+        }
+
+        section {
+            background: #08202c;
+			color: #fcf2dc;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+            width: 70%;
+            margin: 0 auto
+        }
+
+        /* ===== Footer ===== */
+        footer {
+            background-color: #333;
+            color: #fcf2dc;
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* ===== Mobile Styles + Smooth Transition ===== */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            /* Start nav hidden, with smooth slide and fade */
+            .nav-links {
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: #444;
+
+                /* Transition properties */
+                max-height: 0;
+                opacity: 0;
+                overflow: hidden;
+                transition: max-height 0.4s ease, opacity 0.4s ease;
+            }
+
+            /* When menu is active, expand + fade in */
+            .nav-links.active {
+                max-height: 500px; /* Large enough for all links */
+                opacity: 1;
+            }
+
+            .nav-links li {
+                text-align: center;
+                border-bottom: 1px solid #555;
+            }
+        }
+		hr {
+            border: none;
+            border-top: 2px solid #ff6b35;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+            margin: 20px 0;
+        }
+
+       /* ===== Image Styling with Neon Orange Glow ===== */
+.bordered-image {
+    border: 3px solid #ff6b35;
+    border-radius: 5px;
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.5), 0 0 25px rgba(255, 107, 53, 0.3);
+    transition: box-shadow 0.3s ease;
+    max-width: 100%;
+    height: auto;
+}
+
+.bordered-image:hover {
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.8), 0 0 35px rgba(255, 107, 53, 0.5);
+} 
+
+		/* Map container styling */
+        #map {
+            height: 500px;  /* Adjust map height */
+            width: 80%;    /* Full width of parent section */
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+		#map-controls {
+            margin: 10px;
+        }
+
+/* Remove border only from images inside the map container */
+.leaflet-container img {
+    border: none;
+}
+
+/* Style the Leaflet map container with an orange border */
+.leaflet-container {
+    border: 2px solid orange;
+}
+
+/* Style PDF or iframe containers with the same orange border */
+.pdf-container, /* Replace with actual class/ID for PDF container */
+iframe {
+    border: 2px solid orange;
+}
+
+		/* ===== Vaporwave Table Styling ===== */
+table {
+  border-collapse: collapse;
+  background-color: #08202c;
+  border: 2px solid #ff6b35;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
+}
+
+table thead {
+  background-color: #08202c;
+  border-bottom: 2px solid #ff6b35;
+}
+
+table th {
+  color: #fcf2dc;
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 107, 53, 0.4);
+}
+
+table td {
+  color: #fcf2dc;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 107, 53, 0.2);
+}
+
+table tbody tr:hover {
+  background-color: rgba(255, 107, 53, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+	/* Style the button that is used to open and close the collapsible content */
+.collapsible {
+  background-color: #343443;
+  color: #fcf2dc;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #ff00ff;
+  letter-spacing: 3px;
+  outline: none;
+  font-size: 15px;
+  font-family: 'Lucida Console', monospace;
+	font-weight: 700; /* Heavier */
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .collapsible:hover {
+  background-color: #202029;
+}
+
+/* Style the collapsible content. Note: hidden by default */
+.content {
+  padding: 0 18px;
+  background-color: #08202c;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out;
+}
+
+.pdf-container {
+  padding: 0 18px;
+  background-color: #08202c;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out;
+}
+
+.collapsible:after {
+  content: '\02795'; /* Unicode character for "plus" sign (+) */
+  font-size: 13px;
+  color: white;
+  float: left;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2796"; /* Unicode character for "minus" sign (-) */
+}
+
+.container {
+  display: flex; /* Enables flexbox */
+  justify-content: space-between; /* Pushes items to opposite ends */
+  align-items: center; /* Vertically centers them */
+  width: 100%;
+  overflow-wrap: break-word;
+}
+
+.left-side, .right-side {
+  width: 48%; /* Adjust width to fit both plus some spacing */
+}
+
+/* Unvisited link */
+a:link {
+  color: #dbd47b;
+}
+
+/* Visited link */
+a:visited {
+  color: #c9be30;
+}
+
+/* Link on hover */
+a:hover {
+  color: #ffffff;
+  text-decoration: underline; /* Adds underline on hover */
+}
+
+/* Link when focused */
+a:focus {
+  outline: 2px solid #007bff; /* Adds an outline for accessibility */
+}
+
+/* Active link */
+a:active {
+  color: #004085;
+}
+
+/* ===== Enhanced Vaporwave Input Range Styling ===== */
+input[type="range"] {
+  width: 100%;
+  height: 8px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #08202c, #ff6b35);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  accent-color: #ff6b35;
+  cursor: pointer;
+}
+
+/* WebKit browsers (Chrome, Safari, Edge) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ff6b35;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255, 107, 53, 0.8), inset 0 0 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  border: 2px solid #fcf2dc;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  width: 28px;
+  height: 28px;
+  box-shadow: 0 0 20px rgba(255, 107, 53, 1), inset 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  box-shadow: 0 0 25px rgba(255, 107, 53, 1), inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ff6b35;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255, 107, 53, 0.8), inset 0 0 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid #fcf2dc;
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  width: 28px;
+  height: 28px;
+  box-shadow: 0 0 20px rgba(255, 107, 53, 1), inset 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+input[type="range"]::-moz-range-thumb:active {
+  box-shadow: 0 0 25px rgba(255, 107, 53, 1), inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Track styling */
+input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #1a4d6d, #0b2a3b);
+  height: 8px;
+  border-radius: 5px;
+  box-shadow: inset 0 0 5px rgba(255, 107, 53, 0.2);
+}
+
+input[type="range"]::-moz-range-track {
+  background: linear-gradient(to right, #1a4d6d, #0b2a3b);
+  height: 8px;
+  border-radius: 5px;
+  box-shadow: inset 0 0 5px rgba(255, 107, 53, 0.2);
+  border: none;
+}
+
+/* Adjust controls container for better spacing */
+.controls {
+  background: #0b2a3b;
+  padding: 15px;
+  border: 2px solid #ff6b35;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.2);
+}
+
+.controls label {
+  display: block;
+  margin: 12px 0 6px 0;
+  color: #fcf2dc;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(255, 107, 53, 0.3);
+}
+
+.controls input[type="range"] {
+  width: 60%;
+  margin: 8px 0 16px 0;
+}
+
+/* Value display styling */
+#magValue, #timeValue {
+  color: #ff6b35;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(255, 107, 53, 0.5);
+}
+
+/* ===== Vaporwave Select Dropdown ===== */
+select {
+  background-color: #0b2a3b;
+  color: #fcf2dc;
+  border: 2px solid #ff6b35;
+  padding: 8px 12px;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.3);
+  font-weight: 500;
+}
+
+select:hover, select:focus {
+  box-shadow: 0 0 20px rgba(255, 107, 53, 0.6);
+  outline: none;
+}
+
+select option {
+  background-color: #0b2a3b;
+  color: #fcf2dc;
+}
+
+/* ===== Vaporwave Checkbox Styling ===== */
+input[type="checkbox"] {
+  accent-color: #ff6b35;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.circle {
+  display: inline-block;
+  width: 16px;        /* circle size */
+  height: 16px;
+  border-radius: 50%; /* make it round */
+  margin-right: 5px;  /* small space before text */
+}
+
+.circle.green {
+  background-color: green;
+}
+
+.circle.orange {
+  background-color: orange;
+}
+
+.circle.red {
+  background-color: red;
+}
+
+.circle.blue {
+  background-color: blue;
+}
+
+.circle.yellow {
+  background-color: yellow;
+}
+
+.volcano-icon,
+.flood-icon,
+.drought-icon,
+.tropical-icon,
+.fire-icon {
+    text-shadow: none;
+}
+/* ===== Blue Volcano Cluster Styling ===== */
+.marker-cluster-custom {
+  background-color: #1a6fa0;
+  border: 2px solid #00bfff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6), inset 0 0 5px rgba(0, 0, 0, 0.3);
+  color: #fcf2dc;
+  font-weight: bold;
+  font-size: 14px;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+}
+
+.marker-cluster-custom.marker-cluster-small {
+  background-color: #1a6fa0;
+  box-shadow: 0 0 12px rgba(0, 191, 255, 0.5);
+}
+
+.marker-cluster-custom.marker-cluster-medium {
+  background-color: #0d4a7a;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
+  font-size: 15px;
+}
+
+.marker-cluster-custom.marker-cluster-large {
+  background-color: #053a5c;
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.8);
+  font-size: 16px;
+}
+
+.marker-cluster-group span {
+  display: inline-block;
+}

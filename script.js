@@ -1,9 +1,9 @@
 const hamburger = document.querySelector('.hamburger');
-        const navLinks = document.querySelectorAll('.nav-links');
         const navContainer = document.getElementById('nav-container');
 
         function toggleMenu() {
-            navLinks.forEach(nav => nav.classList.toggle('active'));
+            // open/close entire container instead of each list
+            navContainer.classList.toggle('open');
             // update ARIA attribute for accessibility
             const expanded = hamburger.getAttribute('aria-expanded') === 'true';
             hamburger.setAttribute('aria-expanded', (!expanded).toString());
@@ -69,13 +69,17 @@ window.addEventListener('resize', enableLazyImages);
     lightbox.id = 'lightbox';
     document.body.appendChild(lightbox);
 
-    lightbox.addEventListener('click', () => {
-        lightbox.classList.remove('active');
+    lightbox.addEventListener('click', e => {
+        // only close if background (not inner image) is clicked
+        if (e.target === lightbox) {
+            lightbox.classList.remove('active');
+        }
     });
 
     document.querySelectorAll('img').forEach(img => {
         img.style.cursor = 'zoom-in';
-        img.addEventListener('click', () => {
+        img.addEventListener('click', e => {
+            e.stopPropagation(); // prevent bubbling to lightbox
             // skip if image already inside lightbox
             if (img.closest('#lightbox')) return;
             const imgClone = document.createElement('img');

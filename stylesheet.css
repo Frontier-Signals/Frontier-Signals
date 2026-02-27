@@ -122,7 +122,7 @@
 
             section {
                 width: 95%;
-                padding: 15px;
+                padding: 0px;
             }
 
             /* ensure map container expands fully on narrow screens */
@@ -169,7 +169,7 @@
 
             /* When menu is active, expand + fade in */
             .nav-links.active {
-                max-height: 500px; /* Large enough for all links */
+                max-height: 100vh; /* allow full expansion, avoids clipping links */
                 opacity: 1;
             }
 
@@ -225,6 +225,12 @@
 iframe {
     border: 2px solid orange;
 }
+
+        /* fluid media elements */
+        iframe, video {
+            max-width: 100%;
+            height: auto;
+        }
 
 		/* ===== Vaporwave Table Styling ===== */
 table {
@@ -297,12 +303,30 @@ table tbody tr:hover {
   transition: max-height 0.4s ease-out;
 }
 
-.collapsible:after {
-  content: '\02795'; /* Unicode character for "plus" sign (+) */
-  font-size: 13px;
-  color: white;
-  float: left;
-  margin-left: 5px;
+/* lightbox overlay for clickable images */
+#lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+#lightbox.active {
+    visibility: visible;
+    opacity: 1;
+}
+#lightbox img {
+    max-width: 90%;
+    max-height: 90%;
+    box-shadow: 0 0 20px rgba(0,0,0,0.7);
 }
 
 .active:after {

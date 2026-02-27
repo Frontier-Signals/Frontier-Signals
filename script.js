@@ -61,3 +61,28 @@ function enableLazyImages() {
 
 window.addEventListener('load', enableLazyImages);
 window.addEventListener('resize', enableLazyImages);
+
+// ===== Lightbox for clickable images =====
+(function() {
+    // create overlay element
+    const lightbox = document.createElement('div');
+    lightbox.id = 'lightbox';
+    document.body.appendChild(lightbox);
+
+    lightbox.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+    });
+
+    document.querySelectorAll('img').forEach(img => {
+        img.style.cursor = 'zoom-in';
+        img.addEventListener('click', () => {
+            // skip if image already inside lightbox
+            if (img.closest('#lightbox')) return;
+            const imgClone = document.createElement('img');
+            imgClone.src = img.src;
+            while (lightbox.firstChild) lightbox.removeChild(lightbox.firstChild);
+            lightbox.appendChild(imgClone);
+            lightbox.classList.add('active');
+        });
+    });
+})();

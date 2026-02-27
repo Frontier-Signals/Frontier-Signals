@@ -164,6 +164,10 @@
                 text-shadow: none;
             }
 
+            .container {
+                flex-direction: column; /* Stacks items vertically on mobile */
+            }
+
             /* keep hamburger visible and remove its shadow in phone view */
             .hamburger {
                 display: flex;

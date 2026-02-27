@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Real-time earthquake monitoring and hazard maps.">
+    <meta name="keywords" content="earthquakes, seismic activity, real-time monitoring">
+    <meta name="author" content="BraveCat">
+    <meta name="theme-color" content="#00ffff">
+    
+    <!-- Open Graph for social sharing -->
+    <meta property="og:title" content="Earthquake Monitoring - Frontier Signals">
+    <meta property="og:description" content="Real-time earthquake monitoring and hazard maps.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://frontier-signals.com/earthquakes">
+    <link rel="canonical" href="https://frontier-signals.com/earthquakes">
+    <meta property="og:image" content="https://frontier-signals.com/images/FrontierSignalsBanner.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Earthquake Monitoring - Frontier Signals">
+    <meta name="twitter:description" content="Real-time earthquake monitoring and hazard maps.">
+    <meta name="twitter:image" content="https://frontier-signals.com/images/FrontierSignalsBanner.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+
+    <title>Earthquake Monitoring - Frontier Signals</title>
+	<!-- Leaflet CSS (Required for Map Styling) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />	
+	<!-- External Styling Sheet -->
+	<link rel="stylesheet" href="stylesheet.css">	
+	<!-- MarkerCluster CSS -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+  <!-- Leaflet Draw CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <!-- Font Awesome for Draw icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <!-- Leaflet Layer Control CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+    /* Customize Leaflet popup styling */
+.leaflet-tile {
+  filter: brightness(0.8) contrast(1.2);
+  border: none !important;
+}
+.leaflet-popup-content-wrapper {
+  background-color: #0b2a3b;
+  border-radius: 5px;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
+}
+.leaflet-popup-content {
+  color: #fcf2dc;
+  font-family: 'Lucida Console', monospace;
+  font-weight: 700;
+}
+.leaflet-popup-tip {
+  background-color: #d10d0d;
+}
+.leaflet-popup-close-button {
+  color: #fcf2dc;
+}
+      .depth-label {
+  background: none;
+  border: none;
+  box-shadow: none;
+  font-weight: bold;
+  color: #d10d0d;
+  text-shadow: 1px 1px 2px #000;
+  font-size: 14px;
+}
+/* Leaflet Draw - Toolbar styling */
+.leaflet-draw-toolbar {
+  background-color: #79c5ee !important;
+  border: 2px solid #fcf2dc !important;
+}
+.leaflet-draw-toolbar a {
+  background-color: #64bbda !important;
+  border-left: 1px solid #fcf2dc !important;
+}
+.leaflet-draw-toolbar a:hover {
+  background-color: #d10d0d !important;
+}
+.leaflet-draw-toolbar a.leaflet-disabled {
+  background-color: #6cb5dd !important;
+  opacity: 0.5;
+}
+/* Draw action text */
+.leaflet-draw-actions {
+  background-color: #0b2a3b !important;
+  border: 2px solid #fcf2dc !important;
+}
+.leaflet-draw-actions a {
+  color: #fcf2dc !important;
+  background-color: #1a4a5b !important;
+}
+.leaflet-draw-actions a:hover {
+  background-color: #d10d0d !important;
+}
+/* Drawn shapes and lines - bright orange */
+.leaflet-draw path {
+  stroke: #d10d0d !important;
+  fill: #d10d0d !important;
+}
+.leaflet-draw-guide-dash {
+  stroke: #d10d0d !important;
+}
+/* Drawing vertices (points) */
+.leaflet-draw-vertex {
+  background-color: #d10d0d !important;
+  border: 2px solid #fcf2dc !important;
+}
+/* Edit mode styling */
+.leaflet-edit-resize {
+  border-color: #d10d0d !important;
+}
+svg .leaflet-draw-guide-line {
+  stroke: #d10d0d !important;
+}
+.volcano-icon {
+  background: none;
+  border: none;
+  box-shadow: none;
+  font-size: 18px;
+}
+
+/* Map styling */
+#map {
+  border: 2px solid orange;
+}
+.leaflet-layer, .leaflet-overlay-pane {
+  border: none !important;
+}
+    </style>	
+</head>
+<body>
+    <!-- ===== Header ===== -->
+    <header>
+        <center><img id="banner" class="bordered-image" src="images/FrontierSignalsBanner.png" alt="Frontier Signals Official Banner"></center>
+		<p style="text-align: center; color: #ff00ff; font-weight: bold; margin: 5px 0;">Beta</p>
+		<hr>
+        <p>Live Earth Monitor - Earthquake Tracker + Measurement Tools</p>
+    </header>
+    <!-- ===== Navigation ===== -->
+    <nav>
+        <!-- Mobile Hamburger Menu -->
+        <div class="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <!-- Navigation Links -->
+        <ul class="nav-links">
+            <li><a href="index.html">Home Page</a></li>
+			<li><a href="historydata.html">Historical Data & Archives</a></li>
+			<li><a href="peerpapers.html">Frontier Science Articles</a></li>
+      <li><a href="ancienthistory.html">Ancient History</a></li>
+            <li><a href="extras.html">Multimedia & Resource Links</a></li>
+			<li><a href="about.html">About/Contact</a></li>
+        </ul>
+        <hr>
+        <!-- Live Feeds Submenu -->
+        <ul class="nav-links">
+            <li><a href="spaceweather.html">Space Weather Feeds</a></li>
+            <li><a href="earthquakes.html">Earthquake Monitoring</a></li>
+            <li><a href="volcanos.html">Volcano Monitoring</a></li>
+        </ul>
+        <br>
+    </nav>
+		<!-- ===== Main Content ===== -->
+    <main>	
+	<br><br>
+		<!-- ===== Section One ===== -->
+        <section>
+			<h2 style="text-align:center">Live Earth Monitor</h2>
+			<br>
+			<h3 style="text-align:center">Quake Tracker + Volcano Display + Measurement Tools</h3>
+			<!-- ===== Selectable Controls ===== -->
+			<div style="background-color: #0b2a3b;" class="controls">
+  <label for="feedSelect">Select Earthquake Feed</label>
+  <select id="feedSelect">
+    <option value="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson">USGS Past 7 Days - All</option>
+    <option value="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson">USGS Past Hour - All</option>
+    <option value="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson">USGS Past 30 Days - All</option>
+  </select> 
+  <label>
+  <input type="checkbox" id="toggleEarthquakeFeed" checked>
+  Show Earthquake Feed
+</label> 
+  		<!-- ===== Sliders ===== -->
+  <label for="magRange">Min Magnitude: <span id="magValue">0</span></label>
+  <input type="range" id="magRange" min="0" max="10" step="0.1" value="0">
+  <br>
+  <label for="timeRange">Max Age (days): <span id="timeValue">30</span></label>
+  <input type="range" id="timeRange" min="1" max="30" step="1" value="30">
+		<!-- ===== Toggle Clusters ===== -->
+  <br>
+<label>
+  <input type="checkbox" id="toggleCluster" unchecked>
+  Enable Earthquake Clustering
+</label>
+<label>
+      <input type="checkbox" id="togglePlates" />
+      Show tectonic plate boundaries
+    </label>
+<label>
+  <label>
+  <input type="checkbox" id="toggleHolocene" />
+  Show Volcanoes
+</label>
+</div>
+            <!-- Map container -->
+            <center><div id="map" class="leaflet-container" style="height: 400px;"></div></center>
+			<br>
+			<hr>
+			<!-- ===== Table for Legend ===== -->
+       <div class="container">
+        <div class="left-side">
+			<h2>Legend/Key</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Symbol</th>
+            <th>Meaning</th>
+        </tr>
+    </thead>
+    <tbody id="table-body">
+        <tr>
+      <td><span class="circle green"></span></td>
+      <td>Earthquake (Magnitude < 3)</td>
+    </tr>
+    <tr>
+      <td><span class="circle orange"></span></td>
+      <td>Earthquake (Magnitude 3–5.7)</td>
+    </tr>
+    <tr>
+      <td><span class="circle red"></span></td>
+      <td>Earthquake (Magnitude > 5.7)</td>
+    </tr>
+        <tr>
+            <td class="volcano-icon">&#x1F30B;</td>
+            <td>Volcano (Static Location)</td>
+        </tr>
+		<tr>
+            <td class="flood-icon">&#x1F4A7;</td>
+            <td>Flood (coming soon)</td>
+        </tr>
+		<tr>
+            <td class="drought-icon">&#x2600;</td>
+            <td>Drought (coming soon)</td>
+        </tr>
+		<tr>
+            <td class="tropical-icon">&#x1F300;</td>
+            <td>Tropical System (coming soon)</td>
+        </tr>
+		<tr>
+			<td class="fire-icon">&#x1F525;</td>
+			<td>Fire (coming soon)</td>
+		</tr>
+    </tbody>
+</table>
+</div>
+<div class="right-side"><p>Live earthquake data is from USGS using the following GeoJsons:<br><a href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson" target="_blank">https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson</a> USGS Past 7 Days - All<br><a href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson" target="_blank">https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson</a> USGS Past Hour - All<br><a href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson" target="_blank">https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson</a> USGS Past 30 Days - All<br><hr><br>Important note: Volcano overlay is static and does not update in real-time. See Volcano Discovery live image on the <a href="volcanos.html">Volcano Monitoring</a> page for currently active volcanoes. Volcano map overlay is meant for reference only.</p></div>
+</div><br>
+        </section>	
+		<br></br>
+		<!-- ===== Section - Volcano Discovery ===== -->
+		<section>
+
+    </section>
+		<br><br>		
+	
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer>
+        <p>&copy; 2026 Frontier Signals. All rights reserved.</p>
+        <p style="font-size: 12px; margin-top: 10px;">
+            <a href="privacy-policy.html" style="color: #00ffff; text-decoration: none;">Privacy Policy</a> | 
+            <a href="terms-of-service.html" style="color: #00ffff; text-decoration: none;">Terms of Service</a>
+        </p>
+    </footer>
+	
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script src="https://unpkg.com/leaflet-geometryutil@0.9.3/index.js"></script>
+    <script>
+	// === Initialize Leaflet Map ===
+var map = L.map('map', { worldCopyJump: true }).setView([20, 0], 2);
+
+// USGS Topographic Map - reliable terrain with bathymetry
+L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
+  maxZoom: 16,
+  attribution: '© USGS',
+  crossOrigin: 'anonymous'
+}).addTo(map);
+
+// Clustered layer
+var earthquakesLayerClustered = L.markerClusterGroup({
+    disableClusteringAtZoom: 8,
+    maxClusterRadius: 50,
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false
+});
+
+// Non-clustered plain layer
+var earthquakesLayerPlain = L.layerGroup();
+
+// Add clustered by default
+map.addLayer(earthquakesLayerPlain);
+
+// Data cache
+var cachedData = [];
+var clusteringEnabled = false; // tracks state
+
+    // Define plate styling
+    const plateStyle = {
+      color: 'orange',
+      weight: 2,
+      opacity: 0.9
+    };
+
+    // Layer placeholder
+    let plateLayer = null;
+
+    // Toggle logic
+    document.getElementById('togglePlates').addEventListener('change', async function(e) {
+      const checked = e.target.checked;
+
+      if (checked) {
+        // Load GeoJSON if not already loaded
+        if (!plateLayer) {
+          const response = await fetch(
+            'files/PB2002_boundaries.json'
+          );
+          const data = await response.json();
+
+          plateLayer = L.geoJSON(data, { style: plateStyle });
+        }
+
+        plateLayer.addTo(map);
+      } else {
+        if (plateLayer) {
+          map.removeLayer(plateLayer);
+        }
+      }
+    });
+
+    // Combined volcano layer with clustering
+let volcanoLayer = null;
+let volcanoClustered = L.markerClusterGroup({
+    disableClusteringAtZoom: 8,
+    maxClusterRadius: 50,
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    iconCreateFunction: function(cluster) {
+      var childCount = cluster.getChildCount();
+      var c = ' marker-cluster-';
+      if (childCount < 10) {
+        c += 'small';
+      } else if (childCount < 100) {
+        c += 'medium';
+      } else {
+        c += 'large';
+      }
+      return new L.DivIcon({ 
+        html: '<div class="marker-cluster-custom ' + c + '"><span>' + childCount + '</span></div>',
+        className: 'marker-cluster-group',
+        iconSize: new L.Point(40, 40)
+      });
+    }
+});
+
+document.getElementById('toggleHolocene').addEventListener('change', async function(e) {
+  const checked = e.target.checked;
+
+  if (checked) {
+    if (!volcanoLayer) {
+      const response = await fetch('files/volcano.json');
+      const data = await response.json();
+
+      // Create GeoJSON layer
+      volcanoLayer = L.geoJSON(data, {
+        pointToLayer: function(feature, latlng) {
+          return L.marker(latlng, {
+            icon: L.divIcon({
+              html: '&#x1F30B;',
+              iconSize: [32, 32],
+              className: 'volcano-icon'
+            })
+          }).bindPopup(
+            `<strong>${feature.properties.V_Name || 'Unknown'}</strong><br>
+             Country: ${feature.properties.Country || 'N/A'}<br>
+             Region: ${feature.properties.Region || 'N/A'}<br>
+             VEI (Holocene): ${feature.properties.VEI_Holoce || 'N/A'}`
+          );
+        }
+      });
+
+      // Add all markers to cluster group
+      volcanoClustered.addLayer(volcanoLayer);
+    }
+
+    map.addLayer(volcanoClustered);
+  } else {
+    if (volcanoClustered) {
+      map.removeLayer(volcanoClustered);
+    }
+  }
+});
+
+// Earthquake feed visibility toggle
+let earthquakeFeedVisible = true;
+
+document.getElementById('toggleEarthquakeFeed').addEventListener('change', function() {
+  earthquakeFeedVisible = this.checked;
+
+  if (earthquakeFeedVisible) {
+    map.addLayer(earthquakesLayerPlain);
+    if (clusteringEnabled) {
+      map.removeLayer(earthquakesLayerPlain);
+      map.addLayer(earthquakesLayerClustered);
+    }
+  } else {
+    [earthquakesLayerClustered, earthquakesLayerPlain].forEach(layer => {
+  try { map.removeLayer(layer); } catch(e) {}
+});
+  }
+});
+
+function getColorByMagnitude(mag) {
+  if (mag < 3) return "green";
+  else if (mag < 5.8) return "orange";
+  else return "red";
+}
+
+function renderMarkers() {
+  earthquakesLayerClustered.clearLayers();
+  earthquakesLayerPlain.clearLayers();
+
+  let minMag = parseFloat(document.getElementById('magRange').value);
+  let maxAgeDays = parseInt(document.getElementById('timeRange').value);
+  let now = Date.now();
+
+  cachedData.forEach(feature => {
+    let mag = feature.properties.mag || 0;
+    let time = feature.properties.time || 0;
+    let ageDays = (now - time) / (1000 * 60 * 60 * 24);
+
+    if (mag >= minMag && ageDays <= maxAgeDays) {
+      let coords = feature.geometry.coordinates;
+      let lat = coords[1], lon = coords[0];
+      let color = getColorByMagnitude(mag);
+
+      let marker = L.circleMarker([lat, lon], {
+  radius: Math.max(3, mag * 2),
+  fillColor: color,
+  color: "#000",
+  weight: 1,
+  opacity: 1,
+  fillOpacity: 0.8
+}).bindPopup(
+  `<strong>${feature.properties.place}</strong><br>
+   Magnitude: ${mag}<br>
+   Depth: ${coords[2] || 'N/A'} km<br>
+   Time: ${new Date(time).toLocaleString()}`
+);
+
+// Add depth label for earthquakes deeper than 200km
+let depth = coords[2] || 0;
+if (depth > 200) {
+  marker.bindTooltip('D', {
+    permanent: true,
+    direction: 'top',
+    offset: [0, -15],
+    className: 'depth-label'
+  });
+}
+// refresh images every 5 min to pull latest data
+  setInterval(() => {
+    document.querySelectorAll("img").forEach(img => {
+      img.src = img.src.split("?")[0] + "?t=" + Date.now();
+    });
+  }, 300000);
+
+      if (clusteringEnabled) {
+        earthquakesLayerClustered.addLayer(marker);
+      } else {
+        earthquakesLayerPlain.addLayer(marker);
+      }
+    }
+  });
+}
+  
+function loadFeed(url) {
+  earthquakesLayerClustered.clearLayers();
+  earthquakesLayerPlain.clearLayers();
+  cachedData = [];
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      let features = [];
+
+      // --- Detect different feed formats ---
+      if (data.features) {
+        // ✅ USGS / Geoscience Australia / IRIS / FDSN
+        features = data.features.map(f => ({
+          mag: f.properties.mag,
+          place: f.properties.place || f.properties.description || "Unknown Location",
+          time: f.properties.time,
+          coordinates: f.geometry.coordinates
+        }));
+      } else if (Array.isArray(data)) {
+        // ✅ EMSC-type JSON feeds
+        features = data.map(e => ({
+          mag: e.magnitude || e.mag,
+          place: e.region || e.location || "Unknown Location",
+          // Convert ISO time to milliseconds if needed:
+          time: new Date(e.timestamp || e.time).getTime(),
+          coordinates: [e.lng || e.lon, e.lat, e.depth || 0]
+        }));
+      } else if (data.events) {
+        // ✅ GEOFON-style feeds
+        features = data.events.map(ev => ({
+          mag: ev.mag || ev.Magnitude || 0,
+          place: ev.region || ev.area || "Unknown",
+          time: new Date(ev.time).getTime(),
+          coordinates: [ev.lon, ev.lat, ev.depth]
+        }));
+      } else {
+        console.warn("Unknown feed format for", url, data);
+      }
+
+      cachedData = features.map(f => ({
+        properties: { mag: f.mag, place: f.place, time: f.time },
+        geometry: { coordinates: f.coordinates }
+      }));
+
+      renderMarkers();
+    })
+    .catch(err => console.error("Feed error:", err));
+}
+
+document.getElementById('toggleCluster').addEventListener('change', function() {
+  clusteringEnabled = this.checked;
+
+  // Remove both layers, then add the correct one
+  [earthquakesLayerClustered, earthquakesLayerPlain].forEach(layer => {
+  try { map.removeLayer(layer); } catch(e) {}
+});
+
+  if (clusteringEnabled) {
+    map.addLayer(earthquakesLayerClustered);
+  } else {
+    map.addLayer(earthquakesLayerPlain);
+  }
+
+  // Redraw markers in the current view
+  renderMarkers();
+});
+
+// Event listeners
+document.getElementById('feedSelect').addEventListener('change', function() {
+  loadFeed(this.value);
+});
+
+document.getElementById('magRange').addEventListener('input', function() {
+  document.getElementById('magValue').textContent = this.value;
+  renderMarkers();
+});
+
+document.getElementById('timeRange').addEventListener('input', function() {
+  document.getElementById('timeValue').textContent = this.value;
+  renderMarkers();
+});
+
+// Initial load
+loadFeed(document.getElementById('feedSelect').value);
+
+// Initialize Leaflet Draw for measurements
+var drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+
+var drawControl = new L.Control.Draw({
+  position: 'topright',
+  draw: {
+    polygon: {
+      shapeOptions: {
+        color: '#d10d0d',
+        weight: 3,
+        opacity: 0.8,
+        fill: true,
+        fillColor: '#d10d0d',
+        fillOpacity: 0.2
+      }
+    },
+    polyline: {
+      shapeOptions: {
+        color: '#d10d0d',
+        weight: 4,
+        opacity: 0.9,
+        lineCap: 'round',
+        lineJoin: 'round'
+      }
+    },
+    rectangle: {
+      shapeOptions: {
+        color: '#d10d0d',
+        weight: 3,
+        opacity: 0.8,
+        fill: true,
+        fillColor: '#d10d0d',
+        fillOpacity: 0.2
+      }
+    },
+    circle: false,
+    marker: false
+  },
+  edit: {
+    featureGroup: drawnItems,
+    remove: true
+  }
+});
+
+map.addControl(drawControl);
+
+// Calculate and display distance/area
+map.on('draw:created', function(e) {
+  var layer = e.layer;
+  var distance = 0;
+  var area = 0;
+
+  if (e.layerType === 'polyline') {
+    var latlngs = layer.getLatLngs();
+    for (var i = 0; i < latlngs.length - 1; i++) {
+      distance += latlngs[i].distanceTo(latlngs[i + 1]);
+    }
+    var miles = (distance * 0.000621371).toFixed(2);
+    var km = (distance / 1000).toFixed(2);
+    layer.bindPopup(`Distance: ${miles} mi / ${km} km`);
+  } else if (e.layerType === 'polygon' || e.layerType === 'rectangle') {
+    area = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
+    var sqMiles = (area * 0.000000386102).toFixed(2);
+    var sqKm = (area / 1000000).toFixed(2);
+    layer.bindPopup(`Area: ${sqMiles} sq mi / ${sqKm} sq km`);
+  }
+
+  drawnItems.addLayer(layer);
+});
+	</script>
+  <script src="script.js"></script>
+
+</body>
+</html>

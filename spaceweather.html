@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Real-time monitoring of space weather.">
+    <meta name="keywords" content="space weather, solar activity">
+    <meta name="author" content="BraveCat">
+    <meta name="theme-color" content="#00ffff">
+    
+    <!-- Open Graph for social sharing -->
+    <meta property="og:title" content="Frontier Signals">
+    <meta property="og:description" content="Real-time monitoring of space weather, geological events, and their impacts on Earth">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://frontier-signals.com/spaceweather">
+    <link rel="canonical" href="https://frontier-signals.com/spaceweather">
+    <meta property="og:image" content="https://frontier-signals.com/images/FrontierSignalsBanner.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Frontier Signals">
+    <meta name="twitter:description" content="Real-time monitoring of space weather, geological events, and their impacts on Earth">
+    <meta name="twitter:image" content="https://frontier-signals.com/images/FrontierSignalsBanner.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+
+    <title>Space Weather - Frontier Signals</title>
+	
+	<link rel="stylesheet" href="stylesheet.css">
+
+    <style>
+
+    </style>
+</head>
+<body>
+
+    <!-- ===== Header ===== -->
+    <header>
+        <center><img id="banner" class="bordered-image" src="images/FrontierSignalsBanner.png" alt="Frontier Signals Official Banner"></center>
+		<p style="text-align: center; color: #ff00ff; font-weight: bold; margin: 5px 0;">Beta</p>
+		<hr>
+        <p>Space Weather Feeds</p>
+    </header>
+
+    <!-- ===== Navigation ===== -->
+    <nav>
+        <!-- Mobile Hamburger Menu -->
+        <div class="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <!-- Navigation Links -->
+        <ul class="nav-links">
+            <li><a href="index.html">Home Page</a></li>
+			<li><a href="historydata.html">Historical Data & Archives</a></li>
+			<li><a href="peerpapers.html">Frontier Science Articles</a></li>
+      <li><a href="ancienthistory.html">Ancient History</a></li>
+            <li><a href="extras.html">Multimedia & Resource Links</a></li>
+			<li><a href="about.html">About/Contact</a></li>
+        </ul>
+        <hr>
+        <!-- Live Feeds Submenu -->
+        <ul class="nav-links">
+            <li><a href="spaceweather.html">Space Weather Feeds</a></li>
+            <li><a href="earthquakes.html">Earthquake Monitoring</a></li>
+            <li><a href="volcanos.html">Volcano Monitoring</a></li>
+        </ul>
+        <br>
+    </nav>
+    <!-- ===== Main Content ===== -->
+    <main>
+        <br><br>
+        <section>
+            <h2 style="text-align:center">Space Weather Feeds</h2>
+            <h3 style="text-align:center">KP - SDO Feeds - Sunspot Images - Satellite Hazard - Aurora Forecast</h3>
+        </section>
+
+    <!-- ===== Section - KP Index ===== -->
+        <section>
+          <h2 style="text-align:center">Space Weather Overview</h2>
+          <hr>
+            <button type="button" class="collapsible">Show Feeds</button>
+            <div class="content">
+			<hr>
+			<h3 style="text-align:center">X-ray Flux - Solar Proton Flux - Geomagnetic Activity (KP)</h3>
+			<center><img id="swx" class="bordered-image" src="https://services.swpc.noaa.gov/images/swx-overview-large.gif" alt="Space Weather Overview"><center><br>
+        <button type="button" class="collapsible">About Space Weather Overview</button>
+			<div class="content">
+        <p>Solar X-ray Flux: This graph shows the intensity of X-rays emitted by the Sun over time, measured in watts per square meter. Solar flares are classified by their X-ray flux into classes A, B, C, M, and X, with X-class being the most powerful. This data helps predict radio blackouts (R-scales R0-R5).<br><br> Solar Proton Flux: This plot indicates the concentration of solar protons, which are high-energy particles released during large solar flares or coronal mass ejections (CMEs). These events can cause solar radiation storms (S-scales S0-S5), which pose risks to satellites and astronauts.<br><br> Geomagnetic Activity: This section uses the Kp index (ranging from 0 to 9) to measure disturbances in the Earth's magnetic field caused by the solar wind. High Kp values indicate geomagnetic storms (G-scales G0-G5), which can affect power grids, satellite operations, and create auroras. </p>
+			</div><br>
+			<hr>
+			<h3 style="text-align:center">Station K & A Indices</h3><hr>
+        <div class="container"><div class="left-side">
+            <center><img id="kindex" class="bordered-image" src="https://services.swpc.noaa.gov/images/station-k-index.png" alt="Station K Index"></center>
+            </div><div class="right-side">
+            <center><img id="aindex" class="bordered-image" src="https://services.swpc.noaa.gov/images/station-a-index.png" alt="Station A Index"></center>
+            </div></div><br>
+            <button type="button" class="collapsible">About Station Indices</button>
+			<div class="content">
+        <p>Scientists use several related numbers to describe how disturbed Earth’s magnetic field is.<br><br>K-index: A number given every 3 hours that shows how much Earth’s magnetic field changed compared to a calm day. Bigger changes mean a higher K value. Different locations use different scales because magnetic activity varies by latitude.<br><br>ak index: This is the same information as the K-index, but converted into a straightforward, linear number that better represents the size of the disturbance. It can be translated into actual magnetic strength units (nanoteslas).<br><br>A-index: A daily average for one location. It combines the eight ak values from the day into a single number that shows how active the day was overall.<br><br>Kp-index: A global version of the K-index. It averages data from many observatories around the world to show how disturbed Earth’s magnetic field is on a planetary scale. It is used for space weather monitoring and alerts.
+      <br><br>Ap index: A daily global average, based on Kp, that summarizes how active the entire day was worldwide.<br><br>Main idea: K and Kp show short-term magnetic activity, while A and Ap give daily averages. Because K values aren’t linear, they are first converted into “a” values before averaging.</p><br>
+      <h3>For a more complete description of Indices visit <a href="https://www.swpc.noaa.gov/products/station-k-and-indices">https://www.swpc.noaa.gov/products/station-k-and-indices</a></h3><br>			
+    </div>
+      <hr>
+      <h3 style="text-align:center">NOAA Ace MAG & SWEPAM (3 Day)</h3>
+            <center><img id="ACE3day" class="bordered-image" src="https://services.swpc.noaa.gov/images/ace-mag-swepam-3-day.gif" alt="ACE Solar Wind"></center><br>    
+			<button type="button" class="collapsible">About ACE MAG & SWEPAM</button>
+			<div class="content">
+        <p>The graph displays real-time solar wind and magnetic field data from the Advanced Composition Explorer (ACE) satellite, which provides up to an hour's advance warning of potential geomagnetic storms. Each panel represents a different function critical for monitoring space weather: <br><br>Bt & Bz (gam): This panel shows the strength of the total magnetic field (Bt) and the north-south component (Bz) in gamma (nT). The Bz component is particularly important; when it points southward (negative values), it can connect with Earth's magnetic field, allowing solar wind energy to enter the atmosphere and causing geomagnetic storms.<br><br>Phi (gsm): This represents the orientation or angle of the interplanetary magnetic field. Changes in this angle are associated with sector boundary crossings in the solar wind.<br><br>Density (/cm³): This measures the density of solar wind protons in particles per cubic centimeter. Increased density can indicate the arrival of a coronal mass ejection (CME) or a co-rotating interaction region (CIR).
+        <br><br>Speed (km/s): This panel shows the velocity of the solar wind. High-speed streams from coronal holes or the increased speed associated with a CME arrival can lead to enhanced auroral activity and geomagnetic disturbances.<br><br>Temp (K): This indicates the temperature of the solar wind plasma in Kelvin. Temperature changes often correlate with changes in density and speed, providing a more complete picture of the solar wind conditions.</p><br>
+      </div>
+      </div>
+			<br><h3 style="text-align:center">Sourced from NOAA - Updated every 3 hours</h3>
+        </section>
+		<br><br>
+		<!-- ===== Section - SDO Live Feeds ===== -->
+        <section>
+            <h2 style="text-align:center">Live SDO Video Feeds</h2>
+			<hr>
+      <button type="button" class="collapsible">Show SDO Feeds</button>
+      <div class="content">
+			<h3 style="text-align:center">SDO 171 Angstroms - Extreme Ultraviolet - 17.1 nanometers</h3>
+            <center><video autoplay controls loop muted width="600" height="600">
+    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0171.mp4" type="video/mp4">
+	</video></center>
+  <button type="button" class="collapsible">171 Magnetic Field Lines</button>
+  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_0171pfss.jpg" alt="171 Magnetic Field Lines"></center></div>
+  <br><br>
+	<button type="button" class="collapsible">About 171 (EUV)</button>
+			<div class="content">
+			<p>The Solar Dynamics Observatory (SDO) 171 angstrom feed provides images of the Sun's quiet corona and upper transition region, highlighting magnetic structures such as coronal loops. The images appear in the extreme ultraviolet (EUV) range and are typically colorized in gold or yellow.
+			<br><br>Temperature: The material captured in this wavelength is extremely hot, with a characteristic temperature of around 600,000 Kelvin (about 1 million degrees Fahrenheit).
+			<br><br>Plasma/Ions: The light is emitted by iron atoms that have lost eight electrons, known as Fe IX ions.
+			<br><br>Coronal loops appear as giant, arching structures of superheated plasma that trace the magnetic field lines extending from the Sun's surface.
+			<br><br>Bright spots indicate areas where magnetic fields near the surface are particularly strong.
+			<br><br>The overall structure often has a soft, feathery or brush-stroke appearance due to the plasma flowing along the magnetic field lines.</p>
+      </div>
+			<br><hr><br>
+      <div class="container">
+        <div class="left-side">
+			<h3 style="text-align:center">SDO 193 Angstroms - Extreme Ultraviolet - 19.3 nanometers</h3>
+            <center><video autoplay controls loop muted width="600" height="600">
+    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0193.mp4" type="video/mp4">
+	</video></center>
+  <button type="button" class="collapsible">193 Magnetic Field Lines</button>
+  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/f_094_335_193pfss.jpg" alt="193 Magnetic Field Lines"></center></div>
+  <br>
+	<button type="button" class="collapsible">About 193 (EUV)</button>
+			<div class="content">
+			<p>The Solar Dynamics Observatory (SDO) 193 angstrom feed is an extreme ultraviolet (EUV) image that primarily shows the Sun's outer atmosphere, the corona, and very hot flare plasma. This wavelength is particularly useful for identifying key solar features that influence space weather.
+			<br><br>Primary Ions Observed: It highlights emissions from iron atoms that have lost 11 electrons (Fe XII), which corresponds to material at about 1.25 million Kelvin (2.25 million degrees Fahrenheit).
+			<br><br>Hotter Flare Material: It also captures emissions from iron atoms that have lost 23 electrons (Fe XXIV) at much hotter temperatures, around 20 million Kelvin (about 36 million degrees Fahrenheit), which is present during solar flares.
+			<br><br>Bright Areas: Hot, active regions, solar flares, and coronal mass ejections (CMEs) appear bright because the plasma there is denser and hotter, emitting more radiation in this wavelength.
+			<br><br>Dark Areas: Regions known as coronal holes appear as large, dark patches. These are areas where very little radiation is emitted because the Sun's magnetic field lines are open, allowing material to stream out into space as a high-speed solar wind.</p>
+			</div>
+        </div>
+        <div class="right-side">
+			<h3 style="text-align:center">SDO 211 Angstroms - Extreme Ultraviolet - 21.1 nanometers</h3>
+            <center><video controls loop muted width="600" height="600">
+    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0211.mp4" type="video/mp4">
+	</video></center>
+  <button type="button" class="collapsible">211 Magnetic Field Lines</button>
+  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0211pfss.jpg"></center></div>
+  <br>
+	<button type="button" class="collapsible">About 211 (EUV)</button>
+			<div class="content">
+			<p>The Solar Dynamics Observatory (SDO) 211 angstrom feed provides images of the sun's hot, magnetically active regions in the corona. Especially good for viewing coronal holes.<br><br>Plasma Temperature: The 211 Ångstrom (21.1 nanometer) wavelength images material that has a characteristic temperature of about 2 million Kelvin (about 3.6 million degrees Fahrenheit).<br><br>Solar Feature: This light is emitted from iron atoms that have lost thirteen electrons (Fe XIV). It is used to observe the active regions of the Sun's outer atmosphere, the corona.<br><br>Bright areas indicate hot, dense, magnetically active regions (often associated with sunspots) where hot plasma is trapped in closed magnetic field loops. Solar flares and coronal mass ejections (CMEs) also appear as bright, intense bursts.<br><br>Dark areas are called coronal holes. These are regions where very little radiation is emitted because the magnetic field lines are open, allowing plasma to escape into space and form the main source of the solar wind.</p>
+			</div></div></div>
+			<br><hr><br>
+      <div class="container">
+        <div class="left-side">
+			<h3 style="text-align:center">SDO 335 Angstroms - Extreme Ultraviolet - 33.5 nanometers</h3>
+            <center><video controls loop muted width="600" height="600">
+    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0335.mp4" type="video/mp4">
+	</video></center>
+  <button type="button" class="collapsible">335 Magnetic Field Lines</button>
+  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0335pfss.jpg" alt="335 Magnetic Field Lines"></center></div>
+  <br>
+	<button type="button" class="collapsible">About 335 (EUV)</button>
+			<div class="content">
+			<p>The Solar Dynamics Observatory (SDO) 335 angstrom (Å) feed is an extreme ultraviolet (EUV) image that primarily shows hot, magnetically active regions in the Sun's atmosphere, the corona, at a characteristic temperature of approximately 2.5 million Kelvin.<br><br>The 335 Å wavelength is part of the extreme ultraviolet spectrum and is not visible to the human eye. The light at this specific wavelength is emitted by 15-times ionized iron (Fe XVI).<br><br>The overall appearance is that of the outer solar atmosphere (corona).<br><br>The most striking features are the bright, concentrated patches, which correspond to the active regions around sunspots.<br><br>Dark, relatively empty regions (coronal holes) may be visible as large, dark areas, contrasting sharply with the bright active regions.</p>
+			</div></div>
+        <div class="right-side">
+			<h3 style="text-align:center">SDO 94 Angstroms - Extreme Ultraviolet - 9.4 nanometers</h3>
+            <center><video controls loop muted width="600" height="600">
+    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0094.mp4" type="video/mp4">
+	</video></center>
+  <button type="button" class="collapsible">94 Magnetic Field Lines</button>
+  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0094pfss.jpg"></center></div>
+  <br>
+	<button type="button" class="collapsible">About 94 (EUV)</button>
+			<div class="content">
+			<p>The 94 angstrom (9.4 nm) feed from the Solar Dynamics Observatory (SDO) represents extremely hot, flaring regions of the Sun's corona and typically appears as a green-colored image in false-color visualizations. This extreme ultraviolet (EUV) light is invisible to the human eye and is only observable from space.<br><br>Temperature: The light in this wavelength is emitted by material at a characteristic temperature of about 6 million Kelvin (approximately 11 million degrees Fahrenheit).<br><br>Emitting Ion: This specific spectral line is produced by iron atoms that have lost 17 electrons, known as iron-18 or Fe XVIII ions.<br><br>Purpose: By observing the Sun in this and other wavelengths, scientists can track how energy and material move through the solar atmosphere, which helps in understanding solar explosions and improving space weather forecasting.</p>
+			</div></div></div>
+			<br><hr><br>
+      <div class="container">
+        <div class="left-side">
+			<h3 style="text-align:center">SDO 131 Angstroms - Extreme Ultraviolet - 13.1 nanometers</h3>
+            <center><video controls loop muted width="600" height="600">
+    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0131.mp4" type="video/mp4">
+	</video></center>
+  <button type="button" class="collapsible">131 Magnetic Field Lines</button>
+  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0131pfss.jpg"></center></div>
+  <br>
+	<button type="button" class="collapsible">About 131 (EUV)</button>
+			<div class="content">
+			<p>The Solar Dynamics Observatory (SDO) 131 angstrom feed highlights the hottest material in a solar flare, specifically plasma heated to temperatures around 10 million Kelvin (18 million degrees Fahrenheit). This extreme ultraviolet (EUV) light is typically colorized in teal in SDO images.<br><br>Magnetic Activity: It shows active regions on the sun where magnetic field lines are strong and complex. The bright spots in the image correspond to these areas of intense magnetic energy release.</p>
+			</div></div>
+        <div class="right-side">
+			<h3 style="text-align:center">SDO 304 Angstroms - Extreme Ultraviolet - 30.4 nanometers</h3>
+            <center><video controls loop muted width="600" height="600">
+    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304.mp4" type="video/mp4">
+	</video></center>
+  <button type="button" class="collapsible">304 Magnetic Field Lines</button>
+  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304pfss.jpg"></center></div>
+  <br>
+	<button type="button" class="collapsible">About 304 (EUV)</button>
+			<div class="content">
+			<p>The Solar Dynamics Observatory (SDO) feed for 304 angstroms captures extreme ultraviolet (EUV) light emitted by singly ionized helium (He II), primarily showing features in the Sun's chromosphere and transition region.<br><br>Temperature: This wavelength highlights solar material (plasma) with a characteristic temperature of around 50,000 Kelvin (90,000 Fahrenheit).<br><br>Solar Layers: The light originates from the Sun's upper chromosphere and lower transition region, atmospheric layers just above the visible surface.<br><br>Key Features: It is especially useful for observing cooler, denser plumes of plasma that appear as:<br><br>Filaments: Dark, streak-like features when seen against the bright solar disk.<br><br>Prominences: Bright, loop-shaped or erupting jets of material extending out from the Sun's edge (solar limb).<br><br>Coronal Rain: Cooler plasma that condenses along magnetic field lines and falls back to the solar surface.</p>
+			</div></div></div>
+			<br><hr><br>
+      <div class="container">
+        <div class="left-side">
+			<h3 style="text-align:center">SDO 1600 Angstroms - Ultraviolet - 160.0 nanometers</h3>
+            <center><video controls loop muted width="600" height="600">
+    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1600.mp4" type="video/mp4">
+	</video></center>
+  <button type="button" class="collapsible">1600 Magnetic Field Lines</button>
+  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1600pfss.jpg"></center></div>
+  <br>
+	<button type="button" class="collapsible">About 1600 (UV)</button>
+			<div class="content">
+			<p>The Solar Dynamics Observatory (SDO) 1600 angstrom (Å) feed primarily shows the transition region and upper photosphere of the Sun, highlighting areas where the Sun's temperature rapidly rises. The images are typically colorized in a dark, grainy yellow.<br><br>Solar Layer: This ultraviolet (UV) wavelength provides a view of a mixture of the Sun's upper photosphere (the visible surface) and the transition region (the layer between the chromosphere and the corona).<br><br>Temperature: It highlights plasma at a temperature of approximately 10,000 Kelvin (around 17,500 degrees Fahrenheit), which is emitted by a spectral line of quadruply ionized carbon (C IV).<br><br>Sunspots and Active Regions: In contrast, small areas with a high concentration of magnetic field lines, typically found near sunspots and active regions, will appear as black spots. Solar flares appear as bright flashes in this feed, and flare ribbons are clearly visible.</p>
+			</div></div>
+        <div class="right-side">
+			<h3 style="text-align:center">SDO 1700 Angstroms - Ultraviolet - 170.0 nanometers</h3>
+            <center><video controls loop muted width="600" height="600">
+    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1700.mp4" type="video/mp4">
+	</video></center>
+  <button type="button" class="collapsible">1700 Magnetic Field Lines</button>
+  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1700pfss.jpg"></center></div>
+  <br>
+	<button type="button" class="collapsible">About 1700 (UV)</button>
+			<div class="content">
+			<p>The Solar Dynamics Observatory (SDO) 1700 angstrom (Å) feed is in the ultraviolet band and shows the Sun's photosphere and chromosphere. It primarily captures the continuum emission from the solar surface and the lower atmosphere, providing a view of material at a characteristic temperature of around 6,000 Kelvin (approximately 10,340 degrees Fahrenheit).<br><br>Ultraviolet Continuum: Unlike other extreme ultraviolet channels that show specific ions in the hot corona, the 1700 Å channel observes the ultraviolet continuum, essentially the background light from these lower atmospheric layers.<br><br>Magnetic Activity: Images in this channel can highlight areas where magnetic field lines are concentrated, appearing as bright patches, which often correlate with active regions and sunspots seen in visible light.</p>
+			</div></div></div></div><br>
+      <p style="text-align:center">Sourced from NASA Solar Dynamics Observatory (SDO) - Updated every 10 minutes</p><br>
+        </section>
+		<br><br>
+    <!-- ===== Section - Coronagraph ===== -->
+        <section>
+            <h2 style="text-align:center">GOES-19 Live Coronagraph Feed</h2><hr>
+            <button type="button" class="collapsible">Show Coronagraph Feed</button>
+            <div class="content"><center><video controls loop muted width="600" height="600">
+    <source src="https://services.swpc.noaa.gov/products/ccor1/mp4s/ccor1_last_24hrs.mp4" type="video/mp4"></video></center><br>
+    <button type="button" class="collapsible">About Coronagraph Feed</button>
+      <div class="content">
+        <p>The GOES-19 feed from the NOAA Space Weather Prediction Center provides real-time video of the Sun's corona, the outermost layer of the solar atmosphere. The coronagraph uses an occulting disk to block out the bright light from the Sun's surface, allowing us to see the faint corona and any solar activity occurring there.<br><br>Key Features: The feed can show coronal mass ejections (CMEs), which are large expulsions of plasma and magnetic field from the Sun's corona. These appear as bright, expanding clouds moving outward from the Sun. The video also captures the dynamic structure of the corona, including streamers and loops formed by magnetic field lines.<br><br>Space Weather Monitoring: By observing this feed, scientists can track CMEs and predict their potential impact on Earth, such as geomagnetic storms that can affect satellites, power grids, and communication systems.</p>
+      </div></div><br>
+      <p style="text-align:center">Sourced from NOAA GOES-19 - Updated every 10 minutes</p><br>
+        </section>
+    <br><br>
+		<!-- ===== Section - Sunspot Watch ===== -->
+        <section>
+            <h2 style="text-align:center">Live Sunspot Watch</h2>
+			<hr>
+      <button type="button" class="collapsible">Show Feeds</button>
+      <div class="content"><div class="container">
+        <div class="left-side">
+			  <h3 style="text-align:center">SDO Magnetogram</h3>
+			<br><center><a href="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_HMIBC.jpg" target="_blank">Source (Full Resolution)</a></center><br>
+            <center><img Height="800" Width="800" id="M" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_HMIBC.jpg" alt="Magnetogram"></center><br>
+        <br><p style="text-align:center">Credit: Solar Dynamics Observatory (SDO) Helioseismic and Magnetic Imager (HMI)</p><br>
+	<button type="button" class="collapsible">About Magnetogram</button>
+			<div class="content">
+			<p>The magnetogram is not a direct visual image of the sun but a data visualization produced by the Helioseismic and Magnetic Imager (HMI) instrument, which measures the splitting of iron spectral lines due to the Zeeman effect. This data is crucial for: <br><br>Identifying Active Regions: Strong magnetic fields appear as sunspots and active regions, which are the sources of solar flares and coronal mass ejections (CMEs).<br><br>Space Weather Forecasting: By tracking the movement and complexity of these magnetic fields, scientists can better predict space weather events that might impact Earth.<br><br>Studying Solar Dynamics: It provides a uniform, continuous view of how the sun's magnetic field evolves over time. 
+			<br><hr><br>(Color Schemes)<br><br>Grey areas indicate a near-zero magnetic field intensity.<br><br><span class="circle green"></span><span class="circle blue"></span>Positive (North) magnetic polarity (magnetic field lines coming toward the observer/outward from the sun) is represented by greens and blues, with increasing brightness/color intensity indicating stronger fields.<br><br><span class="circle red"></span><span class="circle orange"></span>Negative (South) magnetic polarity (magnetic field lines pointing away from the observer/inward into the sun) is represented by yellows and reds/oranges, with increasing brightness/color intensity indicating stronger fields.<br><br>Strong field regions (sunspots) appear as bright blue (positive) or red (negative) patches with dark central umbrae.</p><br>
+			</div></div><div class="right-side">
+        <h3 style="text-align:center">Far Side Sunspots</h3><br><center><a href="http://jsoc.stanford.edu/data/farside/Recent/Composite_Map.png" target="_blank">Source (Full Resolution)</a></center><br><center><img id="FarSide" class="bordered-image" src="http://jsoc.stanford.edu/data/farside/Recent/Composite_Map.png" alt="Far Side Sunspots"></center><br>
+        <center><a href="http://jsoc.stanford.edu/data/farside/Recent/AR_Map.png" target="_blank">Source (Full Resolution)</a></center><br><center><img id="ARMap" class="bordered-image" src="http://jsoc.stanford.edu/data/farside/Recent/AR_Map.png" alt="Active Region Map"></center><br>
+        <br><p style="text-align:center">Credit: Stanford Seismic Monitor of the Sun's Far Hemisphere for the Solar Dynamics Observatory</p><br><center><a href="http://jsoc.stanford.edu/data/farside/" target="_blank">http://jsoc.stanford.edu/data/farside/</a></center><br><br>
+          <button type="button" class="collapsible">About Far Side Sunspots</button>
+          <div class="content">
+            <p>Far Side Sunspots are detected using helioseismology, which analyzes sound waves generated by solar activity. These waves travel through the Sun's interior and can be observed on the near side.<br><br>Magnetic Field (B(Gauss)): The grayscale bar on the right indicates the magnetic field strength in Gauss. Darker areas usually correspond to strong magnetic fields, which are characteristic of sunspots.<br><br>Travel Time (\(\tau \)(sec)): The color bar on the left indicates acoustic travel-time perturbations in seconds. Large active regions on the far side can be detected by horizontally extended acoustic travel-time reductions.</p><br></div>
+      </div></div><br>
+      </section>
+      <br><br>
+      <!-- ===== Section- Orbital Hazards ===== -->
+      <section>
+        <h2 style="text-align:center">Satellite Charging hazards</h2>
+        <hr>
+        <button type="button" class="collapsible">Show Orbital Hazards</button>
+        <div class="content">
+      <h3 style="text-align:center">Real Time Orbit Display</h3>
+      <center><img id="Orbit" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-space-environment.png"></center>
+      <br><hr><br>
+      <h3 style="text-align:center">Spacecraft Charging Hazard</h3>
+      <center><img id="Spacecraft" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-charging-hazards.png" alt="Spacecraft Charging Hazards"></center>
+      <br><hr><br>
+      <h3 style="text-align:center">Hazard Quotients</h3>
+      <center><img id="Quotient0" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-time-series-0.png" alt="SEAESRT 0E" ><img id="Quotient90" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-time-series-90.png" alt="SEAESRT 90E" ></center>
+      <br><center><img id="Quotient270" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-time-series-270.png" alt="SEAESRT 270E" ><img id="Quotient180" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-time-series-180.png" alt="SEAESRT 180E" ></center>
+      <br>
+      <button type="button" class="collapsible">About SEAESRT Displays</button>
+      <div class="content">
+        <p>The charts displayed are the Spacecraft Environmental Anomalies Expert System – Real Time (SEAESRT) Orbit Displays, a product from the NOAA/NWS Space Weather Prediction Center (SWPC). This system provides real-time guidance on space weather conditions and their potential effects on geosynchronous satellites.
+          <br><br>Hazard Types: The system monitors and provides hazard levels for four common types of satellite problems:<br>- Surface charging<br>- Internal charging<br>- Single event effects (upsets)<br>- Total dose effects<br><hr><br>Hazard Quotient: For each hazard, the system provides a "hazard quotient," which represents the probability of an anomaly relative to the long-term average likelihood. A quotient of 1 indicates an average likelihood.
+          <br><hr><br>Visual Representation:<br><span class="circle green"></span> Green: This color indicates no risk or normal conditions.<br><span class="circle yellow"></span> Yellow/Orange: This indicates potential hazards or an increased probability of an anomaly occurring.<br><span class="circle red"></span> Red: This represents a high hazard or a significant probability of a satellite anomaly.
+        </p><br></div></div><br><p style="text-align:center">Sourced from NOAA Space Weather Prediction Center - Updated every 30 minutes</p><br>
+        </section>
+        <br><br>
+        <!-- ===== Section- Aurora Forecast ===== -->
+		<section>
+		<h2 style="text-align:center">NOAA Aurora Forecast Models</h2>
+		<hr><div class="container">
+        <div class="left-side">
+		<h3 style="text-align:center">Northern Aurora Forecast</h3>
+		<center><img id="NAurora" class="bordered-image" src="https://services.swpc.noaa.gov/images/aurora-forecast-northern-hemisphere.jpg" alt="NOAA Northern Aurora"></center>
+		</div>
+        <div class="right-side">
+		<h3 style="text-align:center">Southern Auroral Forecast</h3>
+		<center><img id="SAurora" class="bordered-image" src="https://services.swpc.noaa.gov/images/aurora-forecast-southern-hemisphere.jpg" alt="NOAA Sothern Aurora"></center>
+    </div></div><br>
+    <p style="text-align:center">Sourced from NOAA Space Weather Prediction Center - Updated every 30 minutes</p><br>
+		</section>
+
+
+
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer>
+        <p>&copy; 2026 Frontier Signals. All rights reserved.</p>
+        <p style="font-size: 12px; margin-top: 10px;">
+            <a href="privacy-policy.html" style="color: #00ffff; text-decoration: none;">Privacy Policy</a> | 
+            <a href="terms-of-service.html" style="color: #00ffff; text-decoration: none;">Terms of Service</a>
+        </p>
+    </footer>
+
+    <script>
+        
+    </script>
+    <script src="script.js"></script>
+
+</body>
+</html>

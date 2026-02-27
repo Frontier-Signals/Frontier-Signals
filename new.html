@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Multiple Earthquake Tables — yearly counts of earthquakes (≥6.0) compiled from USGS datasets.">
+<meta name="keywords" content="earthquakes, datasets, tables, historical earthquakes">
+<meta name="author" content="BraveCat">
+<meta name="theme-color" content="#00ffff">
+
+<!-- Open Graph for social sharing -->
+<meta property="og:title" content="Earthquake Tables - Frontier Signals">
+<meta property="og:description" content="Multiple Earthquake Tables — yearly counts of earthquakes (≥6.0) compiled from USGS datasets.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://frontier-signals.com/new">
+<link rel="canonical" href="https://frontier-signals.com/new">
+<meta property="og:image" content="https://frontier-signals.com/images/FrontierSignalsBanner.png">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Earthquake Tables - Frontier Signals">
+<meta name="twitter:description" content="Multiple Earthquake Tables — yearly counts of earthquakes (≥6.0) compiled from USGS datasets.">
+<meta name="twitter:image" content="https://frontier-signals.com/images/FrontierSignalsBanner.png">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+
+<title>Multiple Earthquake Tables</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 30px; }
+  table { border-collapse: collapse; width: 300px; margin-bottom: 40px; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+  th { background-color: #f2f2f2; }
+  h2 { margin-top: 40px; }
+</style>
+</head>
+<body>
+  <h1>Yearly Count of Earthquakes (≥6.0)</h1>
+  <div id="tables"></div>
+
+<script>
+async function generateTables() {
+  // 🔗 Your JSON data URLs — can be API endpoints or local files
+  const urls = [
+    "https://earthquake.usgs.gov/fdsnws/event/1/query.geojson?starttime=1980-01-01%2000:00:00&endtime=1989-12-31%2023:59:59&minmagnitude=6&maxmagnitude=9.5&orderby=time",
+    "https://earthquake.usgs.gov/fdsnws/event/1/query.geojson?starttime=1990-01-01%2000:00:00&endtime=1999-12-31%2023:59:59&minmagnitude=6&maxmagnitude=9.5&orderby=time",
+    "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2000-01-01&endtime=2025-12-31&minmagnitude=6"
+  ];
+
+  const container = document.getElementById("tables");
+
+  // 🌀 Loop through every URL
+  for (const url of urls) {
+    const response = await fetch(url);
+    const data = await response.json();
+    const yearlyCounts = {};
+
+    // Group & count quakes by year
+    data.features.forEach(eq => {
+      const year = new Date(eq.properties.time).getFullYear();
+      yearlyCounts[year] = (yearlyCounts[year] || 0) + 1;
+    });
+
+    // Build a table for this dataset
+    const years = Object.keys(yearlyCounts).sort();
+    const tableHTML = `
+      <h2>Dataset: ${url}</h2>
+      <table>
+        <tr><th>Year</th><th>Count</th></tr>
+        ${years.map(y => `<tr><td>${y}</td><td>${yearlyCounts[y]}</td></tr>`).join('')}
+      </table>
+    `;
+
+    container.insertAdjacentHTML("beforeend", tableHTML);
+  }
+}
+
+generateTables();
+</script>
+</body>
+</html>
+
+// Old EQ feed loader
+
+function loadFeed(url) {
+  earthquakesLayerClustered.clearLayers();
+  earthquakesLayerPlain.clearLayers();
+  cachedData = [];
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      cachedData = data.features;
+      renderMarkers();
+    });
+}

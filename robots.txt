@@ -1,0 +1,13 @@
+# Frontier Signals - Search Engine Configuration
+
+User-agent: *
+Allow: /
+Disallow: /files/
+Disallow: /.htaccess
+Disallow: /.git
+
+# Sitemap location
+Sitemap: https://frontier-signals.com/sitemap.xml
+
+# Crawl delay (be respectful)
+Crawl-delay: 2

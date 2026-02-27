@@ -150,6 +150,12 @@
                 flex-direction: column;
             }
 
+            .table-container {
+                width: 100%;
+                overflow-x: auto; /* Enables horizontal scrolling */
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            }
+
             /* increase tappable area for links and buttons */
             .nav-links a {
                 padding: 18px 20px;

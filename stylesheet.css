@@ -172,17 +172,12 @@
 
             .container {
                 flex-direction: column; /* Stacks items vertically on mobile */
-                display: flex;
                 width: 100%;
             }
 
             .left-side, .right-side {
                 width: 100%; /* Full width for both sides on mobile */
                 
-            }
-
-            .item {
-                width: 100%;           /* Ensures items fill the screen width */
             }
 
             /* keep hamburger visible and remove its shadow in phone view */
@@ -383,7 +378,7 @@ table tbody tr:hover {
 }
 
 .left-side, .right-side {
-  width: 48%; /* Adjust width to fit both plus some spacing */
+  flex: 1; 
 }
 
 /* Unvisited link */

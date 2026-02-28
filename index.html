@@ -48,29 +48,31 @@
     </header>
 
     <!-- ===== Navigation ===== -->
-    <nav>
+    <nav aria-label="Main navigation">
         <!-- Mobile Hamburger Menu -->
-        <div class="hamburger">
+        <div class="hamburger" aria-controls="nav-container" aria-expanded="false" role="button" tabindex="0">
             <div></div>
             <div></div>
             <div></div>
         </div>
-        <!-- Navigation Links -->
-        <ul class="nav-links">
-            <li><a href="index.html">Home Page</a></li>
-			<li><a href="historydata.html">Historical Data & Archives</a></li>
-			<li><a href="peerpapers.html">Frontier Science Articles</a></li>
-      <li><a href="ancienthistory.html">Ancient History</a></li>
-            <li><a href="extras.html">Multimedia & Resource Links</a></li>
-			<li><a href="about.html">About/Contact</a></li>
-        </ul>
-        <hr>
-        <!-- Live Feeds Submenu -->
-        <ul class="nav-links">
-            <li><a href="spaceweather.html">Space Weather Feeds</a></li>
-            <li><a href="earthquakes.html">Earthquake Monitoring</a></li>
-            <li><a href="volcanos.html">Volcano Monitoring</a></li>
-        </ul>
+        <!-- Navigation Links Wrapped for easier toggling -->
+        <div id="nav-container">
+            <ul class="nav-links">
+                <li><a href="index.html">Home Page</a></li>
+                <li><a href="historydata.html">Historical Data &amp; Archives</a></li>
+                <li><a href="peerpapers.html">Frontier Science Articles</a></li>
+                <li><a href="ancienthistory.html">Ancient History</a></li>
+                <li><a href="extras.html">Multimedia &amp; Resource Links</a></li>
+                <li><a href="about.html">About/Contact</a></li>
+            </ul>
+            <hr>
+            <!-- Live Feeds Submenu (still uses nav-links so CSS applies) -->
+            <ul class="nav-links">
+                <li><a href="spaceweather.html">Space Weather Feeds</a></li>
+                <li><a href="earthquakes.html">Earthquake Monitoring</a></li>
+                <li><a href="volcanos.html">Volcano Monitoring</a></li>
+            </ul>
+        </div>
         <br>
     </nav>
 

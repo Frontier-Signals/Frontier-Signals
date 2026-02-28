@@ -172,6 +172,7 @@
 
             .container {
                 flex-direction: column; /* Stacks items vertically on mobile */
+                width: 100%;
             }
 
             /* keep hamburger visible and remove its shadow in phone view */

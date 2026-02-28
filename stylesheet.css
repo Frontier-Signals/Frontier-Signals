@@ -172,12 +172,12 @@
 
             .container {
                 flex-direction: column; /* Stacks items vertically on mobile */
+                display: flex;
                 width: 100%;
             }
 
             .left-side, .right-side {
                 width: 100%; /* Full width for both sides on mobile */
-                margin-bottom: 20px; /* Add spacing between sections */
             }
 
             /* keep hamburger visible and remove its shadow in phone view */

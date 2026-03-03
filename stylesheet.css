@@ -214,6 +214,7 @@
                 border-bottom: 1px solid #555;
             }
         }
+
 		hr {
             border: none;
             border-top: 2px solid #ff6b35;
@@ -246,11 +247,6 @@
             margin: 10px;
         }
 
-/* Remove border only from images inside the map container */
-.leaflet-container img {
-    border: none;
-}
-
 /* Style the Leaflet map container with an orange border */
 .leaflet-container {
     border: 2px solid orange;
@@ -265,7 +261,7 @@ iframe {
         /* fluid media elements */
         iframe, video {
             max-width: 100%;
-            height: auto;
+            
         }
 
 		/* ===== Vaporwave Table Styling ===== */
@@ -379,6 +375,7 @@ table tbody tr:hover {
 
 .left-side, .right-side {
   flex: 1; 
+  padding: 10px;
 }
 
 /* Unvisited link */

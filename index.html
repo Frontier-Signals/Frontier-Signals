@@ -118,7 +118,7 @@
     </footer>
 
     <script>
-        const API_KEY = "AIzaSyBhbHo0l3ekuJZ2kPJYSFeBHrCROTIgNIw";
+    const API_KEY = "AIzaSyBhbHo0l3ekuJZ2kPJYSFeBHrCROTIgNIw";
     const CHANNEL_ID = "UCWezTl8P7WzpX7SDlNK3qIQ";
 
     async function loadLatestFrontierSignalsVideo() {
@@ -129,7 +129,7 @@
 
       // Filter videos by title
       const filtered = data.items.filter(video =>
-        video.snippet.title.toLowerCase().includes("Frontier Signals |")
+        video.snippet.title.includes("Frontier Signals |")
       );
 
       if (filtered.length === 0) {

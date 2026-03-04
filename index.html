@@ -77,8 +77,7 @@
     </nav>
 
     <!-- ===== Main Content ===== -->
-    <main>
-        <br><br>
+    <main><br><br>
 	<!-- ===== Section One ===== -->
         <section>
             <h2 style="text-align:center">Welcome To Frontier Signals - WIP</h2><hr>
@@ -86,7 +85,6 @@
             <p style="text-align:center">A message to all from a Gen Z perspective: <a href="From-Gen-Z-Distractions-to-Fateful-Encounters.html">From Gen Z Distractions to Fateful Encounters</a></p><br>
             <h2 style="text-align:center">Disclaimer</h2><hr>
             <p>&emsp;The content presented on this website is intended solely for educational and research purposes. Except where explicitly indicated, all third‑party images and materials remain the property of their respective rights holders, and appropriate credit is provided where available.<br><br>&emsp;Content displayed on this site includes public domain materials or works licensed under applicable Creative Commons terms where fair use is permitted. If you have any concerns about the use of content on this site, please contact site owner.<br><br>&emsp;This website is also a work in progress and may contain incomplete or preliminary information. I have no direct affiliation with any scientific institutions or organizations.</p>
-
         </section>
         <br><br>
 		<!-- ===== Section 2 ===== -->
@@ -106,7 +104,7 @@
         <br><br>
 		<!-- ===== Section Three ===== -->
         <section>
-        
+            <br><center><div id="video-container">Loading latest video...</div></center><br>
         </section>
     </main>
 
@@ -120,6 +118,40 @@
     </footer>
 
     <script>
+        const API_KEY = "AIzaSyBhbHo0l3ekuJZ2kPJYSFeBHrCROTIgNIw";
+    const CHANNEL_ID = "UCWezTl8P7WzpX7SDlNK3qIQ";
+
+    async function loadLatestFrontierSignalsVideo() {
+      const url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=10&type=video`;
+
+      const response = await fetch(url);
+      const data = await response.json();
+
+      // Filter videos by title
+      const filtered = data.items.filter(video =>
+        video.snippet.title.toLowerCase().includes("Frontier Signals |")
+      );
+
+      if (filtered.length === 0) {
+        document.getElementById("video-container").innerHTML =
+          "No Frontier Signals videos found.";
+        return;
+      }
+
+      // Most recent match
+      const latestVideo = filtered[0];
+      const videoId = latestVideo.id.videoId;
+
+      document.getElementById("video-container").innerHTML = `
+        <iframe width="560" height="315"
+          src="https://www.youtube.com/embed/${videoId}"
+          frameborder="0"
+          allowfullscreen>
+        </iframe>
+      `;
+    }
+
+    loadLatestFrontierSignalsVideo();
     
     </script>
     <script src="script.js"></script>

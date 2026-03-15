@@ -5,7 +5,7 @@
 		font-weight: 700; /* Heavier */
 		letter-spacing: 3px;
         line-height: 1.7;
-        text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #ff00ff;
+        text-shadow: 0 0 8px #00ffff, 0 0 15px #00ffff, 0 0 20px #ff00ff;
         min-height: 100vh;
 		
         /* Initial background color */

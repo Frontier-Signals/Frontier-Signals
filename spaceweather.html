@@ -57,21 +57,21 @@
         </div>
         <!-- Navigation Links -->
         <ul class="nav-links">
-            <li><a href="index.html">Home Page</a></li>
-			<li><a href="historydata.html">Historical Data & Archives</a></li>
-			<li><a href="peerpapers.html">Frontier Science Articles</a></li>
-      <li><a href="ancienthistory.html">Ancient History</a></li>
-            <li><a href="extras.html">Multimedia & Resource Links</a></li>
-			<li><a href="about.html">About/Contact</a></li>
-        </ul>
-        <hr>
-        <!-- Live Feeds Submenu -->
-        <ul class="nav-links">
-            <li><a href="spaceweather.html">Space Weather Feeds</a></li>
-            <li><a href="earthquakes.html">Earthquake Monitoring</a></li>
-            <li><a href="volcanos.html">Volcano Monitoring</a></li>
-            <li><a href="astrologychart.html">Star Chart</a></li>
-        </ul>
+                <li><a href="index.html" class="button">Home Page</a></li>
+                <li><a href="historydata.html" class="button">Historical Data &amp; Archives</a></li>
+                <li><a href="peerpapers.html" class="button">Frontier Science Articles</a></li>
+                <li><a href="ancienthistory.html" class="button">Ancient History</a></li>
+                <li><a href="extras.html" class="button">Multimedia &amp; Resource Links</a></li>
+                <li><a href="about.html" class="button">About/Contact</a></li>
+            </ul>
+            <hr>
+            <!-- Live Feeds Submenu (still uses nav-links so CSS applies) -->
+            <ul class="nav-links">
+                <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
+                <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
+                <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
+                <li><a href="astrologychart.html" class="button">Star Chart</a></li>
+            </ul>
         <br>
     </nav>
     <!-- ===== Main Content ===== -->
@@ -79,7 +79,8 @@
         <br><br>
         <section>
             <h2 style="text-align:center">Space Weather Feeds</h2>
-            <h3 style="text-align:center">KP - SDO Feeds - Sunspot Images - Satellite Hazard - Aurora Forecast</h3>
+            <h3 style="text-align:center">KP - SDO Feeds - Sunspot Images - Satellite Hazard - Aurora Forecast</h3><hr>
+            <p style="text-align:center">When SDO is down, use NOAA<br><a href="https://www.swpc.noaa.gov/communities/space-weather-enthusiasts-dashboard" class="button" target="_blank">NOAA Space Weather</a></p>
         </section>
 
     <!-- ===== Section - KP Index ===== -->
@@ -275,7 +276,7 @@
       <div class="content"><div class="container">
         <div class="left-side">
 			  <h3 style="text-align:center">SDO Magnetogram</h3>
-			<br><center><a href="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_HMIBC.jpg" target="_blank">Source (Full Resolution)</a></center><br>
+			<br><center><a href="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_HMIBC.jpg" class="button" target="_blank">Source (Full Resolution)</a></center><br>
             <center><img Height="800" Width="800" id="M" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_HMIBC.jpg" alt="Magnetogram"></center><br>
         <br><p style="text-align:center">Credit: Solar Dynamics Observatory (SDO) Helioseismic and Magnetic Imager (HMI)</p><br>
 	<button type="button" class="collapsible">About Magnetogram</button>
@@ -283,13 +284,12 @@
 			<p>The magnetogram is not a direct visual image of the sun but a data visualization produced by the Helioseismic and Magnetic Imager (HMI) instrument, which measures the splitting of iron spectral lines due to the Zeeman effect. This data is crucial for: <br><br>Identifying Active Regions: Strong magnetic fields appear as sunspots and active regions, which are the sources of solar flares and coronal mass ejections (CMEs).<br><br>Space Weather Forecasting: By tracking the movement and complexity of these magnetic fields, scientists can better predict space weather events that might impact Earth.<br><br>Studying Solar Dynamics: It provides a uniform, continuous view of how the sun's magnetic field evolves over time. 
 			<br><hr><br>(Color Schemes)<br><br>Grey areas indicate a near-zero magnetic field intensity.<br><br><span class="circle green"></span><span class="circle blue"></span>Positive (North) magnetic polarity (magnetic field lines coming toward the observer/outward from the sun) is represented by greens and blues, with increasing brightness/color intensity indicating stronger fields.<br><br><span class="circle red"></span><span class="circle orange"></span>Negative (South) magnetic polarity (magnetic field lines pointing away from the observer/inward into the sun) is represented by yellows and reds/oranges, with increasing brightness/color intensity indicating stronger fields.<br><br>Strong field regions (sunspots) appear as bright blue (positive) or red (negative) patches with dark central umbrae.</p><br>
 			</div></div><div class="right-side">
-        <h3 style="text-align:center">Far Side Sunspots</h3><br><center><a href="http://jsoc.stanford.edu/data/farside/Recent/Composite_Map.png" target="_blank">Source (Full Resolution)</a></center><br><center><img id="FarSide" class="bordered-image" src="http://jsoc.stanford.edu/data/farside/Recent/Composite_Map.png" alt="Far Side Sunspots"></center><br>
-        <center><a href="http://jsoc.stanford.edu/data/farside/Recent/AR_Map.png" target="_blank">Source (Full Resolution)</a></center><br><center><img id="ARMap" class="bordered-image" src="https://jsoc.stanford.edu/data/farside/Recent/AR_Map.png" alt="Active Region Map"></center><br>
-        <br><p style="text-align:center">Credit: Stanford Seismic Monitor of the Sun's Far Hemisphere for the Solar Dynamics Observatory</p><br><center><a href="http://jsoc.stanford.edu/data/farside/" target="_blank">http://jsoc.stanford.edu/data/farside/</a></center><br><br>
+        <h3 style="text-align:center">Far Side Sunspots</h3><br><p style="text-align:center">Stanford Seismic Monitor of the Sun's Far Hemisphere for the Solar Dynamics Observatory</p><br><center><a href="http://jsoc.stanford.edu/data/farside/" class="button" target="_blank">http://jsoc.stanford.edu/data/farside/</a></center><br>
           <button type="button" class="collapsible">About Far Side Sunspots</button>
           <div class="content">
             <p>Far Side Sunspots are detected using helioseismology, which analyzes sound waves generated by solar activity. These waves travel through the Sun's interior and can be observed on the near side.<br><br>Magnetic Field (B(Gauss)): The grayscale bar on the right indicates the magnetic field strength in Gauss. Darker areas usually correspond to strong magnetic fields, which are characteristic of sunspots.<br><br>Travel Time (\(\tau \)(sec)): The color bar on the left indicates acoustic travel-time perturbations in seconds. Large active regions on the far side can be detected by horizontally extended acoustic travel-time reductions.</p><br></div>
-      </div></div><br>
+          <br><p style="text-align:center">Alternate sunspot resource:<br><a href="https://jsoc1.stanford.edu/hmi_latest" class="button" target="_blank">Stanford Magnetograms & Sunspot Imagery</a></p></div>
+      </div><br>
       </section>
       <br><br>
       <!-- ===== Section- Orbital Hazards ===== -->

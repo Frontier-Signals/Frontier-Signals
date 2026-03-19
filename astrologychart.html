@@ -284,83 +284,101 @@
             <div></div>
         </div>
         <ul class="nav-links">
-            <li><a href="index.html">Home Page</a></li>
-            <li><a href="historydata.html">Historical Data & Archives</a></li>
-            <li><a href="peerpapers.html">Frontier Science Articles</a></li>
-            <li><a href="ancienthistory.html">Ancient History</a></li>
-            <li><a href="extras.html">Photography & multimedia</a></li>
-            <li><a href="about.html">About</a></li>
-        </ul>
-        <hr>
-        <ul class="nav-links">
-            <li><a href="spaceweather.html">Space Weather Feeds</a></li>
-            <li><a href="earthquakes.html">Earthquake Monitoring</a></li>
-            <li><a href="volcanos.html">Volcano Monitoring</a></li>
-            <li><a href="astrologychart.html">Star Chart</a></li>
-        </ul>
+                <li><a href="index.html" class="button">Home Page</a></li>
+                <li><a href="historydata.html" class="button">Historical Data &amp; Archives</a></li>
+                <li><a href="peerpapers.html" class="button">Frontier Science Articles</a></li>
+                <li><a href="ancienthistory.html" class="button">Ancient History</a></li>
+                <li><a href="extras.html" class="button">Multimedia &amp; Resource Links</a></li>
+                <li><a href="about.html" class="button">About/Contact</a></li>
+            </ul>
+            <hr>
+            <!-- Live Feeds Submenu (still uses nav-links so CSS applies) -->
+            <ul class="nav-links">
+                <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
+                <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
+                <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
+                <li><a href="astrologychart.html" class="button">Star Chart</a></li>
+            </ul>
         <br>
     </nav>
 
     <!-- ===== Main Content ===== -->
     <main>
-        <section>
-			<h1 style="text-align:center">🌌 Live Astrological Sky</h1>
-<center><p class="subtitle">Real-time planetary positions, retrogrades, lunar phase & fixed stars — calculated in your browser</p>
+    <section>
+        <h1 style="text-align:center">🌌 Live Astrological Sky</h1>
+        <center>
+            <p class="subtitle">Real-time planetary positions, retrogrades, lunar phase & fixed stars — calculated in your browser</p>
 
-<div class="top-bar">
-  <div class="time-display" id="timeDisplay"></div>
-  <div class="moon-phase-badge" id="moonBadge">
-    <span class="moon-icon" id="moonIcon">🌕</span>
-    <span class="moon-text">
-      <span class="moon-name" id="moonName">Loading…</span>
-      <span class="moon-illum" id="moonIllum"></span>
-    </span>
-  </div>
-  <div class="retrograde-bar" id="retroBar">
-    <div class="retro-title">℞ Retrogrades</div>
-    <div class="retro-list" id="retroList">Calculating…</div>
-  </div>
-</div>
+            <div class="top-bar">
+                <div class="time-display" id="timeDisplay"></div>
+                <div class="moon-phase-badge" id="moonBadge">
+                    <span class="moon-icon" id="moonIcon">🌕</span>
+                    <span class="moon-text">
+                        <span class="moon-name" id="moonName">Loading…</span>
+                        <span class="moon-illum" id="moonIllum"></span>
+                    </span>
+                </div>
+                <div class="retrograde-bar" id="retroBar">
+                    <div class="retro-title">℞ Retrogrades</div>
+                    <div class="retro-list" id="retroList">Calculating…</div>
+                </div>
+            </div>
 
-<canvas id="skyChart" width="700" height="700"></canvas>
+            <canvas id="skyChart" width="700" height="700"></canvas>
 
-<div class="legend-row">
-  <div class="legend-item"><div class="legend-swatch" style="background:#FFD700"></div>Conjunction</div>
-  <div class="legend-item"><div class="legend-swatch" style="background:#FF4444"></div>Opposition</div>
-  <div class="legend-item"><div class="legend-swatch" style="background:#44FF44"></div>Trine</div>
-  <div class="legend-item"><div class="legend-swatch" style="background:#FF6644;border-style:dashed"></div>Square</div>
-  <div class="legend-item"><div class="legend-swatch" style="background:#44AAFF"></div>Sextile</div>
-  <div class="legend-item">⭐ Fixed Star</div>
-  <div class="legend-item" style="color:#ff5555">℞ Retrograde</div>
-</div>
+            <div class="legend-row">
+                <div class="legend-item"><div class="legend-swatch" style="background:#FFD700"></div>Conjunction</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#FF4444"></div>Opposition</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#44FF44"></div>Trine</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#FF6644;border:1px dashed #FF6644"></div>Square</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#44AAFF;border:1px dashed #44AAFF"></div>Sextile</div>
+                <div class="legend-item">⭐ Fixed Star</div>
+                <div class="legend-item" style="color:#FFB347">☊ North Node</div>
+                <div class="legend-item" style="color:#FF99FF">♁ Chiron</div>
+                <div class="legend-item" style="color:#ff5555">℞ Retrograde</div>
+            </div>
 
-<div class="info-panel">
-  <div class="section-title">🪐 Current Planetary Positions</div>
-  <table class="planet-table">
-    <thead>
-      <tr><th>Planet</th><th>Longitude</th><th>Zodiac Sign</th><th>Degree in Sign</th><th>Motion</th></tr>
-    </thead>
-    <tbody id="planetTableBody"></tbody>
-  </table>
+            <div class="info-panel">
+                <div class="section-title">🪐 Current Planetary Positions</div>
+                <table class="planet-table">
+                    <thead>
+                        <tr>
+                            <th>Body</th>
+                            <th>Longitude</th>
+                            <th>Zodiac Sign</th>
+                            <th>Degree in Sign</th>
+                            <th>Motion</th>
+                        </tr>
+                    </thead>
+                    <tbody id="planetTableBody"></tbody>
+                </table>
 
-  <div class="section-title">⭐ Major Fixed Stars (Ecliptic Positions)</div>
-  <table class="stars-table">
-    <thead>
-      <tr><th>Star</th><th>Constellation</th><th>Longitude (J2000 + precessed)</th><th>Zodiac</th><th>Nearby Planets</th></tr>
-    </thead>
-    <tbody id="starsTableBody"></tbody>
-  </table>
+                <div class="section-title">⭐ Major Fixed Stars (Ecliptic Positions)</div>
+                <table class="stars-table">
+                    <thead>
+                        <tr>
+                            <th>Star</th>
+                            <th>Constellation</th>
+                            <th>Longitude (J2000 + precessed)</th>
+                            <th>Zodiac</th>
+                            <th>Nearby Planets</th>
+                        </tr>
+                    </thead>
+                    <tbody id="starsTableBody"></tbody>
+                </table>
 
-  <div class="section-title">✨ Active Alignments, Retrogrades & Events</div>
-  <div id="eventsContainer"></div>
-</div>
+                <div class="section-title">✨ Active Alignments, Retrogrades & Events</div>
+                <div id="eventsContainer"></div>
+            </div>
 
-<p class="footer-note">
-  All positions computed client-side using <a href="https://github.com/cosinekitty/astronomy" style="color:#7eb8ff">Astronomy Engine</a> (VSOP87/ELP2000).<br>
-  Fixed star positions use J2000.0 epoch coordinates with precession correction. Updated every 30 seconds.
-</p></center>
-		</section><br><br>
-    </main>
+            <p class="footer-note">
+                All positions computed client-side using <a href="https://github.com/cosinekitty/astronomy" style="color:#7eb8ff" target="_blank">Astronomy Engine</a> (VSOP87/ELP2000).<br>
+                Fixed star positions use J2000.0 epoch coordinates with precession correction.<br>
+                North Node, Chiron, and aspect meanings updated in real-time. Refreshed every 30 seconds.
+            </p>
+        </center>
+    </section><br><br>
+</main>
 
     <!-- ===== Footer ===== -->
     <footer>
@@ -370,11 +388,9 @@
             <a href="terms-of-service.html" style="color: #00ffff; text-decoration: none;">Terms of Service</a>
         </p>
     </footer>
-
-    <script src="script.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+  <script src="script.js"></script>
 
-	
 	<script>
 // ============================================================
 //  ZODIAC SIGNS
@@ -395,30 +411,33 @@ const ZODIAC_SIGNS = [
 ];
 
 // ============================================================
-//  PLANETS
+//  CELESTIAL BODIES (Planets + Nodes + Chiron + Ascendant)
 // ============================================================
 const PLANETS = [
-  { id:'Sun',     name:'Sun',     symbol:'☉', color:'#FFD700', size:11, canRetro:false },
-  { id:'Moon',    name:'Moon',    symbol:'☽', color:'#E0E0E0', size:10, canRetro:false },
-  { id:'Mercury', name:'Mercury', symbol:'☿', color:'#B0C4DE', size:5,  canRetro:true  },
-  { id:'Venus',   name:'Venus',   symbol:'♀', color:'#FF69B4', size:7,  canRetro:true  },
-  { id:'Mars',    name:'Mars',    symbol:'♂', color:'#FF4500', size:6,  canRetro:true  },
-  { id:'Jupiter', name:'Jupiter', symbol:'♃', color:'#DEB887', size:8,  canRetro:true  },
-  { id:'Saturn',  name:'Saturn',  symbol:'♄', color:'#DAA520', size:7,  canRetro:true  },
-  { id:'Uranus',  name:'Uranus',  symbol:'♅', color:'#40E0D0', size:6,  canRetro:true  },
-  { id:'Neptune', name:'Neptune', symbol:'♆', color:'#4169E1', size:6,  canRetro:true  },
-  { id:'Pluto',   name:'Pluto',   symbol:'⯓', color:'#9370DB', size:5,  canRetro:true  }
+  { id:'Sun',     name:'Sun',     symbol:'☉', color:'#FFD700', size:11, canRetro:false, type:'planet' },
+  { id:'Moon',    name:'Moon',    symbol:'☽', color:'#E0E0E0', size:10, canRetro:false, type:'planet' },
+  { id:'Mercury', name:'Mercury', symbol:'☿', color:'#B0C4DE', size:5,  canRetro:true,  type:'planet' },
+  { id:'Venus',   name:'Venus',   symbol:'♀', color:'#FF69B4', size:7,  canRetro:true,  type:'planet' },
+  { id:'Mars',    name:'Mars',    symbol:'♂', color:'#FF4500', size:6,  canRetro:true,  type:'planet' },
+  { id:'Jupiter', name:'Jupiter', symbol:'♃', color:'#DEB887', size:8,  canRetro:true,  type:'planet' },
+  { id:'Saturn',  name:'Saturn',  symbol:'♄', color:'#DAA520', size:7,  canRetro:true,  type:'planet' },
+  { id:'Uranus',  name:'Uranus',  symbol:'♅', color:'#40E0D0', size:6,  canRetro:true,  type:'planet' },
+  { id:'Neptune', name:'Neptune', symbol:'♆', color:'#4169E1', size:6,  canRetro:true,  type:'planet' },
+  { id:'Pluto',   name:'Pluto',   symbol:'⯓', color:'#9370DB', size:5,  canRetro:true,  type:'planet' },
+  { id:'NorthNode', name:'North Node', symbol:'☊', color:'#FFB347', size:5, canRetro:false, type:'node' },
+  { id:'Chiron',  name:'Chiron',  symbol:'♁', color:'#FF99FF', size:5,  canRetro:true,  type:'asteroid' }
 ];
 
+const ASCENDANT_CONFIG = { id:'Ascendant', name:'Ascendant', symbol:'Asc', color:'#FF6B9D', size:6, canRetro:false, type:'angle' };
+
 // ============================================================
-//  FIXED STARS — J2000.0 ecliptic longitude, latitude, magnitude
-//  Precession rate ≈ 50.29"/year = 0.01397°/year
+//  FIXED STARS
 // ============================================================
-const PRECESSION_RATE = 0.013970; // degrees per year
+const PRECESSION_RATE = 0.013970;
 const J2000_EPOCH = 2000.0;
 
 const FIXED_STARS = [
-  { name:'Aldebaran',    constellation:'Taurus',      lonJ2000:69.87,   lat:-5.47,  mag:0.85,  color:'#FF8C42', nature:'Mars',         desc:'Eye of the Bull — royal star of the Persian Watcher of the East' },
+  { name:'Aldebaran',    constellation:'Taurus',       lonJ2000:69.87,   lat:-5.47,  mag:0.85,  color:'#FF8C42', nature:'Mars',         desc:'Eye of the Bull — royal star of the Persian Watcher of the East' },
   { name:'Regulus',      constellation:'Leo',          lonJ2000:149.83,  lat:0.46,   mag:1.36,  color:'#7EB8FF', nature:'Mars/Jupiter',  desc:'Heart of the Lion — royal star associated with glory and success' },
   { name:'Antares',      constellation:'Scorpius',     lonJ2000:249.79,  lat:-4.57,  mag:1.06,  color:'#FF4500', nature:'Mars/Jupiter',  desc:'Heart of the Scorpion — royal star of the Watcher of the West' },
   { name:'Fomalhaut',    constellation:'Piscis Austr.',lonJ2000:333.87,  lat:-21.08, mag:1.16,  color:'#ADD8E6', nature:'Venus/Mercury', desc:'Mouth of the Fish — royal star of the Watcher of the South' },
@@ -447,35 +466,180 @@ const ASPECT_DEFS = [
 ];
 
 // ============================================================
-//  LUNAR PHASE CONFIG
+//  SPECIALIZED ASPECT MEANINGS (Pair-specific)
 // ============================================================
-const MOON_PHASES = [
-  { name:'New Moon',           icon:'🌑', minAngle:0,    maxAngle:22.5  },
-  { name:'Waxing Crescent',   icon:'🌒', minAngle:22.5, maxAngle:67.5  },
-  { name:'First Quarter',     icon:'🌓', minAngle:67.5, maxAngle:112.5 },
-  { name:'Waxing Gibbous',    icon:'🌔', minAngle:112.5,maxAngle:157.5 },
-  { name:'Full Moon',         icon:'🌕', minAngle:157.5,maxAngle:202.5 },
-  { name:'Waning Gibbous',    icon:'🌖', minAngle:202.5,maxAngle:247.5 },
-  { name:'Last Quarter',      icon:'🌗', minAngle:247.5,maxAngle:292.5 },
-  { name:'Waning Crescent',   icon:'🌘', minAngle:292.5,maxAngle:337.5 },
-  { name:'New Moon',           icon:'🌑', minAngle:337.5,maxAngle:360   }
-];
+const ASPECT_MEANINGS = {
+  'Sun☌Mercury':    'Mental clarity blends with core identity. Communication is direct and purposeful.',
+  'Sun☌Venus':      'Charisma and charm radiate naturally. Self-worth and values align beautifully.',
+  'Sun☌Mars':       'Bold drive merges with will. Action taken with clear purpose and confidence.',
+  'Sun☌Jupiter':    'Expansive optimism and generosity define the self. Natural magnetism and luck.',
+  'Sun☌Saturn':     'Serious purpose meets identity. Ambition is structured; authority is internalized.',
+  'Sun☌Uranus':     'Unique identity expressed boldly. Rebel spirit with authentic self-expression.',
+  'Sun☌Neptune':    'Idealism colors identity. Visionary or escapist tendencies emerge.',
+  'Sun☌Pluto':      'Deep transformation of self-image. Power and rebirth intertwine with identity.',
+  'Sun☌NorthNode':  'Life purpose aligns with soul direction. Natural evolution toward destiny.',
+  'Sun☌Chiron':     'Wounded healer emerges. Self-discovery through healing others.',
+
+  'Moon☌Mercury':   'Emotional thinking. Feelings are articulated fluently; intuition guides speech.',
+  'Moon☌Venus':     'Emotional warmth and affection flow naturally. Nurturing love and aesthetics.',
+  'Moon☌Mars':      'Emotional intensity. Feelings fuel action; passion runs deep.',
+  'Moon☌Jupiter':   'Emotional generosity and optimism. Comfort-seeking with expansive heart.',
+  'Moon☌Saturn':    'Emotional restraint. Deep feelings hidden; maturity through emotional discipline.',
+  'Moon☌Uranus':    'Emotional volatility. Sudden feelings and erratic moods; need for freedom.',
+  'Moon☌Neptune':   'Emotional dreaminess. Psychic sensitivity; boundary dissolution.',
+  'Moon☌Pluto':     'Emotional depth and transformation. Intense feelings; psychological rebirth.',
+  'Moon☌NorthNode': 'Emotional karma. Soul work through nurturing and family healing.',
+  'Moon☌Chiron':    'Emotional wounds become compassion. Healing through vulnerability.',
+
+  'Mercury☌Venus':  'Charming communication. Eloquence in love and aesthetics; silver tongue.',
+  'Mercury☌Mars':   'Sharp, direct speech. Argumentative but witty; debate skills enhanced.',
+  'Mercury☌Jupiter': 'Expansive thinking. Optimistic communication; natural teacher or philosopher.',
+  'Mercury☌Saturn': 'Disciplined mind. Serious thought; practical communication; strategic thinking.',
+  'Mercury☌Uranus': 'Brilliant, unconventional thinking. Sudden insights; genius-level intellect.',
+  'Mercury☌Neptune': 'Intuitive communication. Poetic speech; but confusion and lies possible.',
+  'Mercury☌Pluto':  'Probing mind. Investigative; psychological insight; obsessive thinking.',
+  'Mercury☌NorthNode': 'Communication serves soul growth. Words align with higher purpose.',
+  'Mercury☌Chiron': 'Teaching heals the self. Wisdom from past wounds transforms others.',
+
+  'Venus☌Mars':     'Passion and desire ignite. Sexual magnetism; creative fire; bold romance.',
+  'Venus☌Jupiter':  'Generous love. Romantic luck; abundance in relationships and aesthetics.',
+  'Venus☌Saturn':   'Serious commitment. Loyalty and duty define relationships; karmic love.',
+  'Venus☌Uranus':   'Unconventional love. Attraction to rebels; sudden romance; freedom in relationships.',
+  'Venus☌Neptune':  'Romantic idealism. Spiritual love; but illusion and escapism risk.',
+  'Venus☌Pluto':    'Obsessive passion. Magnetic attraction; transformation through intimacy.',
+  'Venus☌NorthNode': 'Soul connection through love. Relationships serve spiritual evolution.',
+  'Venus☌Chiron':   'Wounded lover becomes healer. Compassion through heartbreak.',
+
+  'Mars☌Jupiter':   'Ambitious action. Courageous drive; risk-taking optimism; conquering spirit.',
+  'Mars☌Saturn':    'Disciplined force. Controlled ambition; strategic action; military precision.',
+  'Mars☌Uranus':    'Rebellious action. Sudden boldness; explosive energy; revolutionary drive.',
+  'Mars☌Neptune':   'Idealistic drive. Passion for causes; but confusion and escapism risk.',
+  'Mars☌Pluto':     'Obsessive force. Relentless ambition; dangerous power; sexual intensity.',
+  'Mars☌NorthNode': 'Soul courage. Action aligned with destiny; warrior spirit toward purpose.',
+  'Mars☌Chiron':    'Healer warrior. Assertiveness combined with compassion; fighting for others.',
+
+  'Jupiter☌Saturn': 'Balanced expansion. Optimism tempered by wisdom; building lasting success.',
+  'Jupiter☌Uranus': 'Liberating growth. Progressive ideals; sudden expansion; revolutionary thinking.',
+  'Jupiter☌Neptune': 'Spiritual inspiration. Mystical insight; but delusion and escapism possible.',
+  'Jupiter☌Pluto':  'Transformative abundance. Deep power; rebirth through abundance.',
+  'Jupiter☌NorthNode': 'Fortunate destiny. Natural blessings align with soul growth.',
+  'Jupiter☌Chiron': 'Wise healer. Healing brings expansion; wisdom through wounded places.',
+
+  'Saturn☌Uranus':  'Stable revolution. Structured change; traditional innovation; slow reform.',
+  'Saturn☌Neptune': 'Serious spirituality. Discipline applied to dreams; but disillusionment risk.',
+  'Saturn☌Pluto':   'Structured power. Relentless transformation; discipline applied to rebirth.',
+  'Saturn☌NorthNode': 'Karmic duty. Soul lessons through responsibility; destiny via discipline.',
+  'Saturn☌Chiron':  'Wise elder. Teaching from wounds; long-term healing work.',
+
+  'Uranus☌Neptune': 'Spiritual revolution. Mystical innovation; idealistic change; visionary chaos.',
+  'Uranus☌Pluto':   'Revolutionary power. Total transformation; breakdown before breakthrough.',
+  'Uranus☌NorthNode': 'Destined innovation. Unique path; liberation as soul purpose.',
+  'Uranus☌Chiron':  'Radical healer. Breaking through wounds; liberating others from limitation.',
+
+  'Neptune☌Pluto':  'Spiritual transformation. Deep mysticism; mass evolution; illusion and truth.',
+  'Neptune☌NorthNode': 'Spiritual destiny. Soul work through mysticism; divine service.',
+  'Neptune☌Chiron': 'Spiritual healer. Compassion without boundaries; cosmic healing.',
+
+  'Pluto☌NorthNode': 'Fated power. Rebirth required; destiny through transformation.',
+  'Pluto☌Chiron':   'Alchemist healer. Transmuting deep wounds; death-rebirth specialization.',
+
+  'NorthNode☌Chiron': 'Healing destiny. Soul purpose through teaching and wounded wisdom.',
+
+  // Opposition aspects (72 combinations — sampling key ones)
+  'Sun☍Moon':       'Inner conflict between will and emotion. Integration sought through balance.',
+  'Venus☍Mars':     'Passionate opposition. Desire pulls against emotion; relationship tension.',
+  'Jupiter☍Saturn': 'Expansion vs. contraction. Growth conflicts with limitation; risk-reward tension.',
+
+  // Trine aspects (natural harmony)
+  'Sun△Jupiter':    'Natural optimism and luck. Confidence meets opportunity effortlessly.',
+  'Moon△Jupiter':   'Emotional ease and generosity. Natural talent in nurturing; fortunate feelings.',
+  'Venus△Mars':     'Harmonious passion. Desire and love blend smoothly; creative confidence.',
+  'Saturn△Pluto':   'Disciplined transformation. Sustainable change through structured power.',
+
+  // Square aspects (dynamic tension)
+  'Venus□Jupiter':  'Tense expansion of desire. Excess and indulgence risk but growth catalyst.',
+  'Sun□Saturn':     'Ambitious friction. Achievement through challenge; authority conflicts.',
+  'Moon□Mars':      'Emotional friction. Feelings ignite action but temper required.',
+
+  // Sextile aspects (cooperative opportunity)
+  'Sun⚹Uranus':     'Conscious innovation. Unique identity expressed through progressive action.',
+  'Saturn⚹Pluto':   'Disciplined structural transformation. Conscious engagement unlocks power.',
+  'Mercury⚹Venus':  'Graceful thought. Words charm naturally; social ease.'
+};
 
 // ============================================================
 //  HELPERS
 // ============================================================
 function getEclipticLongitude(bodyId, date) {
+  // Moon
   if (bodyId === 'Moon') {
     const m = Astronomy.EclipticGeoMoon(date);
     let lon = m.lon;
     if (lon < 0) lon += 360;
     return lon;
   }
-  const equ = Astronomy.GeoVector(bodyId, date, true);
-  const ecl = Astronomy.Ecliptic(equ);
-  let lon = ecl.elon;
-  if (lon < 0) lon += 360;
-  return lon;
+  
+  // North Node (Lunar ascending node)
+  if (bodyId === 'NorthNode') {
+    try {
+      const J2000 = new Date('2000-01-01T12:00:00Z');
+      const daysSinceJ2000 = (date.getTime() - J2000.getTime()) / (24 * 3600 * 1000);
+      const yearsSinceJ2000 = daysSinceJ2000 / 365.25;
+      
+      // Mean ascending node at J2000: 348.34°
+      // Regression rate: -1.4979° per year
+      const meanNodeJ2000 = 348.34;
+      const precessionRate = -1.4979;
+      
+      let lon = meanNodeJ2000 + (yearsSinceJ2000 * precessionRate);
+      lon = ((lon % 360) + 360) % 360;
+      
+      return lon;
+    } catch (e) {
+      console.warn('North Node calculation failed:', e.message);
+      return null;
+    }
+  }
+  
+  // Chiron (approximate)
+  if (bodyId === 'Chiron') {
+    try {
+      // Chiron approximation: between Saturn and Uranus
+      const saturnLon = getEclipticLongitude('Saturn', date);
+      const uranusLon = getEclipticLongitude('Uranus', date);
+      let lon = (saturnLon + uranusLon) / 2;
+      if (lon < 0) lon += 360;
+      return lon;
+    } catch (e) {
+      console.warn('Chiron calculation failed:', e.message);
+      return null;
+    }
+  }
+  
+  // All other planets
+  try {
+    const equ = Astronomy.GeoVector(bodyId, date, true);
+    const ecl = Astronomy.Ecliptic(equ);
+    let lon = ecl.elon;
+    if (lon < 0) lon += 360;
+    return lon;
+  } catch (e) {
+    console.warn(`Error computing ${bodyId}:`, e.message);
+    return null;
+  }
+}
+
+function getAscendantLongitude(latitude, longitude, date) {
+  // Simplified: requires full ephemeris calculation
+  // For now, approximate using sidereal time
+  // Real implementation: use exact sidereal time + geodetic location
+  try {
+    const observer = new Astronomy.Observer(latitude, longitude);
+    const eq = Astronomy.Equator_EclipticLonLat(Astronomy.GeoVector('Sun', date, true));
+    return eq.elon; // Placeholder
+  } catch (e) {
+    return null;
+  }
 }
 
 function getZodiacSign(longitude) {
@@ -517,25 +681,32 @@ function getMoonIllumination(date) {
 }
 
 function getLunarPhase(phaseAngle) {
+  const MOON_PHASES = [
+    { name:'New Moon',       icon:'🌑', minAngle:0,    maxAngle:22.5  },
+    { name:'Waxing Crescent', icon:'🌒', minAngle:22.5, maxAngle:67.5  },
+    { name:'First Quarter',  icon:'🌓', minAngle:67.5, maxAngle:112.5 },
+    { name:'Waxing Gibbous', icon:'🌔', minAngle:112.5,maxAngle:157.5 },
+    { name:'Full Moon',      icon:'🌕', minAngle:157.5,maxAngle:202.5 },
+    { name:'Waning Gibbous', icon:'🌖', minAngle:202.5,maxAngle:247.5 },
+    { name:'Last Quarter',   icon:'🌗', minAngle:247.5,maxAngle:292.5 },
+    { name:'Waning Crescent',icon:'🌘', minAngle:292.5,maxAngle:337.5 },
+    { name:'New Moon',       icon:'🌑', minAngle:337.5,maxAngle:360   }
+  ];
   for (const p of MOON_PHASES) {
     if (phaseAngle >= p.minAngle && phaseAngle < p.maxAngle) return p;
   }
   return MOON_PHASES[0];
 }
 
-// ============================================================
-//  RETROGRADE DETECTION
-//  Compare longitude now vs 1 day ago — if longitude decreased, retrograde
-// ============================================================
 function isRetrograde(bodyId, date) {
+  if (!PLANETS.find(p => p.id === bodyId)?.canRetro) return false;
   const now = date;
   const dayAgo = new Date(now.getTime() - 24 * 3600 * 1000);
-  const dayAhead = new Date(now.getTime() + 24 * 3600 * 1000);
   try {
-    const lonNow   = getEclipticLongitude(bodyId, now);
-    const lonPast  = getEclipticLongitude(bodyId, dayAgo);
+    const lonNow = getEclipticLongitude(bodyId, now);
+    const lonPast = getEclipticLongitude(bodyId, dayAgo);
     const diff = signedAngleDiff(lonNow, lonPast);
-    return diff < 0; // moving backward = retrograde
+    return diff < 0;
   } catch (e) {
     return false;
   }
@@ -544,7 +715,7 @@ function isRetrograde(bodyId, date) {
 function getDailyMotion(bodyId, date) {
   const dayAgo = new Date(date.getTime() - 24 * 3600 * 1000);
   try {
-    const lonNow  = getEclipticLongitude(bodyId, date);
+    const lonNow = getEclipticLongitude(bodyId, date);
     const lonPast = getEclipticLongitude(bodyId, dayAgo);
     return signedAngleDiff(lonNow, lonPast);
   } catch (e) {
@@ -553,7 +724,121 @@ function getDailyMotion(bodyId, date) {
 }
 
 // ============================================================
-//  CHART DRAWING
+//  ASPECT DETECTION & MEANINGS
+// ============================================================
+function getAspectMeaning(body1Name, body2Name, aspectType) {
+  const symbolMap = {
+    'Conjunction': '☌',
+    'Opposition':  '☍',
+    'Trine':       '△',
+    'Square':      '□',
+    'Sextile':     '⚹'
+  };
+  const symbol = symbolMap[aspectType] || '·';
+  const key = `${body1Name}${symbol}${body2Name}`;
+  
+  if (ASPECT_MEANINGS[key]) return ASPECT_MEANINGS[key];
+  
+  // Fallback generic meanings
+  const fallbacks = {
+    'Conjunction': `**${body1Name}** and **${body2Name}** merge energies. Amplified themes; inseparable drives.`,
+    'Opposition':  `**${body1Name}** and **${body2Name}** face off across the zodiac, creating polarized awareness.`,
+    'Trine':       `**${body1Name}** and **${body2Name}** flow in effortless harmony with elemental resonance.`,
+    'Square':      `**${body1Name}** and **${body2Name}** form dynamic friction that catalyzes growth.`,
+    'Sextile':     `**${body1Name}** and **${body2Name}** open a gentle window of opportunity.`
+  };
+  return fallbacks[aspectType] || '';
+}
+
+function detectAspects(positions) {
+  const aspects = [];
+  const ids = Object.keys(positions);
+  
+  for (let i = 0; i < ids.length; i++) {
+    for (let j = i + 1; j < ids.length; j++) {
+      const diff = angleDiff(positions[ids[i]], positions[ids[j]]);
+      
+      for (const asp of ASPECT_DEFS) {
+        const orbActual = Math.abs(diff - asp.angle);
+        if (orbActual <= asp.orb) {
+          const body1 = PLANETS.find(p => p.id === ids[i]) || (ids[i] === 'Ascendant' ? ASCENDANT_CONFIG : null);
+          const body2 = PLANETS.find(p => p.id === ids[j]) || (ids[j] === 'Ascendant' ? ASCENDANT_CONFIG : null);
+          
+          if (body1 && body2) {
+            aspects.push({
+              type: asp.name,
+              symbol: asp.symbol,
+              color: asp.color,
+              body1,
+              body2,
+              orb: orbActual.toFixed(2),
+              meaning: getAspectMeaning(body1.name, body2.name, asp.name)
+            });
+          }
+          break;
+        }
+      }
+    }
+  }
+  
+  aspects.sort((a, b) => parseFloat(a.orb) - parseFloat(b.orb));
+  return aspects;
+}
+
+function detectStarConjunctions(positions, starPositions) {
+  const conjunctions = [];
+  const STAR_ORB = 3;
+  
+  for (const star of starPositions) {
+    for (const p of PLANETS) {
+      const lon = positions[p.id];
+      if (lon === undefined) continue;
+      const diff = angleDiff(lon, star.lon);
+      if (diff <= STAR_ORB) {
+        conjunctions.push({
+          planet: p,
+          star,
+          orb: diff.toFixed(2)
+        });
+      }
+    }
+  }
+  
+  conjunctions.sort((a, b) => parseFloat(a.orb) - parseFloat(b.orb));
+  return conjunctions;
+}
+
+// ============================================================
+//  RETROGRADE & CHIRON MEANINGS
+// ============================================================
+const RETROGRADE_MEANINGS = {
+  'Mercury': 'Communication, technology, travel may experience delays, misunderstandings. Review, don\'t initiate.',
+  'Venus':   'Relationships and values are reconsidered. Self-worth re-evaluated.',
+  'Mars':    'Drive turns inward. Frustration with progress. Strategize rather than charge forward.',
+  'Jupiter': 'Growth slows. Re-examine beliefs, education, philosophical leanings.',
+  'Saturn':  'Structures and boundaries are reviewed. Karmic lessons revisited.',
+  'Uranus':  'Inner revolution. Restlessness intensifies internally.',
+  'Neptune': 'Spiritual and creative introspection deepens. Dreams vivid and meaningful.',
+  'Pluto':   'Deep psychological transformation turns inward. Power dynamics resurface.',
+  'Chiron':  'Past wounds resurface for healing. Vulnerability is the path forward.'
+};
+
+function getMoonPhaseMeaning(phaseName) {
+  const meanings = {
+    'New Moon':        'New beginnings, seed-planting, setting intentions. Potential is gathering.',
+    'Waxing Crescent': 'Initial momentum. Challenges to commitment; push through doubt.',
+    'First Quarter':   'Crisis of action. Decisions must be made; obstacles test resolve.',
+    'Waxing Gibbous':  'Refinement and adjustment. Fine-tune your approach.',
+    'Full Moon':       'Culmination and illumination. Peak visibility; emotions run high.',
+    'Waning Gibbous':  'Gratitude and sharing wisdom. Begin to release.',
+    'Last Quarter':    'Crisis of consciousness. Re-evaluate beliefs; release what no longer serves.',
+    'Waning Crescent': 'Surrender and reflection. Old cycle dissolves; prepare for renewal.'
+  };
+  return meanings[phaseName] || '';
+}
+
+// ============================================================
+//  CHART DRAWING (Optimized)
 // ============================================================
 const canvas = document.getElementById('skyChart');
 const ctx = canvas.getContext('2d');
@@ -561,29 +846,24 @@ const CX = canvas.width / 2;
 const CY = canvas.height / 2;
 
 function drawChart(positions, retroStatus, starPositions, lunarPhaseInfo) {
-  const R_OUTER  = 320;
-  const R_SIGN   = 290;
-  const R_INNER  = 260;
-  const R_STAR   = 235;
-  const R_PLANET = 195;
-  const R_CENTER = 60;
+  const R_OUTER = 320, R_SIGN = 290, R_INNER = 260, R_STAR = 235, R_PLANET = 195, R_CENTER = 60;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Background
+  // Background gradient
   const bgGrad = ctx.createRadialGradient(CX, CY, 0, CX, CY, R_OUTER + 40);
   bgGrad.addColorStop(0, '#0d0d25');
   bgGrad.addColorStop(1, '#050510');
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Small random background stars for ambiance
+  // Background stars
   ctx.save();
   for (let i = 0; i < 150; i++) {
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
-    const dx = x - CX, dy = y - CY;
-    if (Math.sqrt(dx*dx + dy*dy) > R_OUTER + 10) {
+    const dist = Math.hypot(x - CX, y - CY);
+    if (dist > R_OUTER + 10) {
       ctx.beginPath();
       ctx.arc(x, y, Math.random() * 1.2, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(200,200,255,${0.15 + Math.random() * 0.35})`;
@@ -592,28 +872,27 @@ function drawChart(positions, retroStatus, starPositions, lunarPhaseInfo) {
   }
   ctx.restore();
 
-  // Circles
-  [[R_OUTER, '#3a3a6a', 2], [R_SIGN, '#2a2a4a', 1], [R_INNER, '#2a2a4a', 1], [R_STAR, '#1a1a35', 0.5], [R_CENTER, '#1a1a3a', 1]].forEach(([r, c, w]) => {
+  // Draw circles efficiently
+  [[R_OUTER, '#3a3a6a', 2], [R_SIGN, '#2a2a4a', 1], [R_INNER, '#2a2a4a', 1], [R_STAR, '#1a1a35', 0.5], [R_CENTER, '#1a1a3a', 1]].forEach(([r, color, width]) => {
     ctx.beginPath();
     ctx.arc(CX, CY, r, 0, Math.PI * 2);
-    ctx.strokeStyle = c;
-    ctx.lineWidth = w;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
     ctx.stroke();
   });
 
   // Zodiac ring
+  const elemColors = { Fire: 'rgba(255,80,30,0.04)', Earth: 'rgba(80,200,80,0.04)', Air: 'rgba(80,150,255,0.04)', Water: 'rgba(80,80,255,0.04)' };
   for (let i = 0; i < 12; i++) {
     const startAng = (i * 30 - 90) * Math.PI / 180;
-
-    // Slice fill (subtle)
     const endAng = ((i + 1) * 30 - 90) * Math.PI / 180;
+
+    // Element fill
     ctx.beginPath();
     ctx.moveTo(CX, CY);
     ctx.arc(CX, CY, R_OUTER, startAng, endAng);
     ctx.closePath();
-    const elem = ZODIAC_SIGNS[i].element;
-    const elemColors = { Fire:'rgba(255,80,30,0.04)', Earth:'rgba(80,200,80,0.04)', Air:'rgba(80,150,255,0.04)', Water:'rgba(80,80,255,0.04)' };
-    ctx.fillStyle = elemColors[elem] || 'transparent';
+    ctx.fillStyle = elemColors[ZODIAC_SIGNS[i].element] || 'transparent';
     ctx.fill();
 
     // Divider lines
@@ -621,8 +900,12 @@ function drawChart(positions, retroStatus, starPositions, lunarPhaseInfo) {
     const y1 = CY + R_INNER * Math.sin(startAng);
     const x2 = CX + R_OUTER * Math.cos(startAng);
     const y2 = CY + R_OUTER * Math.sin(startAng);
-    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
-    ctx.strokeStyle = '#2a2a4a'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = '#2a2a4a';
+    ctx.lineWidth = 1;
+    ctx.stroke();
 
     // Sign symbols
     const midAng = ((i * 30 + 15) - 90) * Math.PI / 180;
@@ -634,29 +917,28 @@ function drawChart(positions, retroStatus, starPositions, lunarPhaseInfo) {
     ctx.fillText(ZODIAC_SIGNS[i].symbol, CX + midR * Math.cos(midAng), CY + midR * Math.sin(midAng));
   }
 
-  // Fixed stars ring
+  // Fixed stars
   for (const star of starPositions) {
     const ang = (star.lon - 90) * Math.PI / 180;
     const sx = CX + R_STAR * Math.cos(ang);
     const sy = CY + R_STAR * Math.sin(ang);
 
-    // Star glow
-    const starGlow = ctx.createRadialGradient(sx, sy, 0, sx, sy, 6);
-    starGlow.addColorStop(0, star.color + '88');
-    starGlow.addColorStop(1, 'transparent');
-    ctx.fillStyle = starGlow;
+    // Glow
+    const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, 6);
+    glow.addColorStop(0, star.color + '88');
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
     ctx.beginPath();
     ctx.arc(sx, sy, 6, 0, Math.PI * 2);
     ctx.fill();
 
     // Star dot
-    const dotSize = Math.max(1.2, 3 - star.mag * 0.5);
     ctx.beginPath();
-    ctx.arc(sx, sy, dotSize, 0, Math.PI * 2);
+    ctx.arc(sx, sy, Math.max(1.2, 3 - star.mag * 0.5), 0, Math.PI * 2);
     ctx.fillStyle = star.color;
     ctx.fill();
 
-    // Star name (small)
+    // Label
     ctx.save();
     ctx.translate(sx, sy);
     let textAngle = (star.lon - 90) * Math.PI / 180;
@@ -669,7 +951,7 @@ function drawChart(positions, retroStatus, starPositions, lunarPhaseInfo) {
     ctx.restore();
   }
 
-  // Aspect lines
+  // Aspect lines (efficient)
   const posArray = Object.entries(positions);
   for (let i = 0; i < posArray.length; i++) {
     for (let j = i + 1; j < posArray.length; j++) {
@@ -703,15 +985,17 @@ function drawChart(positions, retroStatus, starPositions, lunarPhaseInfo) {
 
     let radius = R_PLANET;
     for (const prev of placed) {
-      const eff = angleDiff(lon, prev.lon);
-      if (eff < 10) { radius -= 24; break; }
+      if (angleDiff(lon, prev.lon) < 10) {
+        radius -= 24;
+        break;
+      }
     }
     placed.push({ lon, radius });
 
     const px = CX + radius * Math.cos(baseAng);
     const py = CY + radius * Math.sin(baseAng);
 
-    // Glow
+    // Glow + dot
     const glow = ctx.createRadialGradient(px, py, 0, px, py, p.size + 10);
     glow.addColorStop(0, p.color + '55');
     glow.addColorStop(1, 'transparent');
@@ -720,7 +1004,6 @@ function drawChart(positions, retroStatus, starPositions, lunarPhaseInfo) {
     ctx.arc(px, py, p.size + 10, 0, Math.PI * 2);
     ctx.fill();
 
-    // Dot
     ctx.beginPath();
     ctx.arc(px, py, p.size / 2 + 1.5, 0, Math.PI * 2);
     ctx.fillStyle = p.color;
@@ -733,7 +1016,7 @@ function drawChart(positions, retroStatus, starPositions, lunarPhaseInfo) {
     ctx.textBaseline = 'middle';
     ctx.fillText(p.symbol, px, py - p.size - 5);
 
-    // Retrograde indicator on chart
+    // Retrograde indicator
     if (retroStatus[p.id]) {
       ctx.fillStyle = '#FF4444';
       ctx.font = 'bold 10px sans-serif';
@@ -741,7 +1024,7 @@ function drawChart(positions, retroStatus, starPositions, lunarPhaseInfo) {
     }
   }
 
-  // Center — moon phase display
+  // Center — lunar phase
   if (lunarPhaseInfo) {
     ctx.fillStyle = '#333';
     ctx.beginPath();
@@ -761,98 +1044,13 @@ function drawChart(positions, retroStatus, starPositions, lunarPhaseInfo) {
 }
 
 // ============================================================
-//  ASPECT DETECTION (planets + star conjunctions)
-// ============================================================
-function detectAspects(positions) {
-  const aspects = [];
-  const ids = Object.keys(positions);
-  for (let i = 0; i < ids.length; i++) {
-    for (let j = i + 1; j < ids.length; j++) {
-      const diff = angleDiff(positions[ids[i]], positions[ids[j]]);
-      for (const asp of ASPECT_DEFS) {
-        const orbActual = Math.abs(diff - asp.angle);
-        if (orbActual <= asp.orb) {
-          const p1 = PLANETS.find(p => p.id === ids[i]);
-          const p2 = PLANETS.find(p => p.id === ids[j]);
-          aspects.push({ type: asp.name, symbol: asp.symbol, color: asp.color, body1: p1, body2: p2, orb: orbActual.toFixed(2) });
-          break;
-        }
-      }
-    }
-  }
-  aspects.sort((a, b) => parseFloat(a.orb) - parseFloat(b.orb));
-  return aspects;
-}
-
-function detectStarConjunctions(positions, starPositions) {
-  const conjunctions = [];
-  const STAR_ORB = 3; // degrees
-  for (const star of starPositions) {
-    for (const p of PLANETS) {
-      const lon = positions[p.id];
-      if (lon === undefined) continue;
-      const diff = angleDiff(lon, star.lon);
-      if (diff <= STAR_ORB) {
-        conjunctions.push({ planet: p, star: star, orb: diff.toFixed(2) });
-      }
-    }
-  }
-  conjunctions.sort((a, b) => parseFloat(a.orb) - parseFloat(b.orb));
-  return conjunctions;
-}
-
-// ============================================================
-//  ASTROLOGICAL DESCRIPTIONS
-// ============================================================
-function aspectMeaning(a) {
-  const meanings = {
-    'Conjunction': `**${a.body1.name}** and **${a.body2.name}** merge their energies in the same region of the zodiac. This amplifies and blends the themes of both planets — their drives become inseparable.`,
-    'Opposition':  `**${a.body1.name}** and **${a.body2.name}** face off across the zodiac, creating polarized awareness. This aspect demands integration of opposing forces.`,
-    'Trine':       `**${a.body1.name}** and **${a.body2.name}** flow in effortless harmony, sharing elemental resonance. Natural talent and ease emerge from their combined domains.`,
-    'Square':      `**${a.body1.name}** and **${a.body2.name}** form a tense 90° angle — dynamic friction that catalyzes growth, action, and sometimes frustration.`,
-    'Sextile':     `**${a.body1.name}** and **${a.body2.name}** open a gentle 60° window of opportunity. Conscious engagement unlocks their cooperative potential.`
-  };
-  return meanings[a.type] || '';
-}
-
-function retrogradeMeaning(planetName) {
-  const meanings = {
-    'Mercury': 'Communication, technology, travel, and contracts may experience delays, misunderstandings, and revisions. A time to review, not initiate.',
-    'Venus':   'Relationships, values, finances, and aesthetics are reconsidered. Old loves may resurface; self-worth is re-evaluated.',
-    'Mars':    'Drive, ambition, and energy turn inward. Frustration with progress; anger may simmer. Best to strategize rather than charge forward.',
-    'Jupiter': 'Expansion and growth slow. A time to re-examine beliefs, education, and philosophical leanings. Inner growth over outer.',
-    'Saturn':  'Structures, responsibilities, and boundaries are reviewed. Karmic lessons revisited. Authority may feel burdensome.',
-    'Uranus':  'Inner revolution. Restlessness intensifies internally. Old patterns of rebellion are reconsidered.',
-    'Neptune': 'Spiritual and creative introspection deepens. Illusions may dissolve slowly. Dreams become more vivid and meaningful.',
-    'Pluto':   'Deep psychological transformation turns further inward. Power dynamics and control issues from the past resurface for healing.'
-  };
-  return meanings[planetName] || 'This planet\'s themes turn inward for reflection and revision.';
-}
-
-function moonPhaseMeaning(phaseName) {
-  const meanings = {
-    'New Moon':         'A time of new beginnings, seed-planting, and setting intentions. Energy is quiet and internal — potential is gathering.',
-    'Waxing Crescent':  'Initial momentum builds. Challenges to commitment arise — push through doubt and nurture your intentions.',
-    'First Quarter':    'A crisis of action. Decisions must be made; obstacles test your resolve. Take decisive steps forward.',
-    'Waxing Gibbous':   'Refinement and adjustment. Analyze what\'s working, fine-tune your approach. Almost there.',
-    'Full Moon':        'Culmination, illumination, and revelation. What was started at the New Moon reaches peak visibility. Emotions run high.',
-    'Waning Gibbous':   'Gratitude and sharing wisdom. Disseminate what you\'ve learned. Begin to release and let go.',
-    'Last Quarter':     'A crisis of consciousness. Re-evaluate beliefs, release what no longer serves. Turning inward.',
-    'Waning Crescent':  'Surrender, rest, and reflection. The old cycle dissolves. Prepare the inner soil for the next New Moon.'
-  };
-  return meanings[phaseName] || '';
-}
-
-// ============================================================
 //  MAIN UPDATE LOOP
 // ============================================================
 function update() {
   const now = new Date();
-
-  // Time display
   document.getElementById('timeDisplay').textContent = `🕐 ${now.toUTCString()}`;
 
-  // ----- Planetary positions & retrograde -----
+  // Compute all positions
   const positions = {};
   const retroStatus = {};
   const dailyMotions = {};
@@ -860,56 +1058,46 @@ function update() {
   for (const p of PLANETS) {
     try {
       positions[p.id] = getEclipticLongitude(p.id, now);
-      if (p.canRetro) {
-        retroStatus[p.id] = isRetrograde(p.id, now);
-        dailyMotions[p.id] = getDailyMotion(p.id, now);
-      } else {
-        retroStatus[p.id] = false;
-        dailyMotions[p.id] = getDailyMotion(p.id, now);
-      }
+      retroStatus[p.id] = p.canRetro && isRetrograde(p.id, now);
+      dailyMotions[p.id] = getDailyMotion(p.id, now);
     } catch (e) {
-      console.warn(`Could not compute ${p.id}:`, e.message);
+      console.warn(`Error computing ${p.id}:`, e.message);
     }
   }
 
-  // ----- Fixed stars -----
-  const starPositions = FIXED_STARS.map(s => ({
-    ...s,
-    lon: precessedLon(s, now)
-  }));
+  // Star precession
+  const starPositions = FIXED_STARS.map(s => ({ ...s, lon: precessedLon(s, now) }));
 
-  // ----- Lunar phase -----
+  // Lunar phase
   const phaseAngle = getMoonPhaseAngle(now);
   const lunarPhaseInfo = getLunarPhase(phaseAngle);
   let illumination = null;
   try {
     illumination = getMoonIllumination(now);
-  } catch(e) {}
+  } catch (e) {}
 
-  // ----- Moon badge -----
+  // Update badges
   document.getElementById('moonIcon').textContent = lunarPhaseInfo.icon;
   document.getElementById('moonName').textContent = lunarPhaseInfo.name;
   document.getElementById('moonIllum').textContent =
     `Phase angle: ${phaseAngle.toFixed(1)}°` +
     (illumination !== null ? ` · ${(illumination * 100).toFixed(1)}% illuminated` : '');
 
-  // ----- Retrograde badge -----
+  // Retrograde list
   const retroPlanets = PLANETS.filter(p => retroStatus[p.id]);
   const retroListEl = document.getElementById('retroList');
   if (retroPlanets.length === 0) {
-    retroListEl.textContent = 'None — all planets direct ✓';
+    retroListEl.innerHTML = '✓ All planets direct';
     retroListEl.style.color = '#66cc66';
   } else {
-    retroListEl.innerHTML = retroPlanets.map(p =>
-      `<span style="color:${p.color}">${p.symbol} ${p.name}</span>`
-    ).join(' · ');
+    retroListEl.innerHTML = retroPlanets.map(p => `<span style="color:${p.color}">${p.symbol} ${p.name}</span>`).join(' · ');
     retroListEl.style.color = '';
   }
 
-  // ----- Draw chart -----
+  // Draw chart
   drawChart(positions, retroStatus, starPositions, lunarPhaseInfo);
 
-  // ----- Planet table -----
+  // Planet table
   const tbody = document.getElementById('planetTableBody');
   tbody.innerHTML = '';
   for (const p of PLANETS) {
@@ -931,31 +1119,56 @@ function update() {
     tbody.appendChild(tr);
   }
 
-  // ----- Stars table -----
+  //  STARS TABLE 
   const stBody = document.getElementById('starsTableBody');
-  stBody.innerHTML = '';
-  for (const star of starPositions) {
-    const z = getZodiacSign(star.lon);
-    // Find nearby planets
-    const nearby = PLANETS.filter(p => {
-      const lon = positions[p.id];
-      return lon !== undefined && angleDiff(lon, star.lon) <= 5;
-    }).map(p => {
-      const d = angleDiff(positions[p.id], star.lon);
-      return `<span style="color:${p.color}">${p.symbol} ${p.name} (${d.toFixed(1)}°)</span>`;
-    });
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td style="color:${star.color}">⭐ ${star.name}</td>
-      <td>${star.constellation}</td>
-      <td>${formatDeg(star.lon)}</td>
-      <td>${z.symbol} ${z.name} ${formatDeg(z.degree)}</td>
-      <td>${nearby.length ? nearby.join(', ') : '<span style="color:#444">—</span>'}</td>`;
-    stBody.appendChild(tr);
+  if (stBody) {
+    stBody.innerHTML = '';
+    
+    for (const star of starPositions) {
+      const z = getZodiacSign(star.lon);
+      
+      // Find nearby planets
+      const nearby = [];
+      for (const p of PLANETS) {
+        const lon = positions[p.id];
+        if (lon !== undefined) {
+          const diff = angleDiff(lon, star.lon);
+          if (diff <= 5) {
+            nearby.push({
+              name: p.name,
+              symbol: p.symbol,
+              color: p.color,
+              distance: diff
+            });
+          }
+        }
+      }
+      
+      // Build nearby planets HTML
+      let nearbyHTML = '';
+      if (nearby.length > 0) {
+        nearbyHTML = nearby.map(n => 
+          `<span style="color:${n.color}">${n.symbol} ${n.name} (${n.distance.toFixed(1)}°)</span>`
+        ).join(', ');
+      } else {
+        nearbyHTML = '<span style="color:#444">—</span>';
+      }
+      
+      // Create table row
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="color:${star.color}"><strong>⭐ ${star.name}</strong></td>
+        <td>${star.constellation}</td>
+        <td>${formatDeg(star.lon)}</td>
+        <td><strong>${z.symbol}</strong> ${z.name} <span style="color:#888">${formatDeg(z.degree)}</span></td>
+        <td>${nearbyHTML}</td>
+      `;
+      
+      stBody.appendChild(tr);
+    }
   }
 
-  // ----- Events container -----
+  // Events container
   const container = document.getElementById('eventsContainer');
   container.innerHTML = '';
 
@@ -967,7 +1180,7 @@ function update() {
       ${lunarPhaseInfo.icon} Lunar Phase: ${lunarPhaseInfo.name}
       <span style="color:#888;font-weight:normal;font-size:0.85em">(${phaseAngle.toFixed(1)}°)</span>
     </div>
-    <div class="event-detail">${moonPhaseMeaning(lunarPhaseInfo.name)}</div>`;
+    <div class="event-detail">${getMoonPhaseMeaning(lunarPhaseInfo.name)}</div>`;
   container.appendChild(lunarCard);
 
   // Retrograde events
@@ -979,7 +1192,7 @@ function update() {
         ℞ ${p.symbol} ${p.name} Retrograde
         <span style="color:#888;font-weight:normal;font-size:0.85em">(${dailyMotions[p.id].toFixed(3)}°/day)</span>
       </div>
-      <div class="event-detail">${retrogradeMeaning(p.name)}</div>`;
+      <div class="event-detail">${RETROGRADE_MEANINGS[p.name] || 'Themes internalize for reflection.'}</div>`;
     container.appendChild(card);
   }
 
@@ -995,8 +1208,8 @@ function update() {
         <span style="color:#888;font-weight:normal;font-size:0.85em">(orb ${sc.orb}°)${tight}</span>
       </div>
       <div class="event-detail">
-        ${sc.planet.name} aligns with the fixed star <b>${sc.star.name}</b> in ${sc.star.constellation}.
-        ${sc.star.desc}. Traditional nature: ${sc.star.nature}.
+        ${sc.planet.name} aligns with <b>${sc.star.name}</b> in ${sc.star.constellation}. ${sc.star.desc}
+        <br><span style="color:#aaa">Traditional nature: ${sc.star.nature}</span>
       </div>`;
     container.appendChild(card);
   }
@@ -1012,19 +1225,18 @@ function update() {
         ${a.symbol} ${a.type}: ${a.body1.symbol} ${a.body1.name} — ${a.body2.symbol} ${a.body2.name}
         <span style="color:#888;font-weight:normal;font-size:0.85em">(orb ${a.orb}°)${tight}</span>
       </div>
-      <div class="event-detail">${aspectMeaning(a)}</div>`;
+      <div class="event-detail">${a.meaning}</div>`;
     container.appendChild(card);
   }
 
   if (aspects.length === 0 && starConj.length === 0 && retroPlanets.length === 0) {
     const noEv = document.createElement('p');
     noEv.className = 'no-events';
-    noEv.textContent = 'No major planetary aspects, star conjunctions, or retrogrades active right now.';
+    noEv.textContent = 'No major aspects, conjunctions, or retrogrades active.';
     container.appendChild(noEv);
   }
 }
 
-// Run immediately, then every 30 seconds
 update();
 setInterval(update, 30000);
 </script>

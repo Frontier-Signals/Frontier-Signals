@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="404 - Page not found on Frontier Signals.">
+    <meta name="keywords" content="404, page not found, frontier signals">
+    <meta name="author" content="BraveCat">
+    <meta name="theme-color" content="#00ffff">
+    
+    <!-- Open Graph for social sharing -->
+    <meta property="og:title" content="404 - Page Not Found - Frontier Signals">
+    <meta property="og:description" content="404 - Page not found on Frontier Signals.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://frontier-signals.github.io/Frontier-Signals/">
+    <link rel="canonical" href="https://frontier-signals.github.io/Frontier-Signals/">
+    <meta name="robots" content="noindex, nofollow">
+    <meta property="og:image" content="https://frontier-signals.github.io/Frontier-Signals/images/FrontierSignalsBanner.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="404 - Page Not Found - Frontier Signals">
+    <meta name="twitter:description" content="404 - Page not found on Frontier Signals.">
+    <meta name="twitter:image" content="https://frontier-signals.github.io/Frontier-Signals/images/FrontierSignalsBanner.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <title>Page Not Found - Frontier Signals</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <style>
+/* Controls */
+.controls{
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:center;
+  max-width:1050px;width:100%;margin-bottom:10px;
+}
+.ctrl-group{
+  background:#0e0e1a;border:1px solid #1a1a30;border-radius:10px;
+  padding:10px 14px;min-width:180px;flex:1;
+}
+.ctrl-group h3{color:#8ac;font-size:.82em;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.ctrl-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.ctrl-row label{color:#889;font-size:.78em;min-width:60px}
+.ctrl-row input[type=range]{flex:1;min-width:80px;accent-color:#5a8abf}
+.ctrl-row input[type=number]{
+  width:72px;background:#111;border:1px solid #2a2a40;color:#acc;
+  padding:3px 6px;border-radius:4px;font-size:.82em;
+}
+.ctrl-row .val{color:#acd;font-size:.8em;min-width:55px;text-align:right;font-family:'Courier New',monospace}
+button{
+  background:linear-gradient(135deg,#1a2a40,#253550);border:1px solid #3a4a60;
+  color:#9bc;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.82em;
+  transition:all .2s;
+}
+button:hover{background:linear-gradient(135deg,#253550,#304060);border-color:#5a7a9a}
+button.active{background:linear-gradient(135deg,#2a4060,#3a5575);border-color:#6a9ac0;color:#bdf}
+.preset-btn{padding:4px 10px;font-size:.75em;margin:2px}
+.toggle-group{display:flex;gap:4px}
+.toggle-group button{flex:1}
+
+/* Canvas */
+.chart-wrap{position:relative;margin-bottom:10px}
+canvas{border-radius:50%;box-shadow:0 0 60px rgba(40,80,140,.12)}
+.chart-label{
+  position:absolute;color:rgb(109, 109, 179);font-size:.7em;pointer-events:none;
+  text-transform:uppercase;letter-spacing:2px;
+}
+.chart-label.top{top:8px;left:50%;transform:translateX(-50%)}
+.chart-label.bottom{bottom:8px;left:50%;transform:translateX(-50%)}
+.chart-label.left{left:8px;top:50%;transform:translateY(-50%) rotate(-90deg)}
+.chart-label.right{right:8px;top:50%;transform:translateY(-50%) rotate(90deg)}
+
+/* Info panel */
+.info{max-width:1050px;width:100%;display:flex;flex-wrap:wrap;gap:10px;margin-top:5px}
+.info-card{
+  background:#0c0c18;border:1px solid #1a1a2a;border-radius:8px;
+  padding:10px 14px;flex:1;min-width:250px;
+}
+.info-card h3{color:#7a9;font-size:.82em;margin-bottom:6px}
+.info-card p{font-size:.78em;color:#899;line-height:1.5}
+.info-card .highlight{color:#acd;font-family:'Courier New',monospace}
+.pole-star-info{color:#fc8;font-weight:bold}
+
+/* Tooltip */
+#tooltip{
+  position:fixed;background:rgba(10,10,25,.92);border:1px solid #3a3a6a;
+  border-radius:6px;padding:8px 12px;font-size:.8em;pointer-events:none;
+  display:none;z-index:100;max-width:220px;
+}
+#tooltip .tt-name{color:#adf;font-weight:bold}
+#tooltip .tt-info{color:#889;font-size:.9em;margin-top:3px}
+
+.footer{color:rgb(146, 146, 232);font-size:.68em;margin-top:15px;text-align:center;max-width:700px}
+</style>
+</head>
+<body>
+
+    <!-- ===== Header ===== -->
+    <header>
+        <center><img id="banner" class="bordered-image" src="images/FrontierSignalsBanner.png" alt="Frontier Signals Official Banner"></center>
+        <p style="text-align: center; color: #ff00ff; font-weight: bold; margin: 5px 0;">Beta</p>
+        <hr>
+        <p>NEW TEMPLATE</p>
+    </header>
+
+    <!-- ===== Navigation ===== -->
+    <nav>
+        <div class="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home Page</a></li>
+            <li><a href="historydata.html">Historical Data & Archives</a></li>
+            <li><a href="peerpapers.html">Frontier Science Articles</a></li>
+            <li><a href="ancienthistory.html">Ancient History</a></li>
+            <li><a href="extras.html">Multimedia & Resource Links</a></li>
+            <li><a href="about.html">About</a></li>
+        </ul>
+        <hr>
+        <ul class="nav-links">
+            <li><a href="spaceweather.html">Space Weather Feeds</a></li>
+            <li><a href="earthquakes.html">Earthquake Monitoring</a></li>
+            <li><a href="volcanos.html">Volcano Monitoring</a></li>
+			<li><a href="astrologychart.html">Star Chart</a></li>
+        </ul>
+        <br>
+    </nav>
+
+    <!-- ===== Main Content ===== -->
+    <main>
+        <div class="app">
+<h1>🌟 Hypothetical Pole Planetarium</h1>
+<p class="tagline">What would the sky look like if Earth's axis pointed somewhere else?</p>
+
+<div class="container">
+  <div class="left side">
+<div class="controls">
+  <div class="cg">
+    <h3>🧭 Pole Position (J2000)</h3>
+    <div class="cr"><label>RA°:</label><input type="range" id="pRA" min="0" max="359.5" step="0.5" value="0"><span class="v" id="pRAv">0.0°</span></div>
+    <div class="cr"><label>Dec°:</label><input type="range" id="pDec" min="-90" max="90" step="0.5" value="90"><span class="v" id="pDecv">90.0°</span></div>
+    <div class="cr"><label>Set:</label>
+      <input type="number" id="pRAn" value="0" step="1" min="0" max="360" style="width:55px">
+      <input type="number" id="pDecn" value="90" step="1" min="-90" max="90" style="width:55px">
+      <button id="applyC">Apply</button>
+    </div>
+    <div class="cr" style="flex-wrap:wrap;gap:2px">
+      <button class="pb" data-r="0" data-d="90">Current</button>
+      <button class="pb" data-r="37.95" data-d="89.26">Polaris★</button>
+      <button class="pb" data-r="279.23" data-d="38.78">Vega</button>
+      <button class="pb" data-r="211" data-d="64.37">Thuban</button>
+      <button class="pb" data-r="297.7" data-d="8.87">Altair</button>
+      <button class="pb" data-r="101.29" data-d="-16.72">Sirius</button>
+      <button class="pb" data-r="78.63" data-d="-8.2">Rigel</button>
+      <button class="pb" data-r="88.79" data-d="7.41">Betelgeuse</button>
+      <button class="pb" data-r="310.36" data-d="45.28">Deneb</button>
+    </div>
+  </div>
+
+  <div class="cg">
+    <h3>📅 Time / Observer</h3>
+    <div class="cr"><label>Month:</label><input type="range" id="sMonth" min="0" max="11.9" step="0.1" value="2"><span class="v" id="sMv">Mar</span></div>
+    <div class="cr"><label>Hour:</label><input type="range" id="sHour" min="0" max="23.75" step="0.25" value="22"><span class="v" id="sHv">22:00</span></div>
+    <div class="cr"><label>Obs Lat:</label><input type="range" id="oLat" min="-90" max="90" step="1" value="40"><span class="v" id="oLv">40°N</span></div>
+  </div>
+
+  <div class="cg">
+    <h3>👁️ View</h3>
+    <div class="cr"><label>Hemi:</label><div class="tg"><button id="bN" class="on">North ↑</button><button id="bS">South ↓</button></div></div>
+    <div class="cr"><label>Show:</label><div class="tg">
+      <button id="bL" class="on">Lines</button><button id="bNm" class="on">Names</button>
+      <button id="bG">Grid</button><button id="bH" class="on">Horizon</button></div></div>
+    <div class="cr"><label>Mag:</label><input type="range" id="magL" min="2" max="6" step="0.1" value="5"><span class="v" id="magV">5.0</span></div>
+    <div class="cr"><button id="bPick">🎯 Pick Pole on Map</button><button id="bReset">↺ Reset</button></div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="lc" style="background:#B0C4DE"></span> White/Blue</span>
+  <span><span class="lc" style="background:#FFD700"></span> Yellow</span>
+  <span><span class="lc" style="background:#FFA500"></span> Orange</span>
+  <span><span class="lc" style="background:#FF6347"></span> Red</span>
+  <span>— Lines = Constellation stick figures</span>
+  <span style="color:#4a6a4a">— Green circle = Horizon</span>
+</div></div>
+<div class="right side">
+<canvas id="sky" width="720" height="720"></canvas>
+</div></div>
+
+<div class="info">
+  <div class="ic"><h3>🧭 Pole Configuration</h3><p id="pInfo">...</p></div>
+  <div class="ic"><h3>⭐ New Pole Star</h3><p id="psInfo">...</p></div>
+  <div class="ic"><h3>📊 Sky Summary</h3><p id="vInfo">...</p></div>
+</div>
+<p class="ft">Stereographic projection · All math client-side · Star data: BSC5/HYG bright subset · Constellation lines: IAU</p>
+</div>
+<div id="tooltip"><span class="tn"></span><div class="ti"></div></div>
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer>
+        <p>&copy; 2026 Frontier Signals. All rights reserved.</p>
+        <p style="font-size: 12px; margin-top: 10px;">
+            <a href="privacy-policy.html" style="color: #00ffff; text-decoration: none;">Privacy Policy</a> | 
+            <a href="terms-of-service.html" style="color: #00ffff; text-decoration: none;">Terms of Service</a>
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+	<script>
+// ================================================================
+//  STAR DATABASE — Packed format: RA,Dec,Mag,Name,Const|...
+//  ~300 stars to mag ~5, covers all 88 constellation patterns
+// ================================================================
+const S_RAW = `37.95,89.26,1.98,Polaris,UMi|263.05,86.59,2.08,Kochab,UMi|239.17,77.79,3.0,Pherkad,UMi|247.55,75.76,4.36,4-UMi,UMi|290.21,74.16,4.25,5-UMi,UMi|228.07,71.83,4.95,6-UMi,UMi|165.93,61.75,1.77,Dubhe,UMa|166.45,56.38,2.37,Merak,UMa|178.46,53.69,2.44,Phecda,UMa|183.86,57.03,3.31,Megrez,UMa|193.51,55.96,1.77,Alioth,UMa|200.98,54.93,2.27,Mizar,UMa|206.89,49.31,1.86,Alkaid,UMa|10.13,56.54,2.24,Schedar,Cas|2.29,59.15,2.28,Caph,Cas|14.18,60.72,2.47,Gamma Cas,Cas|21.45,60.24,2.68,Ruchbah,Cas|28.6,63.67,3.37,Segin,Cas|319.64,62.59,2.45,Alderamin,Cep|322.17,58.2,3.23,Alfirk,Cep|339.66,77.63,3.21,Errai,Cep|328.49,58.42,4.08,Zeta Cep,Cep|211.1,64.38,3.67,Thuban,Dra|262.61,65.71,2.74,Eltanin,Dra|268.38,66.56,2.79,Rastaban,Dra|275.19,72.15,3.17,Grumium,Dra|257.2,65.01,3.29,Nu2 Dra,Dra|246.0,61.51,3.07,Eta Dra,Dra|231.23,58.97,3.57,Kappa Dra,Dra|245.16,63.86,3.75,Zeta Dra,Dra|188.37,69.79,3.83,Chi Dra,Dra|88.79,7.41,0.45,Betelgeuse,Ori|78.63,-8.2,0.18,Rigel,Ori|83.0,-0.3,1.69,Alnilam,Ori|81.28,-1.94,1.7,Alnitak,Ori|84.05,-1.2,2.25,Mintaka,Ori|86.94,-9.67,2.07,Saiph,Ori|81.57,6.35,1.64,Bellatrix,Ori|101.29,-16.72,-1.46,Sirius,CMa|104.66,-28.97,1.5,Adhara,CMa|107.1,-26.39,1.84,Wezen,CMa|95.99,-17.96,1.98,Mirzam,CMa|114.83,5.22,0.4,Procyon,CMi|111.79,8.29,2.9,Gomeisa,CMi|113.65,31.89,1.16,Pollux,Gem|116.33,28.03,1.93,Castor,Gem|100.98,16.4,2.88,Tejat,Gem|99.43,22.51,2.98,Mebsuta,Gem|93.72,22.5,3.06,Mekbuda,Gem|106.03,20.57,3.36,Wasat,Gem|152.09,11.97,1.36,Regulus,Leo|177.27,14.57,2.14,Denebola,Leo|146.46,23.77,2.01,Algieba,Leo|168.56,20.52,2.56,Zosma,Leo|154.17,19.84,2.98,Eta Leo,Leo|148.19,26.01,3.34,Adhafera,Leo|170.98,15.43,3.44,Theta Leo,Leo|201.3,-11.16,0.98,Spica,Vir|190.42,10.96,2.83,Vindemiatrix,Vir|194.01,10.96,3.38,Eps Vir,Vir|184.98,-0.67,3.61,Zavijava,Vir|247.35,-26.43,1.06,Antares,Sco|252.97,-34.29,1.62,Shaula,Sco|240.08,-22.62,2.29,Dschubba,Sco|245.3,-25.59,2.62,Eps Sco,Sco|248.97,-28.22,2.89,Sigma Sco,Sco|241.36,-19.81,2.56,Acrab,Sco|253.08,-38.05,1.86,Sargas,Sco|256.11,-34.38,2.41,Lambda Sco,Sco|263.4,-37.1,1.87,Kappa Sco,Sco|276.04,-34.38,1.79,Kaus Aust,Sgr|283.82,-26.3,2.05,Nunki,Sgr|275.25,-29.83,2.72,Kaus Med,Sgr|271.45,-30.42,2.82,Kaus Bor,Sgr|286.17,-21.11,2.6,Ascella,Sgr|279.23,38.78,0.03,Vega,Lyr|282.52,33.36,3.25,Sheliak,Lyr|283.63,36.9,3.52,Sulafat,Lyr|310.36,45.28,1.25,Deneb,Cyg|305.56,40.26,2.23,Sadr,Cyg|311.55,33.97,2.46,Gienah Cyg,Cyg|292.68,27.96,2.87,Albireo,Cyg|305.02,36.49,3.21,Delta Cyg,Cyg|297.7,8.87,0.76,Altair,Aql|286.35,13.86,2.72,Tarazed,Aql|296.57,10.61,3.36,Alshain,Aql|68.98,16.51,0.85,Aldebaran,Tau|84.41,21.14,1.65,Elnath,Tau|56.87,24.11,2.86,Alcyone,Tau|64.95,15.63,3.77,Gamma Tau,Tau|67.15,17.93,3.41,Eps Tau,Tau|79.17,45.99,0.08,Capella,Aur|89.88,44.95,1.9,Menkalinan,Aur|74.25,33.17,2.99,Iota Aur,Aur|76.63,39.18,3.17,Eta Aur,Aur|51.08,49.86,1.79,Mirfak,Per|47.04,40.96,2.12,Algol,Per|55.73,47.79,2.85,Delta Per,Per|59.46,40.01,2.91,Eps Per,Per|42.67,50.69,3.08,Gamma Per,Per|2.1,29.09,2.07,Alpheratz,And|17.43,35.62,2.07,Mirach,And|30.97,42.33,2.1,Almach,And|326.05,9.88,2.38,Markab,Peg|345.94,28.08,2.44,Scheat,Peg|340.37,15.21,2.49,Algenib,Peg|31.79,23.46,2.01,Hamal,Ari|28.66,20.81,2.64,Sheratan,Ari|213.92,19.18,0.0,Arcturus,Boo|222.35,27.07,2.06,Izar,Boo|218.02,38.31,2.68,Nekkar,Boo|225.37,40.39,3.03,Seginus,Boo|209.57,18.4,2.7,Eps Boo,Boo|233.67,26.71,2.22,Alphecca,CrB|235.18,29.11,3.66,Nusakan,CrB|247.55,21.49,2.78,Kornephoros,Her|254.45,14.39,3.48,Zeta Her,Her|247.35,19.15,3.16,Delta Her,Her|239.11,35.1,3.14,Eta Her,Her|258.76,24.84,3.35,Eps Her,Her|262.69,31.6,2.81,Rasalgethi,Her|219.9,-60.84,-0.04,Rigil Kent,Cen|210.96,-60.37,0.61,Hadar,Cen|224.63,-42.16,2.06,Menkent,Cen|186.65,-63.1,0.77,Acrux,Cru|191.93,-59.69,1.25,Mimosa,Cru|187.79,-57.11,1.59,Gacrux,Cru|183.79,-58.75,2.78,Delta Cru,Cru|95.99,-52.7,1.86,Canopus,Car|138.3,-59.28,1.68,Miaplacidus,Car|125.63,-59.51,1.86,Avior,Car|160.74,-64.39,2.25,Aspidiske,Car|136.04,-47.34,1.75,Alsephina,Vel|128.51,-44.87,2.21,Gamma Vel,Vel|140.53,-55.01,1.96,Lambda Vel,Vel|131.18,-54.71,2.5,Kappa Vel,Vel|183.95,-17.54,2.59,Gienah,Crv|187.47,-16.52,2.65,Kraz,Crv|190.42,-22.62,2.94,Algorab,Crv|182.63,-24.73,3.0,Minkar,Crv|141.9,-8.66,1.99,Alphard,Hya|263.73,12.56,2.08,Rasalhague,Oph|249.29,-10.57,2.43,Sabik,Oph|243.58,-3.69,2.56,Yed Prior,Oph|235.81,6.43,2.63,Unukalhai,Ser|222.72,-16.04,2.61,Zuben Esc,Lib|222.68,-9.38,2.75,Zuben Elg,Lib|121.89,-24.3,2.25,Naos,Pup|83.18,-17.82,2.58,Arneb,Lep|82.06,-20.76,2.84,Nihal,Lep|43.56,4.09,2.04,Menkar,Cet|10.9,-17.99,2.04,Diphda,Cet|344.41,-29.62,1.16,Fomalhaut,PsA|332.06,-46.96,1.73,Alnair,Gru|340.67,-46.88,2.07,Gruid,Gru|328.48,-37.36,3.01,Gamma Gru,Gru|6.57,-42.31,2.4,Ankaa,Phe|252.17,-69.03,1.91,Atria,TrA|238.19,-63.43,2.85,Beta TrA,TrA|228.43,-68.68,2.89,Gamma TrA,TrA|306.41,-56.74,1.94,Peacock,Pav|24.43,-57.24,0.45,Achernar,Eri|309.39,11.3,3.63,Sualocin,Del|309.18,14.6,3.64,Rotanev,Del|322.89,-0.32,2.95,Sadalsuud,Aqr|331.45,-0.32,2.9,Sadalmelik,Aqr|305.25,-14.78,3.58,Algedi,Cap|325.02,-16.13,2.85,Deneb Alg,Cap|28.27,29.58,3.0,Beta Tri,Tri|28.98,33.85,3.41,Alpha Tri,Tri|34.31,34.99,4.01,Gamma Tri,Tri|194.01,38.32,2.89,Cor Caroli,CVn|189.3,-72.13,2.69,Alpha Mus,Mus|184.74,-68.11,3.05,Beta Mus,Mus|220.48,-47.39,2.3,Alpha Lup,Lup|224.63,-43.13,2.68,Beta Lup,Lup|233.79,-41.17,2.78,Gamma Lup,Lup|262.77,-49.88,2.85,Alpha Ara,Ara|261.33,-55.53,2.84,Beta Ara,Ara|84.91,-34.07,2.64,Phact,Col|87.74,-35.77,3.12,Wazn,Col|130.81,21.47,3.53,Acubens,Cnc|131.17,18.15,3.94,Delta Cnc,Cnc|295.02,17.48,3.47,Gamma Sge,Sge|296.25,18.01,3.68,Delta Sge,Sge|29.69,-61.57,2.8,Beta Hyi,Hyi|6.42,-77.25,2.86,Alpha Hyi,Hyi|57.3,-74.24,3.24,Gamma Hyi,Hyi|63.6,-62.47,3.33,Alpha Ret,Ret|56.25,-64.81,3.84,Beta Ret,Ret|287.37,-4.88,3.44,Theta Aql,Aql|291.37,-5.71,3.23,Delta Aql,Aql|316.23,38.05,2.48,Eps Cyg,Cyg|335.41,23.4,3.41,Matar,Peg|109.29,-26.77,3.02,Aludra,CMa|220.86,-64.98,3.19,Alpha Cir,Cir|306.41,-12.51,3.08,Dabih,Cap|284.43,-29.88,2.88,Phi Sgr,Sgr|81.67,-56.17,3.24,Alpha Pic,Pic|83.41,-62.49,3.27,Alpha Dor,Dor|45.56,-42.29,3.86,Alpha Hor,Hor|322.85,-77.39,3.73,Nu Oct,Oct|176.4,-54.49,4.05,Eta Cen,Cen|190.38,-48.96,2.17,Muhlifain,Cen|182.09,-50.72,2.6,Eps Cen,Cen|200.15,-36.71,2.55,Iota Cen,Cen`;
+
+// ================================================================
+//  CONSTELLATION LINES — pairs of star indices (into parsed array)
+//  Built by matching nearest star RA/Dec from the catalog
+// ================================================================
+const CL_RAW = {
+UMi:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,1]],
+UMa:[[12,11],[11,10],[10,9],[9,8],[8,7],[7,6],[9,8]],
+Cas:[[17,16],[16,15],[15,13],[13,14]],
+Cep:[[18,19],[19,21],[21,20],[20,18]],
+Dra:[[25,24],[24,23],[23,26],[26,27],[27,29],[29,28],[28,22],[22,30]],
+Ori:[[31,36],[36,37],[37,31],[36,35],[35,33],[33,34],[34,31],[32,33]],
+CMa:[[38,41],[38,39],[39,40],[40,38]],
+CMi:[[42,43]],
+Gem:[[44,45],[44,49],[49,47],[47,48],[45,46]],
+Leo:[[50,54],[54,55],[55,52],[52,53],[53,51],[51,56],[56,50],[52,50]],
+Vir:[[57,59],[59,58],[58,60],[57,59]],
+Sco:[[65,62],[62,63],[63,61],[61,64],[64,67],[67,66],[66,68]],
+Sgr:[[72,71],[71,70],[71,69],[69,73],[73,74]],
+Lyr:[[75,76],[76,77],[77,75]],
+Cyg:[[78,79],[79,81],[79,80],[78,84],[82,79]],
+Aql:[[85,86],[85,87],[85,88],[88,89]],
+Tau:[[90,91],[90,93],[93,94],[94,92]],
+Aur:[[95,96],[95,98],[98,97],[97,95]],
+Per:[[99,103],[99,100],[100,101],[99,102]],
+And:[[104,105],[105,106]],
+Peg:[[107,109],[109,108],[108,104],[104,107],[108,121]],
+Ari:[[110,111]],
+Boo:[[112,116],[112,113],[113,114],[114,115],[112,116]],
+CrB:[[117,118]],
+Her:[[119,121],[121,122],[122,120],[120,119],[120,123]],
+Cen:[[124,125],[125,131],[126,132]],
+Cru:[[127,129],[128,130]],
+Car:[[133,134],[134,136],[136,135],[135,133]],
+Vel:[[137,138],[139,140],[140,137]],
+Crv:[[141,142],[142,143],[143,144],[144,141]],
+Hya:[[145,145]],
+Sco2:[[61,62]],
+Lib:[[153,154]],
+Lep:[[157,158]],
+Cet:[[159,160]],
+PsA:[[161,161]],
+Gru:[[162,163],[163,164],[164,162]],
+Phe:[[165,165]],
+TrA:[[166,167],[167,168],[168,166]],
+Del:[[172,173]],
+Aqr:[[174,175]],
+Tri:[[180,181],[181,182],[182,180]],
+CVn:[[183,183]],
+Mus:[[184,185]],
+Lup:[[186,187],[187,188]],
+Col:[[193,194]],
+Cnc:[[195,196]],
+Sge:[[197,198]],
+Hyi:[[199,200],[200,201],[201,199]],
+Ret:[[202,203]],
+};
+
+// ================================================================
+//  PARSE STARS
+// ================================================================
+const stars = S_RAW.split('|').map(s => {
+  const p = s.split(',');
+  return { ra:+p[0], dec:+p[1], mag:+p[2], name:p[3], con:p[4] };
+});
+
+// ================================================================
+//  MATH ENGINE
+// ================================================================
+const DEG = Math.PI/180, RAD = 180/Math.PI;
+
+function radec2cart(ra,dec){
+  const r=ra*DEG, d=dec*DEG;
+  return [Math.cos(d)*Math.cos(r), Math.cos(d)*Math.sin(r), Math.sin(d)];
+}
+function cart2radec(x,y,z){
+  const dec=Math.asin(Math.max(-1,Math.min(1,z)))*RAD;
+  let ra=Math.atan2(y,x)*RAD;
+  if(ra<0)ra+=360;
+  return {ra,dec};
+}
+function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]}
+function cross(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]}
+function norm(v){const l=Math.sqrt(dot(v,v));return l<1e-12?[0,0,1]:[v[0]/l,v[1]/l,v[2]/l]}
+function sub(a,b){return[a[0]-b[0],a[1]-b[1],a[2]-b[2]]}
+
+// Build rotation matrix: transforms J2000 equatorial → new pole system
+function buildMatrix(poleRA, poleDec, eqRA){
+  const zp = radec2cart(poleRA, poleDec); // new pole
+  // reference direction for new RA=0: project a point onto new equator
+  const ref = radec2cart(eqRA, 0);
+  const d = dot(ref, zp);
+  let xp = norm(sub(ref, [d*zp[0], d*zp[1], d*zp[2]]));
+  // if ref is parallel to pole, pick arbitrary perpendicular
+  if(dot(xp,xp)<0.5){
+    const alt = radec2cart(eqRA+90, 0);
+    const d2 = dot(alt, zp);
+    xp = norm(sub(alt, [d2*zp[0], d2*zp[1], d2*zp[2]]));
+  }
+  const yp = cross(zp, xp);
+  return { x:xp, y:yp, z:zp };
+}
+
+function transformStar(ra, dec, M){
+  const c = radec2cart(ra, dec);
+  return {
+    x: dot(M.x, c),
+    y: dot(M.y, c),
+    z: dot(M.z, c) // z = sin(new dec) → positive = near new pole
+  };
+}
+
+// Stereographic projection from pole
+// For north view: project from south pole onto plane tangent at north pole
+// For south view: project from north pole onto plane tangent at south pole
+function stereoProject(newRA, newDec, isNorth){
+  const r = newRA * DEG, d = newDec * DEG;
+  if(isNorth){
+    // Project stars above equator (newDec > 0 most visible)
+    const denom = 1 + Math.sin(d);
+    if(denom < 0.01) return null; // near south pole, behind projection
+    const scale = 2 / denom;
+    const x = scale * Math.cos(d) * Math.sin(r);   // RA increases counterclockwise
+    const y = -scale * Math.cos(d) * Math.cos(r);  // north up
+    return {x, y};
+  } else {
+    const denom = 1 - Math.sin(d);
+    if(denom < 0.01) return null;
+    const scale = 2 / denom;
+    const x = -scale * Math.cos(d) * Math.sin(r);
+    const y = -scale * Math.cos(d) * Math.cos(r);
+    return {x, y};
+  }
+}
+
+// ================================================================
+//  STATE
+// ================================================================
+let poleRA = 0, poleDec = 90, eqRef = 0;
+let month = 2, hour = 22, obsLat = 40;
+let viewNorth = true;
+let showLines = true, showNames = true, showGrid = false, showHorizon = true;
+let magLimit = 5.0;
+let pickMode = false;
+
+// Projected star cache for tooltip
+let projectedStars = [];
+
+// ================================================================
+//  RENDERING
+// ================================================================
+const canvas = document.getElementById('sky');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const CX = W/2, CY = H/2, RADIUS = W/2 - 20;
+
+function getSeasonalRotation(){
+  // Earth orbits Sun → stars shift ~1°/day → ~30°/month
+  // At sidereal time = 0, RA=0 is on meridian
+  // Local sidereal time ≈ month*30 + hour*15 (degrees, very simplified)
+  return (month * 30 + hour * 15) % 360;
+}
+
+function render(){
+  const lst = getSeasonalRotation();
+  // Build rotation matrix for new pole
+  // The equinox reference rotates with sidereal time
+  const M = buildMatrix(poleRA, poleDec, lst);
+
+  ctx.clearRect(0,0,W,H);
+
+  // Background
+  const bg = ctx.createRadialGradient(CX,CY,0,CX,CY,RADIUS+20);
+  bg.addColorStop(0,'#0c0c20');
+  bg.addColorStop(1,'#050510');
+  ctx.fillStyle=bg;
+  ctx.fillRect(0,0,W,H);
+
+  // Outer circle
+  ctx.beginPath();ctx.arc(CX,CY,RADIUS,0,Math.PI*2);
+  ctx.strokeStyle='#1a2a3a';ctx.lineWidth=2;ctx.stroke();
+  ctx.save();ctx.clip();
+
+  // Background speckle
+  ctx.fillStyle='rgba(180,200,255,0.07)';
+  for(let i=0;i<200;i++){
+    const a=Math.random()*Math.PI*2, r=Math.random()*RADIUS;
+    ctx.fillRect(CX+r*Math.cos(a), CY+r*Math.sin(a), 0.8, 0.8);
+  }
+
+  // Grid
+  if(showGrid){
+    ctx.strokeStyle='rgba(60,80,120,0.2)';ctx.lineWidth=0.5;
+    // Dec circles (in new system)
+    for(let d=10;d<=80;d+=10){
+      const rd = RADIUS * (viewNorth ? (90-d)/90 : (90-(-d+90))/90);
+      const r2 = RADIUS * ((90 - d) / 90);
+      ctx.beginPath();ctx.arc(CX,CY,r2,0,Math.PI*2);ctx.stroke();
+    }
+    // RA lines
+    for(let r=0;r<360;r+=30){
+      const a=(r-90)*DEG;
+      ctx.beginPath();ctx.moveTo(CX,CY);
+      ctx.lineTo(CX+RADIUS*Math.cos(a),CY+RADIUS*Math.sin(a));ctx.stroke();
+    }
+    // Dec labels
+    ctx.fillStyle='rgba(100,130,180,0.4)';ctx.font='9px monospace';ctx.textAlign='center';
+    for(let d=10;d<=80;d+=20){
+      const r2 = RADIUS * ((90 - d) / 90);
+      const lbl = viewNorth ? `+${d}°` : `-${d}°`;
+      ctx.fillText(lbl, CX+4, CY-r2+10);
+    }
+  }
+
+  // Horizon circle (if enabled)
+  // In the new coordinate system, the horizon is a circle at newDec = (90 - |obsLat|)
+  // Zenith is at newDec = +90 (north view) or -90 (south view)
+  // Horizon is at altitude 0 → newDec = 90 - obsLat for north hemisphere observer
+  let horizonR = null;
+  if(showHorizon && Math.abs(obsLat)>0){
+    const horizDec = viewNorth ? (90 - obsLat) : (90 - Math.abs(obsLat));
+    const horizFrac = Math.max(0, Math.min(1, horizDec / 90));
+    horizonR = RADIUS * horizFrac;
+    if(horizonR > 0 && horizonR < RADIUS){
+      ctx.beginPath();ctx.arc(CX,CY,horizonR,0,Math.PI*2);
+      ctx.strokeStyle='rgba(60,140,60,0.5)';ctx.lineWidth=1.5;
+      ctx.setLineDash([6,4]);ctx.stroke();ctx.setLineDash([]);
+      // Fill below horizon
+      ctx.beginPath();ctx.arc(CX,CY,RADIUS,0,Math.PI*2);
+      ctx.arc(CX,CY,horizonR,0,Math.PI*2,true);
+      ctx.fillStyle='rgba(30,60,30,0.1)';ctx.fill();
+      // Label
+      ctx.fillStyle='rgba(60,140,60,0.6)';ctx.font='10px sans-serif';ctx.textAlign='left';
+      ctx.fillText('HORIZON',CX+horizonR*0.5+5,CY-horizonR+12);
+    }
+  }
+
+  // Transform and project all stars
+  projectedStars = [];
+  const maxStereoR = viewNorth ? 2.0 : 2.0;
+
+  for(let i=0;i<stars.length;i++){
+    const s = stars[i];
+    if(s.mag > magLimit) continue;
+    const t = transformStar(s.ra, s.dec, M);
+    const newCoord = cart2radec(t.x, t.y, t.z);
+    const newDec = newCoord.dec;
+    const newRA = newCoord.ra;
+
+    // Visibility check
+    if(viewNorth && newDec < -5) continue;
+    if(!viewNorth && newDec > 5) continue;
+
+    const proj = stereoProject(newRA, newDec, viewNorth);
+    if(!proj) continue;
+
+    const px = CX + proj.x * RADIUS / maxStereoR;
+    const py = CY + proj.y * RADIUS / maxStereoR;
+
+    // Check if within chart circle
+    const dx=px-CX, dy=py-CY;
+    if(Math.sqrt(dx*dx+dy*dy) > RADIUS-2) continue;
+
+    // Star appearance
+    const size = Math.max(0.5, (6.5 - s.mag) * 0.9);
+    const alpha = Math.max(0.3, Math.min(1, (6 - s.mag) / 4));
+
+    // Color by spectral type (approximate from magnitude/position)
+    let col;
+    if(s.mag < 0.5) col = `rgba(200,220,255,${alpha})`;
+    else if(s.name.includes('Betelgeuse')||s.name.includes('Antares')||s.name.includes('Aldebaran'))
+      col = `rgba(255,140,80,${alpha})`;
+    else if(s.name.includes('Arcturus')||s.name.includes('Capella')||s.name.includes('Pollux'))
+      col = `rgba(255,220,120,${alpha})`;
+    else if(s.name.includes('Rigel')||s.name.includes('Spica')||s.name.includes('Vega')||
+            s.name.includes('Sirius')||s.name.includes('Deneb'))
+      col = `rgba(180,210,255,${alpha})`;
+    else col = `rgba(220,225,240,${alpha})`;
+
+    projectedStars.push({x:px, y:py, size, star:s, idx:i, newRA, newDec});
+
+    // Glow for bright stars
+    if(s.mag < 2){
+      const g = ctx.createRadialGradient(px,py,0,px,py,size+6);
+      g.addColorStop(0, col.replace(/[\d.]+\)$/,'0.25)'));
+      g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;
+      ctx.beginPath();ctx.arc(px,py,size+6,0,Math.PI*2);ctx.fill();
+    }
+
+    // Star dot
+    ctx.beginPath();ctx.arc(px,py,size,0,Math.PI*2);
+    ctx.fillStyle=col;ctx.fill();
+  }
+
+  // Constellation lines
+  if(showLines){
+    ctx.strokeStyle='rgba(80,120,180,0.18)';ctx.lineWidth=0.8;
+    for(const [con, segs] of Object.entries(CL_RAW)){
+      for(const seg of segs){
+        if(seg.length < 2) continue;
+        // Find projected positions for these star indices
+        const pts = seg.map(idx => projectedStars.find(p => p.idx === idx)).filter(Boolean);
+        if(pts.length < 2) continue;
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for(let k=1;k<pts.length;k++){
+          // Don't draw lines that cross too far (wrapping)
+          const dx=pts[k].x-pts[k-1].x, dy=pts[k].y-pts[k-1].y;
+          if(Math.sqrt(dx*dx+dy*dy) < RADIUS*0.8){
+            ctx.lineTo(pts[k].x, pts[k].y);
+          } else {
+            ctx.moveTo(pts[k].x, pts[k].y);
+          }
+        }
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Star labels
+  if(showNames){
+    ctx.textAlign='left';ctx.textBaseline='middle';
+    for(const p of projectedStars){
+      if(p.star.mag > 3.2) continue;
+      if(p.star.name.includes('-')) continue; // skip unnamed
+      ctx.fillStyle = p.star.mag < 1.5 ? 'rgba(200,220,255,0.7)' : 'rgba(160,170,190,0.45)';
+      ctx.font = p.star.mag < 1.5 ? 'bold 10px sans-serif' : '8px sans-serif';
+      ctx.fillText(p.star.name, p.x + p.size + 4, p.y);
+    }
+  }
+
+  // Pole marker
+  if(viewNorth){
+    ctx.beginPath();ctx.arc(CX,CY,4,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,100,100,0.8)';ctx.fill();
+    ctx.fillStyle='rgba(255,100,100,0.6)';ctx.font='bold 9px sans-serif';
+    ctx.textAlign='center';ctx.fillText('NCP', CX, CY-10);
+  } else {
+    ctx.beginPath();ctx.arc(CX,CY,4,0,Math.PI*2);
+    ctx.fillStyle='rgba(100,100,255,0.8)';ctx.fill();
+    ctx.fillStyle='rgba(100,100,255,0.6)';ctx.font='bold 9px sans-serif';
+    ctx.textAlign='center';ctx.fillText('SCP', CX, CY-10);
+  }
+
+  // Cardinal directions
+  ctx.fillStyle='rgba(150,180,220,0.5)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+  const cardinals = viewNorth ?
+    [['N',CX,18],['S',CX,H-8],['E',14,CY],['W',W-14,CY]] :
+    [['S',CX,18],['N',CX,H-8],['W',14,CY],['E',W-14,CY]];
+
+  ctx.restore();
+
+  // Pick mode indicator
+  if(pickMode){
+    ctx.strokeStyle='rgba(255,200,50,0.6)';ctx.lineWidth=3;
+    ctx.setLineDash([8,6]);
+    ctx.beginPath();ctx.arc(CX,CY,RADIUS+8,0,Math.PI*2);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,200,50,0.8)';ctx.font='bold 11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('🎯 CLICK TO SET NEW POLE POSITION', CX, H-5);
+  }
+
+  // Update info panels
+  updateInfo();
+}
+
+// ================================================================
+//  INFO PANELS
+// ================================================================
+function updateInfo(){
+  // Pole info
+  const z = getZodiac(poleRA);
+  document.getElementById('pInfo').innerHTML =
+    `Pole RA: <span class="hi">${poleRA.toFixed(1)}°</span> (${(poleRA/15).toFixed(2)}h)` +
+    ` · Dec: <span class="hi">${poleDec.toFixed(1)}°</span><br>` +
+    `Direction: ${z.symbol} ${z.name} region<br>` +
+    `${poleDec===90&&poleRA===0 ? '✅ <b>Current real pole</b>' : '⚡ <b>Hypothetical pole</b>'}` +
+    `<br>Observer latitude: ${obsLat}° · ${viewNorth?'Northern':'Southern'} view`;
+
+  // Find nearest star to pole
+  let best=null, bestD=999;
+  for(const s of stars){
+    const d = angDist(poleRA, poleDec, s.ra, s.dec);
+    if(d<bestD){bestD=d;best=s}
+  }
+  document.getElementById('psInfo').innerHTML = best ?
+    `<span class="ps">${best.name}</span> (${best.con}) at ${bestD.toFixed(1)}° from pole<br>` +
+    `Magnitude: ${best.mag.toFixed(2)}<br>` +
+    (bestD < 3 ? `⭐ This would serve as a good pole star!` :
+     bestD < 10 ? `🔸 Fairly close — a usable pole reference` :
+     `🔹 No bright star very near this pole position`) : '—';
+
+  // Visibility summary
+  const visN = stars.filter(s => {
+    const M = buildMatrix(poleRA, poleDec, 0);
+    const t = transformStar(s.ra, s.dec, M);
+    return t.z > 0;
+  }).length;
+  const circum = stars.filter(s => {
+    const M = buildMatrix(poleRA, poleDec, 0);
+    const t = transformStar(s.ra, s.dec, M);
+    const nd = Math.asin(Math.max(-1,Math.min(1,t.z)))*RAD;
+    return nd > (90 - obsLat);
+  }).length;
+  const never = stars.filter(s => {
+    const M = buildMatrix(poleRA, poleDec, 0);
+    const t = transformStar(s.ra, s.dec, M);
+    const nd = Math.asin(Math.max(-1,Math.min(1,t.z)))*RAD;
+    return nd < -(90 - obsLat);
+  }).length;
+
+  document.getElementById('vInfo').innerHTML =
+    `Stars in catalog: <span class="hi">${stars.length}</span><br>` +
+    `Visible from ${obsLat}°N: <span class="hi">${visN}</span><br>` +
+    `Circumpolar (always up): <span class="hi">${circum}</span><br>` +
+    `Never visible: <span class="hi">${never}</span>`;
+}
+
+function angDist(ra1,dec1,ra2,dec2){
+  const c1=radec2cart(ra1,dec1), c2=radec2cart(ra2,dec2);
+  const d=dot(c1,c2);
+  return Math.acos(Math.max(-1,Math.min(1,d)))*RAD;
+}
+
+const ZODIAC = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+const ZSYM   = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+function getZodiac(ra){ const i=Math.floor(ra/30)%12; return {name:ZODIAC[i],symbol:ZSYM[i]}; }
+
+// ================================================================
+//  CONTROLS & INTERACTION
+// ================================================================
+const $ = id => document.getElementById(id);
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function syncSliders(){
+  $('pRA').value = poleRA; $('pRAv').textContent = poleRA.toFixed(1)+'°';
+  $('pDec').value = poleDec; $('pDecv').textContent = poleDec.toFixed(1)+'°';
+  $('pRAn').value = Math.round(poleRA); $('pDecn').value = Math.round(poleDec);
+  $('sMv').textContent = MONTHS[Math.floor(month)];
+  $('sHv').textContent = `${Math.floor(hour)}:${((hour%1)*60).toFixed(0).padStart(2,'0')}`;
+  $('oLv').textContent = `${obsLat}°${obsLat>=0?'N':'S'}`;
+  $('magV').textContent = magLimit.toFixed(1);
+}
+
+$('pRA').oninput = function(){ poleRA=+this.value; syncSliders(); render(); };
+$('pDec').oninput = function(){ poleDec=+this.value; syncSliders(); render(); };
+$('sMonth').oninput = function(){ month=+this.value; syncSliders(); render(); };
+$('sHour').oninput = function(){ hour=+this.value; syncSliders(); render(); };
+$('oLat').oninput = function(){ obsLat=+this.value; syncSliders(); render(); };
+$('magL').oninput = function(){ magLimit=+this.value; syncSliders(); render(); };
+
+$('applyC').onclick = function(){
+  poleRA = Math.max(0,Math.min(360,+$('pRAn').value));
+  poleDec = Math.max(-90,Math.min(90,+$('pDecn').value));
+  syncSliders(); render();
+};
+
+// Preset buttons
+document.querySelectorAll('.pb').forEach(btn => {
+  btn.onclick = function(){
+    poleRA = +this.dataset.r;
+    poleDec = +this.dataset.d;
+    syncSliders(); render();
+  };
+});
+
+// Hemisphere toggle
+$('bN').onclick = function(){ viewNorth=true; $('bN').classList.add('on'); $('bS').classList.remove('on'); render(); };
+$('bS').onclick = function(){ viewNorth=false; $('bS').classList.add('on'); $('bN').classList.remove('on'); render(); };
+
+// Show toggles
+function toggleBtn(id, getter, setter){
+  $(id).onclick = function(){ setter(!getter()); this.classList.toggle('on'); render(); };
+}
+toggleBtn('bL', ()=>showLines, v=>{showLines=v});
+toggleBtn('bNm', ()=>showNames, v=>{showNames=v});
+toggleBtn('bG', ()=>showGrid, v=>{showGrid=v});
+toggleBtn('bH', ()=>showHorizon, v=>{showHorizon=v});
+
+// Pick pole on map
+$('bPick').onclick = function(){
+  pickMode = !pickMode;
+  this.classList.toggle('on');
+  render();
+};
+// ---- Pick pole on map (canvas click handler) ----
+canvas.onclick = function(e){
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = W / rect.width, scaleY = H / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX - CX;
+  const my = (e.clientY - rect.top) * scaleY - CY;
+  const dist = Math.sqrt(mx*mx + my*my);
+
+  if(pickMode && dist <= RADIUS){
+    // Reverse stereographic → new system RA/Dec
+    const maxR = 2.0;
+    const sx = mx / RADIUS * maxR;
+    const sy = my / RADIUS * maxR;
+    const rho = Math.sqrt(sx*sx + sy*sy);
+
+    if(rho > 0.001){
+      let newRA, newDec;
+      if(viewNorth){
+        const c = 2 * Math.atan(rho / 2);
+        newDec = Math.asin(Math.max(-1, Math.min(1, Math.cos(c)))) * RAD;
+        newRA = Math.atan2(sx, -sy) * RAD;
+      } else {
+        const c = 2 * Math.atan(rho / 2);
+        newDec = -Math.asin(Math.max(-1, Math.min(1, Math.cos(c)))) * RAD;
+        newRA = Math.atan2(-sx, -sy) * RAD;
+      }
+      if(newRA < 0) newRA += 360;
+
+      // Transform back to J2000 using inverse (transpose) of rotation matrix
+      const M = buildMatrix(poleRA, poleDec, getSeasonalRotation());
+      const c3 = [
+        Math.cos(newDec * DEG) * Math.cos(newRA * DEG),
+        Math.cos(newDec * DEG) * Math.sin(newRA * DEG),
+        Math.sin(newDec * DEG)
+      ];
+      // M^T · c3 = original J2000 cartesian
+      const ox = M.x[0]*c3[0] + M.y[0]*c3[1] + M.z[0]*c3[2];
+      const oy = M.x[1]*c3[0] + M.y[1]*c3[1] + M.z[1]*c3[2];
+      const oz = M.x[2]*c3[0] + M.y[2]*c3[1] + M.z[2]*c3[2];
+      const orig = cart2radec(ox, oy, oz);
+
+      // Set this as new pole
+      poleRA = orig.ra;
+      poleDec = orig.dec;
+      syncSliders();
+      render();
+    }
+    return;
+  }
+
+  // If not in pick mode, check for star hover/click
+  // (tooltip on click for mobile)
+  handleStarClick(e);
+};
+
+function handleStarClick(e){
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = W / rect.width, scaleY = H / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleY;
+  let found = null, bestD = 15;
+  for(const p of projectedStars){
+    const d = Math.sqrt((p.x-mx)**2 + (p.y-my)**2);
+    if(d < bestD){ bestD = d; found = p; }
+  }
+  if(found){
+    showTooltip(e.clientX, e.clientY, found);
+  } else {
+    hideTooltip();
+  }
+}
+
+// ---- Tooltip ----
+const tooltip = document.getElementById('tooltip');
+
+canvas.onmousemove = function(e){
+  if(pickMode){ canvas.style.cursor='crosshair'; return; }
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = W / rect.width, scaleY = H / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleY;
+  let found = null, bestD = 12;
+  for(const p of projectedStars){
+    const d = Math.sqrt((p.x - mx)**2 + (p.y - my)**2);
+    if(d < bestD){ bestD = d; found = p; }
+  }
+  if(found){
+    canvas.style.cursor = 'pointer';
+    showTooltip(e.clientX, e.clientY, found);
+  } else {
+    canvas.style.cursor = pickMode ? 'crosshair' : 'default';
+    hideTooltip();
+  }
+};
+
+canvas.onmouseleave = function(){ hideTooltip(); };
+
+function showTooltip(x, y, p){
+  const s = p.star;
+  const z = getZodiac(s.ra);
+  const origDist = angDist(poleRA, poleDec, s.ra, s.dec);
+  tooltip.style.display = 'block';
+  tooltip.style.left = (x + 15) + 'px';
+  tooltip.style.top = (y - 10) + 'px';
+  tooltip.querySelector('.tn').textContent = `${s.name} (${s.con})`;
+  tooltip.querySelector('.ti').innerHTML =
+    `Mag: ${s.mag.toFixed(2)}<br>` +
+    `J2000 RA: ${s.ra.toFixed(2)}° (${(s.ra/15).toFixed(2)}h)<br>` +
+    `J2000 Dec: ${s.dec.toFixed(2)}°<br>` +
+    `Region: ${z.symbol} ${z.name}<br>` +
+    `New-system Dec: ${p.newDec.toFixed(1)}°<br>` +
+    `Dist from new pole: ${origDist.toFixed(1)}°` +
+    (origDist < 5 ? '<br>⭐ Near the pole!' : '');
+}
+
+function hideTooltip(){ tooltip.style.display = 'none'; }
+
+// ---- Reset ----
+$('bReset').onclick = function(){
+  poleRA = 0; poleDec = 90; month = 2; hour = 22; obsLat = 40;
+  viewNorth = true; showLines = true; showNames = true;
+  showGrid = false; showHorizon = true; magLimit = 5.0; pickMode = false;
+  $('sMonth').value = 2; $('sHour').value = 22; $('oLat').value = 40;
+  $('magL').value = 5.0;
+  $('bN').classList.add('on'); $('bS').classList.remove('on');
+  $('bL').classList.add('on'); $('bNm').classList.add('on');
+  $('bG').classList.remove('on'); $('bH').classList.add('on');
+  $('bPick').classList.remove('on');
+  syncSliders(); render();
+};
+
+// ---- Keyboard shortcuts ----
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName === 'INPUT') return;
+  switch(e.key){
+    case 'n': $('bN').click(); break;
+    case 's': $('bS').click(); break;
+    case 'l': $('bL').click(); break;
+    case 'g': $('bG').click(); break;
+    case 'h': $('bH').click(); break;
+    case 'p': $('bPick').click(); break;
+    case 'r': $('bReset').click(); break;
+    case 'ArrowLeft':
+      month = (month - 0.5 + 12) % 12;
+      $('sMonth').value = month; syncSliders(); render(); break;
+    case 'ArrowRight':
+      month = (month + 0.5) % 12;
+      $('sMonth').value = month; syncSliders(); render(); break;
+    case 'ArrowUp':
+      hour = (hour - 1 + 24) % 24;
+      $('sHour').value = hour; syncSliders(); render(); break;
+    case 'ArrowDown':
+      hour = (hour + 1) % 24;
+      $('sHour').value = hour; syncSliders(); render(); break;
+  }
+});
+
+// ---- Initial render ----
+syncSliders();
+render();
+</script>
+
+</body>
+</html>

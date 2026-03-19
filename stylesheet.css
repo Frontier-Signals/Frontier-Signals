@@ -105,6 +105,31 @@
             padding: 10px;
         }
 
+        .button {
+  background-color: #2d1846; 
+  border: none;              /* Remove default border */
+  color: #fcf2dc;              /* White text color */
+  padding: 12px 24px;        /* Space around the text (top/bottom, left/right) */
+  text-align: center;        /* Center the text */
+  text-decoration: none;     /* Remove default link underline */
+  display: inline-block;     /* Allows setting padding and margins correctly */
+  font-size: 16px;           /* Set the font size */
+  margin: 4px 2px;           /* Space between buttons if you have multiple */
+  cursor: pointer;           /* Change cursor to a hand icon on hover */
+  border-radius: 8px;        /* Rounded corners */
+  transition-duration: 0.4s; /* Smooth transition for hover effects */
+}
+
+/* Hover Effect: Change color when the user mouses over the button */
+.button:hover {
+  background-color: #363417; /* Darker blue on hover */
+}
+
+/* Focus Effect: Important for keyboard navigation accessibility */
+.button:focus {
+  box-shadow: 0 0 0 3px #363417; /* Add a visible focus indicator */
+}
+
         /* ===== Mobile Styles + Smooth Transition ===== */
         @media (max-width: 768px) {
             /* include padding/border in width calculations everywhere */

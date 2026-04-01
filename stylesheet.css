@@ -247,6 +247,12 @@
             margin: 20px 0;
         }
 
+h1, h2, h3, h4, h5, h6 {
+    color: #ff6b35;
+    text-shadow:none;
+    font-weight: 700; /* Heavier */
+}
+
        /* ===== Image Styling with Neon Orange Glow ===== */
 .bordered-image {
     border: 3px solid #ff6b35;

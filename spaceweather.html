@@ -313,8 +313,54 @@
           <br><br>Hazard Types: The system monitors and provides hazard levels for four common types of satellite problems:<br>- Surface charging<br>- Internal charging<br>- Single event effects (upsets)<br>- Total dose effects<br><hr><br>Hazard Quotient: For each hazard, the system provides a "hazard quotient," which represents the probability of an anomaly relative to the long-term average likelihood. A quotient of 1 indicates an average likelihood.
           <br><hr><br>Visual Representation:<br><span class="circle green"></span> Green: This color indicates no risk or normal conditions.<br><span class="circle yellow"></span> Yellow/Orange: This indicates potential hazards or an increased probability of an anomaly occurring.<br><span class="circle red"></span> Red: This represents a high hazard or a significant probability of a satellite anomaly.
         </p><br></div></div><br><p style="text-align:center">Sourced from NOAA Space Weather Prediction Center - Updated every 30 minutes</p><br>
-        </section>
+          <!-- ===== NOAA ENLIL Spiral Forecast ===== -->
+      </section>
         <br><br>
+        <section>
+      <h2 style="text-align:center">NOAA ENLIL Spiral Forecast</h2>
+      <hr>
+      <button type="button" class="collapsible">Show ENLIL Forecast</button>
+      <div class="content">
+        <div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
+          <div style="text-align:center; color:#00ffff; font-weight:bold; margin-bottom:12px; font-size:14px;">
+            <span id="enlil-status">Loading ENLIL animation…</span>
+          </div>
+          <canvas id="enlil-canvas" width="600" height="600" 
+                  style="display:block; margin:0 auto; background:#000; border:2px solid #ff00ff; max-width:100%; height:auto; image-rendering:pixelated;"></canvas>
+          
+          <div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
+            <button id="enlil-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev</button>
+            <button id="enlil-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
+            <button id="enlil-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
+            <button id="enlil-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next ▶</button>
+            <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
+              Speed:
+              <select id="enlil-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
+                <option value="600">0.6s</option>
+                <option value="400">0.4s</option>
+                <option value="250" selected>0.25s</option>
+                <option value="150">0.15s</option>
+              </select>
+            </label>
+          </div>
+          
+          <div style="margin-top:12px;">
+            <input id="enlil-slider" type="range" min="0" max="0" value="0"
+                   style="width:100%; cursor:pointer; accent-color:#00ffff;" />
+            <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
+              Frame <span id="enlil-frame-num">0</span> / <span id="enlil-frame-total">0</span>
+            </div>
+          </div>
+        </div>
+        
+        <button type="button" class="collapsible" style="margin-top:12px;">About ENLIL Forecast</button>
+        <div class="content">
+          <p>The ENLIL (Enlarge and Invert the Low-frequency Interplanetary model) model from NOAA provides a real-time 3D visualization of solar wind propagation through the heliosphere. This spiral forecast shows how coronal mass ejections (CMEs) and solar wind interact as they travel from the Sun toward Earth's orbit and beyond.<br><br><strong>Spiral Structure:</strong> The frame rotates to show the Sun-Earth line at the top, displaying how solar features spiral outward due to the Sun's rotation. Brighter or darker regions indicate variations in solar wind density, temperature, or magnetic field strength.<br><br><strong>Forecasting Value:</strong> By observing the ENLIL model, space weather forecasters can estimate arrival times of CMEs at Earth and predict the intensity of resulting geomagnetic storms. This helps with satellite operations, power grid management, and communication system planning.</p>
+        </div>
+        <p style="text-align:center; color:#00ffff; font-size:12px; margin-top:12px;">Sourced from NOAA Space Weather Prediction Center - Updated every 3 hours</p>
+      </div>
+    </section>
+    <br><br>
         <!-- ===== Section- Aurora Forecast ===== -->
 		<section>
 		<h2 style="text-align:center">NOAA Aurora Forecast Models</h2>
@@ -344,7 +390,127 @@
     </footer>
 
     <script>
+       (function() {
+        // ENLIL Player State
+        const canvas = document.getElementById("enlil-canvas");
+        const ctx = canvas.getContext("2d");
+        const jsonUrl = "https://services.swpc.noaa.gov/products/animations/enlil.json";
+        const baseUrl = "https://services.swpc.noaa.gov";
         
+        const status = document.getElementById("enlil-status");
+        const frameNum = document.getElementById("enlil-frame-num");
+        const frameTotal = document.getElementById("enlil-frame-total");
+        const playBtn = document.getElementById("enlil-play");
+        const pauseBtn = document.getElementById("enlil-pause");
+        const prevBtn = document.getElementById("enlil-prev");
+        const nextBtn = document.getElementById("enlil-next");
+        const speedSelect = document.getElementById("enlil-speed");
+        const slider = document.getElementById("enlil-slider");
+        
+        let frames = [];
+        let imageCache = {};
+        let currentIndex = 0;
+        let isPlaying = false;
+        let playTimer = null;
+        let playSpeed = Number(speedSelect.value);
+        
+        function drawFrame(index) {
+          if (frames.length === 0) return;
+          
+          currentIndex = Math.max(0, Math.min(index, frames.length - 1));
+          const frameUrl = frames[currentIndex];
+          
+          if (imageCache[frameUrl]) {
+            ctx.drawImage(imageCache[frameUrl], 0, 0, canvas.width, canvas.height);
+            updateUI();
+          } else {
+            const img = new Image();
+            img.onload = () => {
+              imageCache[frameUrl] = img;
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              updateUI();
+            };
+            img.onerror = () => {
+              ctx.fillStyle = "#000";
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+              ctx.fillStyle = "#ff0000";
+              ctx.textAlign = "center";
+              ctx.font = "16px Arial";
+              ctx.fillText("Frame load error", canvas.width / 2, canvas.height / 2);
+            };
+            img.crossOrigin = "anonymous";
+            img.src = frameUrl;
+          }
+        }
+        
+        function updateUI() {
+          frameNum.textContent = currentIndex + 1;
+          frameTotal.textContent = frames.length;
+          slider.value = currentIndex;
+        }
+        
+        function playAnimation() {
+          if (isPlaying) return;
+          isPlaying = true;
+          status.textContent = `▶ Playing (${frames.length} frames)`;
+          
+          playTimer = setInterval(() => {
+            currentIndex = (currentIndex + 1) % frames.length;
+            drawFrame(currentIndex);
+          }, playSpeed);
+        }
+        
+        function pauseAnimation() {
+          clearInterval(playTimer);
+          isPlaying = false;
+          status.textContent = `⏸ Paused at frame ${currentIndex + 1}`;
+        }
+        
+        function updateSpeed() {
+          playSpeed = Number(speedSelect.value);
+          if (isPlaying) {
+            pauseAnimation();
+            playAnimation();
+          }
+        }
+        
+        playBtn.addEventListener("click", playAnimation);
+        pauseBtn.addEventListener("click", pauseAnimation);
+        prevBtn.addEventListener("click", () => drawFrame(currentIndex - 1));
+        nextBtn.addEventListener("click", () => drawFrame(currentIndex + 1));
+        speedSelect.addEventListener("change", updateSpeed);
+        slider.addEventListener("input", () => drawFrame(Number(slider.value)));
+        
+        // Load ENLIL data
+        fetch(jsonUrl)
+          .then(response => response.json())
+          .then(data => {
+            frames = data
+              .map(item => item.url ? baseUrl + item.url : null)
+              .filter(Boolean);
+            
+            if (frames.length === 0) {
+              status.textContent = "❌ No frames available";
+              return;
+            }
+            
+            slider.max = frames.length - 1;
+            frameTotal.textContent = frames.length;
+            drawFrame(0);
+            status.textContent = `✓ ENLIL loaded (${frames.length} frames)`;
+          })
+          .catch(err => {
+            status.textContent = "❌ Failed to load ENLIL";
+            console.error("ENLIL Error:", err);
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#ff0000";
+            ctx.textAlign = "center";
+            ctx.font = "14px Arial";
+            ctx.fillText("Failed to load ENLIL animation", canvas.width / 2, canvas.height / 2 - 20);
+            ctx.fillText("Check internet connection", canvas.width / 2, canvas.height / 2 + 20);
+          });
+      })(); 
     </script>
     <script src="script.js"></script>
 

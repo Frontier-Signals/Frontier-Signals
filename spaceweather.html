@@ -127,9 +127,31 @@
       <button type="button" class="collapsible">Show SDO Feeds</button>
       <div class="content">
 			<h3 style="text-align:center">SDO 171 Angstroms - Extreme Ultraviolet - 17.1 nanometers</h3>
-            <center><video autoplay controls loop muted width="600" height="600">
+            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
+<video id="sdo-171" width="600" height="600" loop muted autoplay>
     <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0171.mp4" type="video/mp4">
-	</video></center>
+</video>
+<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
+  <button id="sdo-171-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
+  <button id="sdo-171-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
+  <button id="sdo-171-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
+  <button id="sdo-171-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
+  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
+    Speed:
+    <select id="sdo-171-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+    </select>
+  </label>
+</div>
+<div style="margin-top:12px;">
+  <input id="sdo-171-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
+  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
+    Time: <span id="sdo-171-time">0:00</span> / <span id="sdo-171-duration">0:00</span>
+  </div>
+</div>
+</div></center>
   <button type="button" class="collapsible">171 Magnetic Field Lines</button>
   <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_0171pfss.jpg" alt="171 Magnetic Field Lines"></center></div>
   <br><br>
@@ -146,9 +168,31 @@
       <div class="container">
         <div class="left-side">
 			<h3 style="text-align:center">SDO 193 Angstroms - Extreme Ultraviolet - 19.3 nanometers</h3>
-            <center><video autoplay controls loop muted width="600" height="600">
+            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
+<video id="sdo-193" width="600" height="600" loop muted autoplay>
     <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0193.mp4" type="video/mp4">
-	</video></center>
+</video>
+<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
+  <button id="sdo-193-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
+  <button id="sdo-193-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
+  <button id="sdo-193-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
+  <button id="sdo-193-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
+  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
+    Speed:
+    <select id="sdo-193-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+    </select>
+  </label>
+</div>
+<div style="margin-top:12px;">
+  <input id="sdo-193-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
+  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
+    Time: <span id="sdo-193-time">0:00</span> / <span id="sdo-193-duration">0:00</span>
+  </div>
+</div>
+</div></center>
   <button type="button" class="collapsible">193 Magnetic Field Lines</button>
   <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/f_094_335_193pfss.jpg" alt="193 Magnetic Field Lines"></center></div>
   <br>
@@ -163,9 +207,31 @@
         </div>
         <div class="right-side">
 			<h3 style="text-align:center">SDO 211 Angstroms - Extreme Ultraviolet - 21.1 nanometers</h3>
-            <center><video controls loop muted width="600" height="600">
+            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
+<video id="sdo-211" width="600" height="600" loop muted>
     <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0211.mp4" type="video/mp4">
-	</video></center>
+</video>
+<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
+  <button id="sdo-211-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
+  <button id="sdo-211-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
+  <button id="sdo-211-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
+  <button id="sdo-211-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
+  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
+    Speed:
+    <select id="sdo-211-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+    </select>
+  </label>
+</div>
+<div style="margin-top:12px;">
+  <input id="sdo-211-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
+  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
+    Time: <span id="sdo-211-time">0:00</span> / <span id="sdo-211-duration">0:00</span>
+  </div>
+</div>
+</div></center>
   <button type="button" class="collapsible">211 Magnetic Field Lines</button>
   <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0211pfss.jpg"></center></div>
   <br>
@@ -177,9 +243,31 @@
       <div class="container">
         <div class="left-side">
 			<h3 style="text-align:center">SDO 335 Angstroms - Extreme Ultraviolet - 33.5 nanometers</h3>
-            <center><video controls loop muted width="600" height="600">
+            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
+<video id="sdo-335" width="600" height="600" loop muted>
     <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0335.mp4" type="video/mp4">
-	</video></center>
+</video>
+<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
+  <button id="sdo-335-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
+  <button id="sdo-335-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
+  <button id="sdo-335-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
+  <button id="sdo-335-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
+  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
+    Speed:
+    <select id="sdo-335-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+    </select>
+  </label>
+</div>
+<div style="margin-top:12px;">
+  <input id="sdo-335-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
+  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
+    Time: <span id="sdo-335-time">0:00</span> / <span id="sdo-335-duration">0:00</span>
+  </div>
+</div>
+</div></center>
   <button type="button" class="collapsible">335 Magnetic Field Lines</button>
   <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0335pfss.jpg" alt="335 Magnetic Field Lines"></center></div>
   <br>
@@ -189,9 +277,31 @@
 			</div></div>
         <div class="right-side">
 			<h3 style="text-align:center">SDO 94 Angstroms - Extreme Ultraviolet - 9.4 nanometers</h3>
-            <center><video controls loop muted width="600" height="600">
+            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
+<video id="sdo-94" width="600" height="600" loop muted>
     <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0094.mp4" type="video/mp4">
-	</video></center>
+</video>
+<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
+  <button id="sdo-94-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
+  <button id="sdo-94-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
+  <button id="sdo-94-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
+  <button id="sdo-94-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
+  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
+    Speed:
+    <select id="sdo-94-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+    </select>
+  </label>
+</div>
+<div style="margin-top:12px;">
+  <input id="sdo-94-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
+  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
+    Time: <span id="sdo-94-time">0:00</span> / <span id="sdo-94-duration">0:00</span>
+  </div>
+</div>
+</div></center>
   <button type="button" class="collapsible">94 Magnetic Field Lines</button>
   <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0094pfss.jpg"></center></div>
   <br>
@@ -203,9 +313,31 @@
       <div class="container">
         <div class="left-side">
 			<h3 style="text-align:center">SDO 131 Angstroms - Extreme Ultraviolet - 13.1 nanometers</h3>
-            <center><video controls loop muted width="600" height="600">
+            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
+<video id="sdo-131" width="600" height="600" loop muted>
     <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0131.mp4" type="video/mp4">
-	</video></center>
+</video>
+<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
+  <button id="sdo-131-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
+  <button id="sdo-131-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
+  <button id="sdo-131-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
+  <button id="sdo-131-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
+  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
+    Speed:
+    <select id="sdo-131-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+    </select>
+  </label>
+</div>
+<div style="margin-top:12px;">
+  <input id="sdo-131-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
+  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
+    Time: <span id="sdo-131-time">0:00</span> / <span id="sdo-131-duration">0:00</span>
+  </div>
+</div>
+</div></center>
   <button type="button" class="collapsible">131 Magnetic Field Lines</button>
   <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0131pfss.jpg"></center></div>
   <br>
@@ -215,9 +347,31 @@
 			</div></div>
         <div class="right-side">
 			<h3 style="text-align:center">SDO 304 Angstroms - Extreme Ultraviolet - 30.4 nanometers</h3>
-            <center><video controls loop muted width="600" height="600">
+            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
+<video id="sdo-304" width="600" height="600" loop muted>
     <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304.mp4" type="video/mp4">
-	</video></center>
+</video>
+<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
+  <button id="sdo-304-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
+  <button id="sdo-304-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
+  <button id="sdo-304-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
+  <button id="sdo-304-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
+  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
+    Speed:
+    <select id="sdo-304-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+    </select>
+  </label>
+</div>
+<div style="margin-top:12px;">
+  <input id="sdo-304-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
+  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
+    Time: <span id="sdo-304-time">0:00</span> / <span id="sdo-304-duration">0:00</span>
+  </div>
+</div>
+</div></center>
   <button type="button" class="collapsible">304 Magnetic Field Lines</button>
   <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304pfss.jpg"></center></div>
   <br>
@@ -229,9 +383,31 @@
       <div class="container">
         <div class="left-side">
 			<h3 style="text-align:center">SDO 1600 Angstroms - Ultraviolet - 160.0 nanometers</h3>
-            <center><video controls loop muted width="600" height="600">
+            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
+<video id="sdo-1600" width="600" height="600" loop muted>
     <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1600.mp4" type="video/mp4">
-	</video></center>
+</video>
+<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
+  <button id="sdo-1600-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
+  <button id="sdo-1600-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
+  <button id="sdo-1600-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
+  <button id="sdo-1600-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
+  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
+    Speed:
+    <select id="sdo-1600-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+    </select>
+  </label>
+</div>
+<div style="margin-top:12px;">
+  <input id="sdo-1600-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
+  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
+    Time: <span id="sdo-1600-time">0:00</span> / <span id="sdo-1600-duration">0:00</span>
+  </div>
+</div>
+</div></center>
   <button type="button" class="collapsible">1600 Magnetic Field Lines</button>
   <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1600pfss.jpg"></center></div>
   <br>
@@ -241,9 +417,31 @@
 			</div></div>
         <div class="right-side">
 			<h3 style="text-align:center">SDO 1700 Angstroms - Ultraviolet - 170.0 nanometers</h3>
-            <center><video controls loop muted width="600" height="600">
+            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
+<video id="sdo-1700" width="600" height="600" loop muted>
     <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1700.mp4" type="video/mp4">
-	</video></center>
+</video>
+<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
+  <button id="sdo-1700-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
+  <button id="sdo-1700-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
+  <button id="sdo-1700-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
+  <button id="sdo-1700-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
+  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
+    Speed:
+    <select id="sdo-1700-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+    </select>
+  </label>
+</div>
+<div style="margin-top:12px;">
+  <input id="sdo-1700-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
+  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
+    Time: <span id="sdo-1700-time">0:00</span> / <span id="sdo-1700-duration">0:00</span>
+  </div>
+</div>
+</div></center>
   <button type="button" class="collapsible">1700 Magnetic Field Lines</button>
   <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1700pfss.jpg"></center></div>
   <br>
@@ -258,8 +456,30 @@
         <section>
             <h2 style="text-align:center">GOES-19 Live Coronagraph Feed</h2><hr>
             <button type="button" class="collapsible">Show Coronagraph Feed</button>
-            <div class="content"><center><video controls loop muted width="600" height="600">
-    <source src="https://services.swpc.noaa.gov/products/ccor1/mp4s/ccor1_last_24hrs.mp4" type="video/mp4"></video></center><br>
+            <div class="content"><center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
+<video id="goes-coronagraph" controls loop muted width="600" height="600">
+    <source src="https://services.swpc.noaa.gov/products/ccor1/mp4s/ccor1_last_24hrs.mp4" type="video/mp4"></video>
+<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
+  <button id="goes-coronagraph-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
+  <button id="goes-coronagraph-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
+  <button id="goes-coronagraph-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
+  <button id="goes-coronagraph-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
+  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
+    Speed:
+    <select id="goes-coronagraph-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+    </select>
+  </label>
+</div>
+<div style="margin-top:12px;">
+  <input id="goes-coronagraph-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
+  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
+    Time: <span id="goes-coronagraph-time">0:00</span> / <span id="goes-coronagraph-duration">0:00</span>
+  </div>
+</div>
+</div></center><br>
     <button type="button" class="collapsible">About Coronagraph Feed</button>
       <div class="content">
         <p>The GOES-19 feed from the NOAA Space Weather Prediction Center provides real-time video of the Sun's corona, the outermost layer of the solar atmosphere. The coronagraph uses an occulting disk to block out the bright light from the Sun's surface, allowing us to see the faint corona and any solar activity occurring there.<br><br>Key Features: The feed can show coronal mass ejections (CMEs), which are large expulsions of plasma and magnetic field from the Sun's corona. These appear as bright, expanding clouds moving outward from the Sun. The video also captures the dynamic structure of the corona, including streamers and loops formed by magnetic field lines.<br><br>Space Weather Monitoring: By observing this feed, scientists can track CMEs and predict their potential impact on Earth, such as geomagnetic storms that can affect satellites, power grids, and communication systems.</p>
@@ -511,6 +731,89 @@
             ctx.fillText("Check internet connection", canvas.width / 2, canvas.height / 2 + 20);
           });
       })(); 
+    </script>
+    <script>
+      // SDO Video Players
+      (function() {
+        const videoIds = ['sdo-171', 'sdo-193', 'sdo-211', 'sdo-335', 'sdo-94', 'sdo-131', 'sdo-304', 'sdo-1600', 'sdo-1700', 'goes-coronagraph'];
+        const autoplayIds = ['sdo-171', 'sdo-193'];
+        
+        function formatTime(seconds) {
+          const mins = Math.floor(seconds / 60);
+          const secs = Math.floor(seconds % 60);
+          return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function initVideoPlayer(videoId) {
+          const video = document.getElementById(videoId);
+          const playBtn = document.getElementById(videoId + '-play');
+          const pauseBtn = document.getElementById(videoId + '-pause');
+          const prevBtn = document.getElementById(videoId + '-prev');
+          const nextBtn = document.getElementById(videoId + '-next');
+          const speedSelect = document.getElementById(videoId + '-speed');
+          const slider = document.getElementById(videoId + '-slider');
+          const timeSpan = document.getElementById(videoId + '-time');
+          const durationSpan = document.getElementById(videoId + '-duration');
+          
+          let isPlaying = false;
+          
+          function updateUI() {
+            timeSpan.textContent = formatTime(video.currentTime);
+            durationSpan.textContent = formatTime(video.duration || 0);
+            slider.value = video.duration ? (video.currentTime / video.duration) * 100 : 0;
+          }
+          
+          function playVideo() {
+            video.play();
+            isPlaying = true;
+          }
+          
+          function pauseVideo() {
+            video.pause();
+            isPlaying = false;
+          }
+          
+          function stepFrame(direction) {
+            // Assume 24 fps for frame stepping
+            const frameDuration = 1 / 24;
+            const newTime = video.currentTime + (direction * frameDuration);
+            video.currentTime = Math.max(0, Math.min(newTime, video.duration || 0));
+          }
+          
+          function updateSpeed() {
+            video.playbackRate = parseFloat(speedSelect.value);
+          }
+          
+          function seekToPosition() {
+            const seekTime = (slider.value / 100) * (video.duration || 0);
+            video.currentTime = seekTime;
+          }
+          
+          // Event listeners
+          playBtn.addEventListener('click', playVideo);
+          pauseBtn.addEventListener('click', pauseVideo);
+          prevBtn.addEventListener('click', () => stepFrame(-1));
+          nextBtn.addEventListener('click', () => stepFrame(1));
+          speedSelect.addEventListener('change', updateSpeed);
+          slider.addEventListener('input', seekToPosition);
+          
+          // Video events
+          video.addEventListener('loadedmetadata', () => {
+            updateUI();
+            if (autoplayIds.includes(videoId)) {
+              playVideo();
+            }
+          });
+          
+          video.addEventListener('timeupdate', updateUI);
+          video.addEventListener('ended', () => {
+            isPlaying = false;
+          });
+        }
+        
+        // Initialize all video players
+        videoIds.forEach(initVideoPlayer);
+      })();
     </script>
     <script src="script.js"></script>
 

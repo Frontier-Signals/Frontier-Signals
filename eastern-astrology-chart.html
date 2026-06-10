@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Eastern astrology chart with Chinese calendrical pillars and Vedic-style sidereal lunar data.">
+    <meta name="keywords" content="Eastern astrology, Chinese zodiac, Vedic astrology, nakshatra, tithi, Frontier Signals">
+    <meta name="author" content="BraveCat">
+    <meta name="theme-color" content="#00ffff">
+    <meta property="og:title" content="Eastern Astrology Chart - Frontier Signals">
+    <meta property="og:description" content="Chinese zodiac cycles and Vedic-style sidereal lunar astrology calculated in browser.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://frontier-signals.github.io/Frontier-Signals/eastern-astrology-chart.html">
+    <link rel="canonical" href="https://frontier-signals.github.io/Frontier-Signals/eastern-astrology-chart.html">
+    <meta property="og:image" content="https://frontier-signals.github.io/Frontier-Signals/images/FrontierSignalsBanner.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Eastern Astrology Chart - Frontier Signals">
+    <meta name="twitter:description" content="Chinese zodiac cycles and Vedic-style sidereal lunar astrology calculated in browser.">
+    <meta name="twitter:image" content="https://frontier-signals.github.io/Frontier-Signals/images/FrontierSignalsBanner.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <title>Eastern Astrology Chart - Frontier Signals</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <style>
+        .eastern-tool {
+            display: grid;
+            gap: 18px;
+        }
+
+        .control-grid, .summary-grid, .reading-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .astro-card {
+            border: 1px solid #ff5a1f;
+            background: rgba(0, 28, 40, 0.88);
+            padding: 14px;
+            min-width: 0;
+        }
+
+        .astro-card h3 {
+            color: #f4e6d0;
+            margin: 0 0 8px;
+            font-size: 1.05rem;
+            letter-spacing: 0.12em;
+        }
+
+        .astro-value {
+            color: #00ffff;
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-shadow: 0 0 8px #00aaff;
+            overflow-wrap: anywhere;
+        }
+
+        .astro-sub {
+            color: #f7f2df;
+            font-size: 0.9rem;
+            line-height: 1.55;
+            margin-top: 8px;
+        }
+
+        .field-row {
+            display: grid;
+            gap: 6px;
+        }
+
+        .field-row label {
+            color: #f4e6d0;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+        }
+
+        .field-row input, .field-row select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #00ffff;
+            background: #061b25;
+            color: #f7f2df;
+            font-family: inherit;
+        }
+
+        .chart-art {
+            display: block;
+            width: 100%;
+            max-width: 980px;
+            margin: 18px auto 4px;
+            border: 1px solid #ff5a1f;
+            box-shadow: 0 0 24px rgba(0, 255, 255, 0.28);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid #ff5a1f;
+        }
+
+        .eastern-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 720px;
+        }
+
+        .eastern-table th, .eastern-table td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 90, 31, 0.45);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .eastern-table th {
+            background: rgba(255, 90, 31, 0.18);
+            color: #f4e6d0;
+        }
+
+        .note-box {
+            border-left: 4px solid #00ffff;
+            background: rgba(0, 255, 255, 0.08);
+            padding: 12px 14px;
+            color: #f7f2df;
+            line-height: 1.6;
+        }
+
+        .meter {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(0, 255, 255, 0.35);
+            margin-top: 6px;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #ff5a1f);
+        }
+
+        @media (max-width: 700px) {
+            .astro-value { font-size: 1.05rem; }
+            .eastern-table { min-width: 620px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <center><img id="banner" class="bordered-image" src="images/FrontierSignalsBanner.png" alt="Frontier Signals Official Banner"></center>
+        <p style="text-align: center; color: #ff00ff; font-weight: bold; margin: 5px 0;">Beta</p>
+        <hr>
+        <p>Eastern Astrology Chart - Chinese Zodiac Cycles - Sidereal Lunar Indicators</p>
+    </header>
+
+    <nav>
+        <div class="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="button">Home Page</a></li>
+            <li><a href="historydata.html" class="button">Historical Data &amp; Archives</a></li>
+            <li><a href="peerpapers.html" class="button">Frontier Science Articles</a></li>
+            <li><a href="ancienthistory.html" class="button">Ancient History</a></li>
+            <li><a href="extras.html" class="button">Multimedia &amp; Resource Links</a></li>
+            <li><a href="about.html" class="button">About/Contact</a></li>
+        </ul>
+        <hr>
+        <ul class="nav-links">
+            <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
+            <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
+            <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
+            <li><a href="starcharts.html" class="button">Star Charts</a></li>
+            <li><a href="models.html" class="button">Models</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section>
+            <h1 style="text-align:center">Eastern Astrology Chart</h1>
+            <hr>
+            <p>
+                This tool combines two major Eastern astrology frameworks that use different logic:
+                Chinese calendrical astrology, which reads time through the 10 Heavenly Stems,
+                12 Earthly Branches, zodiac animals, five elements, and yin-yang polarity; and
+                Vedic/Jyotish-style sidereal lunar astrology, which emphasizes the sidereal zodiac,
+                Moon nakshatra, lunar day, and waxing or waning half of the cycle.
+            </p>
+            <p>
+                The chart is interpretive and educational. Chinese pillar values are calculated with
+                solar-calendar approximations, and the sidereal layer uses an approximate Lahiri-style
+                ayanamsa suitable for a lightweight browser tool rather than a full traditional almanac.
+            </p>
+            <img class="chart-art" src="images/eastern-astrology-calendar.png" alt="Traditional Eastern astrology calendar wheel with zodiac, lunar, elemental, and star map motifs">
+        </section>
+
+        <section class="eastern-tool">
+            <h2 style="text-align:center">Chart Controls</h2>
+            <hr>
+            <div class="control-grid">
+                <div class="field-row">
+                    <label for="chartMode">Chart Mode</label>
+                    <select id="chartMode">
+                        <option value="current">Current Transit Chart</option>
+                        <option value="birth">Birth / Natal Chart</option>
+                    </select>
+                </div>
+                <div class="field-row">
+                    <label for="chartDateTime">Date and Time</label>
+                    <input id="chartDateTime" type="datetime-local">
+                </div>
+                <div class="field-row">
+                    <label for="birthLatitude">Latitude</label>
+                    <input id="birthLatitude" type="number" step="0.0001" min="-90" max="90" value="40.7608">
+                </div>
+                <div class="field-row">
+                    <label for="birthLongitude">Longitude</label>
+                    <input id="birthLongitude" type="number" step="0.0001" min="-180" max="180" value="-111.8910">
+                </div>
+                <button id="useNowBtn" class="button" type="button">Use Current Time</button>
+            </div>
+            <div id="statusLine" class="note-box">Calculating chart...</div>
+        </section>
+
+        <section>
+            <h2 style="text-align:center">Chinese Calendrical Layer</h2>
+            <hr>
+            <div class="summary-grid" id="chineseSummary"></div>
+            <div class="reading-grid" id="elementBalance"></div>
+            <div class="table-wrap">
+                <table class="eastern-table" id="pillarTable">
+                    <thead>
+                        <tr>
+                            <th>Pillar</th>
+                            <th>Stem</th>
+                            <th>Branch / Animal</th>
+                            <th>Element</th>
+                            <th>Polarity</th>
+                            <th>Reading</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <br>
+            <div class="table-wrap">
+                <table class="eastern-table" id="hiddenStemTable">
+                    <thead>
+                        <tr>
+                            <th>Branch</th>
+                            <th>Hidden Stems</th>
+                            <th>Practical Reading</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2 style="text-align:center">Sidereal Planetary and Lunar Layer</h2>
+            <hr>
+            <div class="summary-grid" id="vedicSummary"></div>
+            <div class="reading-grid" id="readingGrid"></div>
+            <div class="table-wrap">
+                <table class="eastern-table" id="vedicPlanetTable">
+                    <thead>
+                        <tr>
+                            <th>Body</th>
+                            <th>Sidereal Position</th>
+                            <th>Nakshatra</th>
+                            <th>Pada</th>
+                            <th>Motion</th>
+                            <th>Reading</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2 style="text-align:center">System Notes</h2>
+            <hr>
+            <p>
+                Western tropical astrology usually starts from the seasonal equinox framework and
+                emphasizes planetary aspects inside a twelve-sign zodiac. Chinese astrology is not
+                primarily a map of planets against constellations; it is a cyclical calendar language
+                built from stems, branches, animals, elements, and time periods. Vedic/Jyotish methods
+                commonly use a sidereal zodiac and give the Moon a stronger organizing role through
+                nakshatras and tithis.
+            </p>
+            <p>
+                For exact traditional work, especially birth charts, use the birth location, local
+                time zone, daylight-saving rules, and a dedicated panchanga or Chinese almanac. This
+                page is designed for real-time browser exploration and broad pattern reading.
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Frontier Signals. All rights reserved.</p>
+        <p style="font-size: 12px; margin-top: 10px;">
+            <a href="privacy-policy.html" style="color: #00ffff; text-decoration: none;">Privacy Policy</a> |
+            <a href="terms-of-service.html" style="color: #00ffff; text-decoration: none;">Terms of Service</a>
+        </p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+    const STEMS = [
+      { name:'Jia', element:'Wood', polarity:'Yang', tone:'initiating growth, fresh direction, courage to sprout, and visible ambition' },
+      { name:'Yi', element:'Wood', polarity:'Yin', tone:'adaptable growth, refinement, diplomacy, and subtle persistence' },
+      { name:'Bing', element:'Fire', polarity:'Yang', tone:'radiance, confidence, visibility, warmth, and direct expression' },
+      { name:'Ding', element:'Fire', polarity:'Yin', tone:'focused flame, sensitivity, craft, spiritual attention, and careful illumination' },
+      { name:'Wu', element:'Earth', polarity:'Yang', tone:'stability, protection, mass, responsibility, and dependable structure' },
+      { name:'Ji', element:'Earth', polarity:'Yin', tone:'cultivation, service, nourishment, practical repair, and patient development' },
+      { name:'Geng', element:'Metal', polarity:'Yang', tone:'cutting force, standards, justice, discipline, and decisive separation' },
+      { name:'Xin', element:'Metal', polarity:'Yin', tone:'precision, beauty, refinement, discernment, and valuable detail' },
+      { name:'Ren', element:'Water', polarity:'Yang', tone:'movement, strategy, travel, adaptability, and wide intelligence' },
+      { name:'Gui', element:'Water', polarity:'Yin', tone:'intuition, memory, subtle influence, hidden currents, and deep listening' }
+    ];
+
+    const BRANCHES = [
+      { name:'Zi', animal:'Rat', element:'Water', polarity:'Yang', hours:'23:00-01:00', tone:'quick perception, resourcefulness, timing, survival intelligence, and opportunistic planning' },
+      { name:'Chou', animal:'Ox', element:'Earth', polarity:'Yin', hours:'01:00-03:00', tone:'endurance, stored resources, duty, patience, and slow reliable building' },
+      { name:'Yin', animal:'Tiger', element:'Wood', polarity:'Yang', hours:'03:00-05:00', tone:'courage, emergence, forceful growth, risk, leadership, and decisive movement' },
+      { name:'Mao', animal:'Rabbit', element:'Wood', polarity:'Yin', hours:'05:00-07:00', tone:'grace, social intelligence, protection, aesthetics, and strategic softness' },
+      { name:'Chen', animal:'Dragon', element:'Earth', polarity:'Yang', hours:'07:00-09:00', tone:'stored power, weather change, charisma, ambition, and catalytic transformation' },
+      { name:'Si', animal:'Snake', element:'Fire', polarity:'Yin', hours:'09:00-11:00', tone:'insight, secrecy, refinement, concentration, and controlled heat' },
+      { name:'Wu', animal:'Horse', element:'Fire', polarity:'Yang', hours:'11:00-13:00', tone:'visibility, speed, independence, passion, and public momentum' },
+      { name:'Wei', animal:'Goat', element:'Earth', polarity:'Yin', hours:'13:00-15:00', tone:'care, artistry, group sensitivity, cultivation, and emotional intelligence' },
+      { name:'Shen', animal:'Monkey', element:'Metal', polarity:'Yang', hours:'15:00-17:00', tone:'invention, agility, tactics, humor, systems, and problem-solving' },
+      { name:'You', animal:'Rooster', element:'Metal', polarity:'Yin', hours:'17:00-19:00', tone:'precision, presentation, critique, ritual, beauty, and exact standards' },
+      { name:'Xu', animal:'Dog', element:'Earth', polarity:'Yang', hours:'19:00-21:00', tone:'loyalty, vigilance, ethics, defense, and testing what deserves trust' },
+      { name:'Hai', animal:'Pig', element:'Water', polarity:'Yin', hours:'21:00-23:00', tone:'generosity, restoration, depth, sensuality, and emotional completion' }
+    ];
+
+    const HIDDEN_STEMS = {
+      Zi:['Gui'],
+      Chou:['Ji','Gui','Xin'],
+      Yin:['Jia','Bing','Wu'],
+      Mao:['Yi'],
+      Chen:['Wu','Yi','Gui'],
+      Si:['Bing','Geng','Wu'],
+      Wu:['Ding','Ji'],
+      Wei:['Ji','Ding','Yi'],
+      Shen:['Geng','Ren','Wu'],
+      You:['Xin'],
+      Xu:['Wu','Xin','Ding'],
+      Hai:['Ren','Jia']
+    };
+
+    const ELEMENT_RELATIONSHIPS = {
+      Wood: { produces:'Fire', producedBy:'Water', controls:'Earth', controlledBy:'Metal' },
+      Fire: { produces:'Earth', producedBy:'Wood', controls:'Metal', controlledBy:'Water' },
+      Earth: { produces:'Metal', producedBy:'Fire', controls:'Water', controlledBy:'Wood' },
+      Metal: { produces:'Water', producedBy:'Earth', controls:'Wood', controlledBy:'Fire' },
+      Water: { produces:'Wood', producedBy:'Metal', controls:'Fire', controlledBy:'Earth' }
+    };
+
+    const VEDIC_BODIES = [
+      { id:'Sun', name:'Sun', reading:'soul, vitality, authority, visibility, father-line symbolism, and the organizing center of the chart' },
+      { id:'Moon', name:'Moon', reading:'mind, emotion, memory, receptivity, mother-line symbolism, habit, and lived experience' },
+      { id:'Mercury', name:'Mercury', reading:'speech, learning, commerce, calculation, analysis, tools, and flexible intelligence' },
+      { id:'Venus', name:'Venus', reading:'relationship, pleasure, art, beauty, comfort, vehicles, agreements, and material enjoyment' },
+      { id:'Mars', name:'Mars', reading:'drive, courage, conflict, siblings, heat, surgery, weapons, and decisive action' },
+      { id:'Jupiter', name:'Jupiter', reading:'wisdom, teachers, law, children, grace, expansion, ethics, and protective meaning' },
+      { id:'Saturn', name:'Saturn', reading:'time, labor, endurance, discipline, grief, boundaries, service, and karmic consequence' },
+      { id:'Uranus', name:'Uranus', reading:'modern addition: disruption, invention, liberation, shocks, networks, and reform pressure' },
+      { id:'Neptune', name:'Neptune', reading:'modern addition: imagination, mysticism, dissolving boundaries, fog, film, music, and ideals' },
+      { id:'Pluto', name:'Pluto', reading:'modern addition: deep transformation, power, compulsion, crisis, and hidden psychological force' },
+      { id:'Rahu', name:'Rahu', reading:'north lunar node: appetite, amplification, obsession, foreignness, ambition, and future-facing disruption' },
+      { id:'Ketu', name:'Ketu', reading:'south lunar node: release, detachment, inherited skill, spiritualization, loss, and past-pattern residue' }
+    ];
+
+    const SIDEREAL_SIGNS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+    const NAKSHATRAS = [
+      ['Ashwini','fast beginnings, healing, recovery, and movement from inertia into life'],
+      ['Bharani','pressure, fertility, restraint, moral weight, and the power to carry consequences'],
+      ['Krittika','cutting, purification, fire, standards, and separating useful truth from excess'],
+      ['Rohini','growth, beauty, fertility, desire, and the magnetic pull of form'],
+      ['Mrigashira','searching, curiosity, nervous intelligence, travel, and following subtle tracks'],
+      ['Ardra','storms, grief, intensity, research, and cleansing through emotional weather'],
+      ['Punarvasu','return, renewal, restoration, shelter, and the ability to begin again'],
+      ['Pushya','nourishment, teaching, protection, sacred duty, and steady blessing'],
+      ['Ashlesha','binding, instinct, hidden influence, serpentine intelligence, and psychological knots'],
+      ['Magha','ancestry, throne, lineage, dignity, and inherited authority'],
+      ['Purva Phalguni','pleasure, creativity, romance, rest, and fertile enjoyment'],
+      ['Uttara Phalguni','contracts, patronage, loyalty, formal support, and durable alliances'],
+      ['Hasta','hands, skill, craft, humor, dexterity, and practical magic'],
+      ['Chitra','design, brilliance, architecture, image, and making beauty precise'],
+      ['Swati','wind, independence, trade, flexibility, and finding a path through movement'],
+      ['Vishakha','aim, ambition, branching paths, devotion, and the pressure to choose'],
+      ['Anuradha','friendship, discipline, loyalty, networks, and devotion under constraint'],
+      ['Jyeshtha','seniority, protection, complexity, responsibility, and guarding what is vulnerable'],
+      ['Mula','roots, investigation, rupture, truth-seeking, and removing what is false'],
+      ['Purva Ashadha','declaration, victory, cleansing, persuasion, and emotional conviction'],
+      ['Uttara Ashadha','lasting success, ethics, leadership, and commitments that outlive mood'],
+      ['Shravana','listening, learning, transmission, memory, and receiving guidance'],
+      ['Dhanishta','rhythm, wealth, community, timing, and the drumbeat of coordinated effort'],
+      ['Shatabhisha','healing circles, secrecy, science, isolation, and difficult remedies'],
+      ['Purva Bhadrapada','fierce ideals, intensity, sacrifice, and confronting extremes'],
+      ['Uttara Bhadrapada','depth, patience, containment, and wisdom beneath the surface'],
+      ['Revati','safe passage, completion, compassion, travel, and guiding things to their next world']
+    ];
+
+    const TITHI_NAMES = [
+      'Pratipada','Dwitiya','Tritiya','Chaturthi','Panchami','Shashthi','Saptami','Ashtami','Navami','Dashami','Ekadashi','Dwadashi','Trayodashi','Chaturdashi','Purnima',
+      'Pratipada','Dwitiya','Tritiya','Chaturthi','Panchami','Shashthi','Saptami','Ashtami','Navami','Dashami','Ekadashi','Dwadashi','Trayodashi','Chaturdashi','Amavasya'
+    ];
+
+    function positiveMod(value, mod) {
+      return ((value % mod) + mod) % mod;
+    }
+
+    function localInputValue(date) {
+      const offset = date.getTimezoneOffset();
+      const local = new Date(date.getTime() - offset * 60000);
+      return local.toISOString().slice(0, 16);
+    }
+
+    function julianDayNumber(date) {
+      const y = date.getUTCFullYear();
+      const m = date.getUTCMonth() + 1;
+      const d = date.getUTCDate();
+      const a = Math.floor((14 - m) / 12);
+      const yy = y + 4800 - a;
+      const mm = m + 12 * a - 3;
+      return d + Math.floor((153 * mm + 2) / 5) + 365 * yy + Math.floor(yy / 4) - Math.floor(yy / 100) + Math.floor(yy / 400) - 32045;
+    }
+
+    function sexagenaryFromIndex(index) {
+      const stem = STEMS[positiveMod(index, 10)];
+      const branch = BRANCHES[positiveMod(index, 12)];
+      return { index: positiveMod(index, 60), stem, branch };
+    }
+
+    function getSolarYear(date) {
+      const year = date.getFullYear();
+      const springStart = new Date(year, 1, 4, 0, 0, 0);
+      return date < springStart ? year - 1 : year;
+    }
+
+    function getYearPillar(date) {
+      const solarYear = getSolarYear(date);
+      return { label:'Year', year: solarYear, ...sexagenaryFromIndex(solarYear - 1984) };
+    }
+
+    function getMonthPillar(date, yearPillar) {
+      const solarMonths = [
+        [1, 4], [2, 6], [3, 5], [4, 6], [5, 6], [6, 7],
+        [7, 8], [8, 8], [9, 8], [10, 7], [11, 7], [0, 6]
+      ];
+      const year = date.getFullYear();
+      let monthIndex = 11;
+      for (let i = 0; i < solarMonths.length; i++) {
+        const [month, day] = solarMonths[i];
+        const start = new Date(month === 0 ? year + 1 : year, month, day);
+        if (date >= start) monthIndex = i;
+      }
+      if (date < new Date(year, 1, 4)) monthIndex = 11;
+      const branchIndex = positiveMod(monthIndex + 2, 12);
+      const stemIndex = positiveMod((yearPillar.stemIndex || yearPillar.index % 10) * 2 + monthIndex + 2, 10);
+      return { label:'Month', index: monthIndex, stem: STEMS[stemIndex], branch: BRANCHES[branchIndex] };
+    }
+
+    function getDayPillar(date) {
+      const jdn = julianDayNumber(date);
+      return { label:'Day', approx:true, ...sexagenaryFromIndex(jdn + 49) };
+    }
+
+    function getHourPillar(date, dayPillar) {
+      const hour = date.getHours();
+      const branchIndex = hour === 23 ? 0 : Math.floor((hour + 1) / 2) % 12;
+      const dayStemIndex = dayPillar.index % 10;
+      const stemIndex = positiveMod((dayStemIndex % 5) * 2 + branchIndex, 10);
+      return { label:'Hour', stem: STEMS[stemIndex], branch: BRANCHES[branchIndex] };
+    }
+
+    function findStem(name) {
+      return STEMS.find((stem) => stem.name === name);
+    }
+
+    function chineseReading(pillar) {
+      const place = pillar.label.toLowerCase();
+      return `The ${place} pillar blends ${pillar.stem.name} ${pillar.stem.element} ${pillar.stem.polarity} tone (${pillar.stem.tone}) with ${pillar.branch.animal} branch tone (${pillar.branch.tone}). Read it as a time signature: stem shows the visible current, branch shows the deeper seasonal or instinctive container.`;
+    }
+
+    function countElements(pillars) {
+      const counts = { Wood:0, Fire:0, Earth:0, Metal:0, Water:0 };
+      for (const pillar of pillars) {
+        counts[pillar.stem.element] += 1;
+        counts[pillar.branch.element] += 1;
+        for (const stemName of HIDDEN_STEMS[pillar.branch.name] || []) {
+          const hidden = findStem(stemName);
+          if (hidden) counts[hidden.element] += 0.5;
+        }
+      }
+      return counts;
+    }
+
+    function elementReading(element, value, max) {
+      const rel = ELEMENT_RELATIONSHIPS[element];
+      const emphasis = value === max ? 'dominant' : value <= 1 ? 'light' : 'active';
+      return `${element} is ${emphasis} in this chart. It produces ${rel.produces}, is fed by ${rel.producedBy}, controls ${rel.controls}, and is checked by ${rel.controlledBy}.`;
+    }
+
+    function hiddenStemReading(branch) {
+      const hidden = (HIDDEN_STEMS[branch.name] || []).map(findStem).filter(Boolean);
+      if (!hidden.length) return 'No hidden stems listed for this branch.';
+      const names = hidden.map((stem) => `${stem.name} ${stem.element}`).join(', ');
+      return `${branch.animal} carries ${names} beneath the visible branch. Hidden stems show stored motives, secondary resources, and the material that becomes active under timing pressure.`;
+    }
+
+    function eclipticLongitude(body, date) {
+      if (body === 'Rahu') return meanNorthNode(date);
+      if (body === 'Ketu') return positiveMod(meanNorthNode(date) + 180, 360);
+      if (body === 'Moon') {
+        const moon = Astronomy.EclipticGeoMoon(date);
+        return positiveMod(moon.lon, 360);
+      }
+      const vec = Astronomy.GeoVector(body, date, true);
+      const ecl = Astronomy.Ecliptic(vec);
+      return positiveMod(ecl.elon, 360);
+    }
+
+    function meanNorthNode(date) {
+      const epoch = new Date('2000-01-01T12:00:00Z');
+      const years = (date.getTime() - epoch.getTime()) / (365.25 * 86400000);
+      return positiveMod(348.34 - 1.4979 * years, 360);
+    }
+
+    function dailyMotion(body, date) {
+      const yesterday = new Date(date.getTime() - 86400000);
+      const now = eclipticLongitude(body, date);
+      const past = eclipticLongitude(body, yesterday);
+      let diff = now - past;
+      while (diff > 180) diff -= 360;
+      while (diff < -180) diff += 360;
+      return diff;
+    }
+
+    function approximateAyanamsa(date) {
+      const year = date.getUTCFullYear() + (date.getUTCMonth() / 12);
+      return 23.857 + (year - 2000) * 0.01397;
+    }
+
+    function siderealInfo(lon, ayanamsa) {
+      const sidereal = positiveMod(lon - ayanamsa, 360);
+      const signIndex = Math.floor(sidereal / 30);
+      return {
+        lon: sidereal,
+        sign: SIDEREAL_SIGNS[signIndex],
+        deg: sidereal % 30
+      };
+    }
+
+    function formatDegrees(value) {
+      const deg = Math.floor(value);
+      const min = Math.floor((value - deg) * 60);
+      return `${deg} deg ${String(min).padStart(2, '0')}'`;
+    }
+
+    function getNakshatra(moonSiderealLon) {
+      const segment = 360 / 27;
+      const index = Math.floor(moonSiderealLon / segment);
+      const pada = Math.floor((moonSiderealLon % segment) / (segment / 4)) + 1;
+      const [name, reading] = NAKSHATRAS[index];
+      return { name, index, pada, reading };
+    }
+
+    function getTithi(sunLon, moonLon) {
+      const elongation = positiveMod(moonLon - sunLon, 360);
+      const index = Math.floor(elongation / 12);
+      const paksha = index < 15 ? 'Shukla Paksha (waxing)' : 'Krishna Paksha (waning)';
+      const progress = ((elongation % 12) / 12) * 100;
+      return { name:TITHI_NAMES[index], index:index + 1, paksha, elongation, progress };
+    }
+
+    function signReading(sign, bodyName) {
+      const readings = {
+        Aries:'direct, pioneering, hot, impatient, and action-oriented',
+        Taurus:'steady, sensual, resource-focused, patient, and resistant to needless change',
+        Gemini:'curious, verbal, mobile, tactical, and responsive to new information',
+        Cancer:'protective, memory-rich, domestic, intuitive, and emotionally responsive',
+        Leo:'expressive, proud, dramatic, generous, and visibility-oriented',
+        Virgo:'analytical, corrective, service-minded, precise, and improvement-focused',
+        Libra:'relational, balancing, aesthetic, diplomatic, and comparison-driven',
+        Scorpio:'intense, private, investigative, loyal, and transformation-oriented',
+        Sagittarius:'expansive, philosophical, restless, teaching-oriented, and truth-seeking',
+        Capricorn:'structured, strategic, disciplined, consequential, and long-range',
+        Aquarius:'systemic, unconventional, social, reforming, and future-facing',
+        Pisces:'imaginative, porous, devotional, compassionate, and symbolic'
+      };
+      return `${bodyName} in sidereal ${sign} expresses through a ${readings[sign]} field.`;
+    }
+
+    function card(title, value, sub) {
+      return `<div class="astro-card"><h3>${title}</h3><div class="astro-value">${value}</div><div class="astro-sub">${sub}</div></div>`;
+    }
+
+    function renderChart() {
+      const input = document.getElementById('chartDateTime');
+      const mode = document.getElementById('chartMode').value;
+      const lat = Number(document.getElementById('birthLatitude').value);
+      const lon = Number(document.getElementById('birthLongitude').value);
+      const date = input.value ? new Date(input.value) : new Date();
+      const yearPillar = getYearPillar(date);
+      const monthPillar = getMonthPillar(date, yearPillar);
+      const dayPillar = getDayPillar(date);
+      const hourPillar = getHourPillar(date, dayPillar);
+      const pillars = [yearPillar, monthPillar, dayPillar, hourPillar];
+
+      document.getElementById('statusLine').textContent = `${mode === 'birth' ? 'Birth/natal' : 'Current transit'} chart calculated for ${date.toLocaleString()} using local browser time. Location set to ${Number.isFinite(lat) ? lat.toFixed(4) : 'n/a'}, ${Number.isFinite(lon) ? lon.toFixed(4) : 'n/a'} for chart context. Chinese month boundaries, sexagenary day, lunar nodes, and sidereal ayanamsa are approximate.`;
+      document.getElementById('chineseSummary').innerHTML = [
+        card('Year Animal', yearPillar.branch.animal, `${yearPillar.stem.element} ${yearPillar.stem.polarity}; solar year ${yearPillar.year}`),
+        card('Month Animal', monthPillar.branch.animal, `${monthPillar.stem.element} ${monthPillar.stem.polarity}; seasonal pillar`),
+        card('Day Animal', dayPillar.branch.animal, `${dayPillar.stem.element} ${dayPillar.stem.polarity}; approximate sexagenary day`),
+        card('Hour Animal', hourPillar.branch.animal, `${hourPillar.branch.hours}; ${hourPillar.stem.element} ${hourPillar.stem.polarity}`)
+      ].join('');
+
+      const elementCounts = countElements(pillars);
+      const maxElement = Math.max(...Object.values(elementCounts));
+      document.getElementById('elementBalance').innerHTML = Object.entries(elementCounts).map(([element, value]) => {
+        const width = Math.max(8, Math.round((value / maxElement) * 100));
+        return `<div class="astro-card"><h3>${element}</h3><div class="astro-value">${value.toFixed(1)}</div><div class="meter"><div class="meter-fill" style="width:${width}%"></div></div><div class="astro-sub">${elementReading(element, value, maxElement)}</div></div>`;
+      }).join('');
+
+      document.querySelector('#pillarTable tbody').innerHTML = pillars.map((pillar) => `
+        <tr>
+          <td>${pillar.label}${pillar.approx ? ' (approx.)' : ''}</td>
+          <td>${pillar.stem.name}</td>
+          <td>${pillar.branch.name} / ${pillar.branch.animal}</td>
+          <td>${pillar.stem.element} over ${pillar.branch.element}</td>
+          <td>${pillar.stem.polarity} stem, ${pillar.branch.polarity} branch</td>
+          <td>${chineseReading(pillar)}</td>
+        </tr>
+      `).join('');
+
+      document.querySelector('#hiddenStemTable tbody').innerHTML = pillars.map((pillar) => {
+        const hiddenNames = (HIDDEN_STEMS[pillar.branch.name] || []).map((name) => {
+          const stem = findStem(name);
+          return stem ? `${stem.name} (${stem.element} ${stem.polarity})` : name;
+        }).join(', ');
+        return `<tr><td>${pillar.label}: ${pillar.branch.name} / ${pillar.branch.animal}</td><td>${hiddenNames}</td><td>${hiddenStemReading(pillar.branch)}</td></tr>`;
+      }).join('');
+
+      const sunLon = eclipticLongitude('Sun', date);
+      const moonLon = eclipticLongitude('Moon', date);
+      const ayanamsa = approximateAyanamsa(date);
+      const sunSidereal = siderealInfo(sunLon, ayanamsa);
+      const moonSidereal = siderealInfo(moonLon, ayanamsa);
+      const nakshatra = getNakshatra(moonSidereal.lon);
+      const tithi = getTithi(sunLon, moonLon);
+
+      document.getElementById('vedicSummary').innerHTML = [
+        card('Sidereal Sun', `${sunSidereal.sign} ${formatDegrees(sunSidereal.deg)}`, signReading(sunSidereal.sign, 'The Sun')),
+        card('Sidereal Moon', `${moonSidereal.sign} ${formatDegrees(moonSidereal.deg)}`, signReading(moonSidereal.sign, 'The Moon')),
+        card('Moon Nakshatra', `${nakshatra.name} Pada ${nakshatra.pada}`, nakshatra.reading),
+        card('Tithi', `${tithi.name}`, `${tithi.paksha}; lunar elongation ${formatDegrees(tithi.elongation)}; tithi progress ${tithi.progress.toFixed(0)}%`)
+      ].join('');
+
+      document.getElementById('readingGrid').innerHTML = [
+        card('Combined Time Signature', `${yearPillar.stem.element} ${yearPillar.branch.animal}`, `The year layer describes the broad social weather: ${yearPillar.stem.tone}, held inside ${yearPillar.branch.tone}.`),
+        card('Lunar Emphasis', nakshatra.name, `The Moon's nakshatra refines the emotional reading beyond sign alone. ${nakshatra.name} emphasizes ${nakshatra.reading}. Pada ${nakshatra.pada} makes the lunar tone more specific within that mansion.`),
+        card('Paksha Direction', tithi.paksha, tithi.index <= 15 ? 'Waxing tithis build visibility, appetite, and outward development.' : 'Waning tithis release, digest, internalize, and prepare the next cycle.'),
+        card('Ayanamsa Used', `${ayanamsa.toFixed(2)} deg`, 'Approximate Lahiri-style offset from tropical longitude to sidereal longitude. This keeps the signs closer to the observed constellational framework than tropical astrology.')
+      ].join('');
+
+      document.querySelector('#vedicPlanetTable tbody').innerHTML = VEDIC_BODIES.map((body) => {
+        try {
+          const tropicalLon = eclipticLongitude(body.id, date);
+          const sidereal = siderealInfo(tropicalLon, ayanamsa);
+          const nak = getNakshatra(sidereal.lon);
+          const motion = dailyMotion(body.id, date);
+          const motionLabel = motion < -0.01 ? `Retrograde (${motion.toFixed(3)} deg/day)` : `Direct (${motion.toFixed(3)} deg/day)`;
+          return `<tr>
+            <td>${body.name}</td>
+            <td>${sidereal.sign} ${formatDegrees(sidereal.deg)}</td>
+            <td>${nak.name}</td>
+            <td>${nak.pada}</td>
+            <td>${motionLabel}</td>
+            <td>${body.reading}. In ${nak.name}, it is colored by ${nak.reading}.</td>
+          </tr>`;
+        } catch (error) {
+          return `<tr><td>${body.name}</td><td colspan="5">Position unavailable in this browser calculation: ${error.message}</td></tr>`;
+        }
+      }).join('');
+    }
+
+    document.getElementById('useNowBtn').addEventListener('click', () => {
+      document.getElementById('chartDateTime').value = localInputValue(new Date());
+      document.getElementById('chartMode').value = 'current';
+      renderChart();
+    });
+    ['chartDateTime','chartMode','birthLatitude','birthLongitude'].forEach((id) => {
+      document.getElementById(id).addEventListener('change', renderChart);
+      document.getElementById(id).addEventListener('input', renderChart);
+    });
+    document.getElementById('chartDateTime').value = localInputValue(new Date());
+    renderChart();
+    </script>
+</body>
+</html>

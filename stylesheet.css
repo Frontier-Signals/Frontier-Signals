@@ -97,6 +97,10 @@
             margin: 0 auto
         }
 
+        img, canvas, svg {
+            max-width: 100%;
+        }
+
         /* ===== Footer ===== */
         footer {
             background-color: #333;
@@ -229,9 +233,15 @@
                 width: 100%;
                 background-color: #444;
                 opacity: 1;
-                max-height: none;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.35s ease;
+            }
+
+            #nav-container .nav-links,
+            nav.open .nav-links {
+                max-height: 100vh;
                 overflow: visible;
-                transition: none;
             }
 
             .nav-links li {
@@ -301,6 +311,7 @@ table {
   background-color: #08202c;
   border: 2px solid #ff6b35;
   box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
+  width: 100%;
 }
 
 table thead {
@@ -325,6 +336,114 @@ table td {
 table tbody tr:hover {
   background-color: rgba(255, 107, 53, 0.1);
   transition: background-color 0.3s ease;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.data-table {
+  min-width: 680px;
+}
+
+.data-table caption {
+  color: #fcf2dc;
+  padding: 12px;
+}
+
+.data-tools {
+  background: #0b2a3b;
+  border: 2px solid #ff6b35;
+  border-radius: 5px;
+  padding: 16px;
+  margin: 16px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.data-tools label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.data-tools input,
+.data-tools select {
+  min-height: 44px;
+}
+
+.status-note {
+  color: #fcf2dc;
+  background: rgba(255, 107, 53, 0.12);
+  border-left: 3px solid #ff6b35;
+  padding: 10px 12px;
+  margin: 12px 0;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.summary-tile {
+  background: #0b2a3b;
+  border: 1px solid rgba(255, 107, 53, 0.7);
+  border-radius: 5px;
+  padding: 12px;
+}
+
+.summary-tile strong {
+  display: block;
+  color: #ff6b35;
+  font-size: 1.35rem;
+}
+
+@media (max-width: 768px) {
+  .data-table {
+    min-width: 0;
+    border: none;
+    box-shadow: none;
+  }
+
+  .data-table thead {
+    display: none;
+  }
+
+  .data-table,
+  .data-table tbody,
+  .data-table tr,
+  .data-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .data-table tr {
+    border: 2px solid #ff6b35;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    background: #08202c;
+    box-shadow: 0 0 10px rgba(255, 107, 53, 0.2);
+  }
+
+  .data-table td {
+    display: grid;
+    grid-template-columns: minmax(110px, 42%) 1fr;
+    gap: 10px;
+    padding: 10px;
+    text-align: right;
+    word-break: break-word;
+  }
+
+  .data-table td::before {
+    content: attr(data-label);
+    color: #ff6b35;
+    text-align: left;
+  }
 }
 
 	/* Style the button that is used to open and close the collapsible content */

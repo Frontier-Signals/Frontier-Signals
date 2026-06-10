@@ -31,33 +31,53 @@
     
     <title>Volcano Monitoring - Frontier Signals</title>
 	
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 	<link rel="stylesheet" href="stylesheet.css">
 
     <style>
         #live-volcano-list {
-            max-width: 900px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 0 1rem;
+            padding: 0 0.75rem;
+            max-height: 760px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            border: 1px solid #ff5a1f;
+            background: rgba(0, 14, 22, 0.62);
+            box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.35);
         }
         .live-volcano-grid {
             display: grid;
-            gap: 1rem;
-            margin-top: 1rem;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            margin-top: 0;
         }
         .volcano-card {
             border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 10px;
-            background: #111;
+            border-radius: 8px;
+            background: rgba(0, 26, 36, 0.92);
             color: #f8f8f8;
-            padding: 1rem;
+            padding: 0.85rem 1rem;
             box-shadow: 0 0 18px rgba(0, 0, 0, 0.25);
+        }
+        .volcano-card:focus {
+            outline: 2px solid #00ffff;
+            outline-offset: 2px;
+        }
+        .volcano-card.notable {
+            border-color: #ff5a1f;
+            box-shadow: 0 0 18px rgba(255, 90, 31, 0.24);
+        }
+        .volcano-card.reactivation {
+            border-color: #00ffff;
+            box-shadow: 0 0 18px rgba(0, 255, 255, 0.22);
         }
         .volcano-card h3 {
             margin: 0 0 0.35rem;
             font-size: 1.1rem;
         }
         .volcano-card p {
-            margin: 0.35rem 0;
+            margin: 0.28rem 0;
             line-height: 1.45;
             font-size: 0.95rem;
         }
@@ -80,6 +100,21 @@
             color: #ccc;
             margin-bottom: 0.8rem;
         }
+        .volcano-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            margin: 0.45rem 0;
+        }
+        .volcano-tag {
+            border: 1px solid rgba(0,255,255,0.35);
+            color: #dff;
+            background: rgba(0,255,255,0.08);
+            padding: 0.22rem 0.48rem;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
         .volcano-link {
             display: inline-block;
             margin-top: 0.45rem;
@@ -89,6 +124,20 @@
         }
         .volcano-link:hover {
             text-decoration: underline;
+        }
+        button.volcano-link {
+            border: 0;
+            background: transparent;
+            padding: 0;
+            font: inherit;
+            cursor: pointer;
+        }
+        .volcano-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+            align-items: center;
+            margin-top: 0.55rem;
         }
         .filter-controls {
             display: flex;
@@ -143,6 +192,156 @@
             color: #bbb;
             margin-top: 0.25rem;
         }
+        .volcano-dashboard {
+            max-width: 1100px;
+            margin: 0 auto 1rem;
+            padding: 0 1rem;
+        }
+        .volcano-dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .volcano-panel {
+            border: 1px solid #ff5a1f;
+            background: rgba(0, 28, 40, 0.86);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .volcano-panel h3 {
+            margin: 0 0 0.6rem;
+            color: #f4e6d0;
+            font-size: 1rem;
+            letter-spacing: 0.08em;
+        }
+        .volcano-panel ul {
+            margin: 0;
+            padding-left: 1.1rem;
+            color: #f8f8f8;
+            line-height: 1.5;
+        }
+        .volcano-panel li + li {
+            margin-top: 0.45rem;
+        }
+        .volcano-search-row {
+            max-width: 780px;
+            margin: 0 auto 0.8rem;
+            padding: 0 1rem;
+            display: grid;
+            gap: 0.45rem;
+        }
+        .volcano-search-row label {
+            color: #f4e6d0;
+            font-weight: 700;
+            text-align: center;
+        }
+        .volcano-search-row input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #00ffff;
+            background: #061b25;
+            color: #f7f2df;
+            font-family: inherit;
+        }
+        .activity-summary {
+            color: #f7f2df;
+            line-height: 1.55;
+        }
+        #volcano-map {
+            width: 100%;
+            height: 560px;
+            border: 2px solid #ffae00;
+            background: #061b25;
+        }
+        .leaflet-popup-content-wrapper {
+            background: #082c3c;
+            color: #f7f2df;
+            border: 1px solid #ff5a1f;
+        }
+        .leaflet-popup-tip {
+            background: #082c3c;
+        }
+        .volcano-map-icon {
+            border-radius: 50%;
+            border: 2px solid #111;
+            box-shadow: 0 0 12px rgba(255, 90, 31, 0.8);
+        }
+        .priority-pill {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 0.22rem 0.55rem;
+            font-size: 0.76rem;
+            font-weight: 800;
+            background: #111;
+            border: 1px solid #00ffff;
+            color: #f7f2df;
+        }
+        .priority-high { border-color: #ff2020; color: #ffd4d4; }
+        .priority-medium { border-color: #ffae00; color: #ffe8b0; }
+        .priority-low { border-color: #00ffff; color: #dff; }
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.72);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 1rem;
+        }
+        .modal-backdrop.open {
+            display: flex;
+        }
+        .volcano-modal {
+            width: min(920px, 96vw);
+            max-height: 88vh;
+            overflow-y: auto;
+            background: #061b25;
+            border: 2px solid #ff5a1f;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.25);
+            padding: 1rem;
+            color: #f7f2df;
+        }
+        .volcano-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            border-bottom: 1px solid rgba(255, 90, 31, 0.55);
+            padding-bottom: 0.7rem;
+            margin-bottom: 0.8rem;
+        }
+        .modal-close {
+            border: 1px solid #00ffff;
+            background: transparent;
+            color: #00ffff;
+            padding: 0.35rem 0.55rem;
+            cursor: pointer;
+            font-weight: 800;
+        }
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 0.75rem;
+        }
+        .modal-panel {
+            border: 1px solid rgba(0,255,255,0.35);
+            background: rgba(0,255,255,0.06);
+            padding: 0.75rem;
+        }
+        @media (max-width: 700px) {
+            #live-volcano-list {
+                max-height: 620px;
+                padding: 0 0.5rem;
+            }
+            #volcano-map {
+                height: 440px;
+            }
+            .filter-button {
+                flex: 1 1 170px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -178,7 +377,8 @@
                 <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
                 <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
                 <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
-                <li><a href="astrologychart.html" class="button">Star Chart</a></li>
+                <li><a href="starcharts.html" class="button">Star Charts</a></li>
+				<li><a href="models.html" class="button">Models</a></li>
             </ul>
     </nav>
 
@@ -187,27 +387,58 @@
         <br><br>
 	<!-- ===== Section One ===== -->
         <section>
+            <img class="bordered-image" src="images/volcanobanner.png" alt="Volcano Monitoring Banner" style="width:100%;height:auto;max-width:100%;display:block;margin:auto">
+        </section>
+
+        <section>
             <h2 style="text-align:center">Volcano Monitoring</h2><hr>
-            <p>&emsp;This page is dedicated to real-time volcano monitoring and volcanic activity tracking. Currently Volcano Discovery are the sources used for the below maps.<br><center><a href="https://www.volcanodiscovery.com" class="button" target="_blank">View Volcano Discovery</a></center></p>
+            <p>&emsp;This page is dedicated to real-time volcano monitoring and volcanic activity tracking. VolcanoDiscovery remains the primary source for the live status list and map below. The dashboard now extracts activity indicators from the feed to surface erupting systems, unrest, ash reports, and possible reactivation language when a report suggests renewed activity after a quieter period.<br><center><a href="https://www.volcanodiscovery.com" class="button" target="_blank">View Volcano Discovery</a></center></p>
         </section>
         <br><br>
-        <!-- ===== Section - Volcano Discovery ===== -->
+        <!-- ===== Section - Custom Live Volcano Map ===== -->
 		<section>
-            <h2 style="text-align:center">Volcano Discovery Static Updated Map</h2><hr>
-		<center><div style="position:relative;margin:10px 0"><div style="position:absolute;right:5px;top:5px;width:16px;height:16px"><a href="https://volcanodiscovery.de/maps/active-volcano-map2l.jpg" title="View this image in new window" target="_blank"><img class="bordered-image" src="https://volcanodiscovery.de/fileadmin/voldis/png/zoom_in.png" alt="" width="16" height="16"/></a></div><img class="bordered-image" style="max-width:900px;width:100%;height:auto;margin:auto" src="https://volcanodiscovery.de/maps/active-volcano-map2l.jpg" alt="Currently active volcanoes in the world" /><div style="height:15px;font:10px Verdana,sans-serif;color:#999;text-align:right;vertical-align:middle;overflow:hidden">Source: <a style="color:#999;text-decoration:none;" href="https://www.volcanodiscovery.com/daily-map-of-active-volcanoes.html" target="_blank">VolcanoDiscovery</a></div></div></center>
+            <h2 style="text-align:center">Frontier Signals Live Volcano Map</h2><hr>
+            <p style="text-align:center;color:#ccc;font-size:0.95rem">Markers are built from the VolcanoDiscovery live status feed. Select a marker or a list card to sync the map and open detailed activity context.</p>
+		    <div id="volcano-map"></div>
 		</section>
         <br><br>
         <section>
             <h2 style="text-align:center">Live Volcano Status</h2><hr>
+            <div class="volcano-dashboard">
+                <div class="volcano-dashboard-grid">
+                    <div class="volcano-panel">
+                        <h3>Notable Activity</h3>
+                        <ul id="notable-volcano-list"><li>Loading current activity...</li></ul>
+                    </div>
+                    <div class="volcano-panel">
+                        <h3>Reactivation Watch</h3>
+                        <ul id="reactivation-volcano-list"><li>Scanning source descriptions...</li></ul>
+                    </div>
+                    <div class="volcano-panel">
+                        <h3>Regional Concentration</h3>
+                        <ul id="regional-volcano-list"><li>Loading regional summary...</li></ul>
+                    </div>
+                </div>
+            </div>
             <div class="filter-controls">
                 <button type="button" class="filter-button active" data-filter="active">Show unrest + eruptions</button>
+                <button type="button" class="filter-button" data-filter="erupting">Erupting only</button>
+                <button type="button" class="filter-button" data-filter="reactivation">Reactivation watch</button>
+                <button type="button" class="filter-button" data-filter="ash">Ash reports</button>
                 <button type="button" class="filter-button" data-filter="all">Show all volcanoes</button>
+            </div>
+            <div class="volcano-search-row">
+                <label for="volcano-search">Search volcano name, region, or activity keywords</label>
+                <input id="volcano-search" type="search" placeholder="Example: ash, lava, Indonesia, unrest">
             </div>
             <div id="live-volcano-counts" class="volcano-stats">
                 <div class="volcano-stat"><span>Erupting</span><strong id="count-erupting">0</strong></div>
                 <div class="volcano-stat"><span>Unrest</span><strong id="count-unrest">0</strong></div>
+                <div class="volcano-stat"><span>Reactivation Watch</span><strong id="count-reactivation">0</strong></div>
+                <div class="volcano-stat"><span>Ash Reports</span><strong id="count-ash">0</strong></div>
                 <div class="volcano-stat"><span>Non active</span><strong id="count-nonactive">0</strong></div>
             </div>
+            <p style="text-align:center; color:#bbb; font-size:0.9rem; margin:0.4rem 0 0.7rem;">Scroll inside the live list panel to browse additional volcano reports.</p>
             <div id="live-volcano-list">
                 <p style="text-align:center; color:#ccc;">Loading live volcano status from VolcanoDiscovery...</p>
             </div>
@@ -215,10 +446,8 @@
         </section>
         <br><br>
         <section>
-            <h2 style="text-align:center">Interactive Live Volcano Map</h2><hr>
-        <!-- begin VolcanoWidget -->
-    <center><iframe id="VW_iframe" width="80%" height="600px" scrolling="no" frameborder="0" marginwidth="0" marginheight="0" src="https://earthquakes.volcanodiscovery.com?hideQuakes=1&minMag=0"></iframe></center>
-<!-- end VolcanoWidget / http://www.volcano-news.com/active-volcanoes-map/get-widget.html -->
+            <h2 style="text-align:center">VolcanoDiscovery Static Updated Map</h2><hr>
+		    <center><div style="position:relative;margin:10px 0"><div style="position:absolute;right:5px;top:5px;width:16px;height:16px"><a href="https://volcanodiscovery.de/maps/active-volcano-map2l.jpg" title="View this image in new window" target="_blank"><img class="bordered-image" src="https://volcanodiscovery.de/fileadmin/voldis/png/zoom_in.png" alt="" width="16" height="16"/></a></div><img class="bordered-image" style="max-width:900px;width:100%;height:auto;margin:auto" src="https://volcanodiscovery.de/maps/active-volcano-map2l.jpg" alt="Currently active volcanoes in the world" /><div style="height:15px;font:10px Verdana,sans-serif;color:#999;text-align:right;vertical-align:middle;overflow:hidden">Source: <a style="color:#999;text-decoration:none;" href="https://www.volcanodiscovery.com/daily-map-of-active-volcanoes.html" target="_blank">VolcanoDiscovery</a></div></div></center>
         </section>
         <br><br>
 
@@ -233,11 +462,77 @@
         </p>
     </footer>
 
+    <div id="volcano-modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="volcano-modal-title">
+        <div class="volcano-modal">
+            <div class="volcano-modal-header">
+                <div>
+                    <h2 id="volcano-modal-title" style="margin:0;color:#ff5a1f">Volcano Details</h2>
+                    <p id="volcano-modal-subtitle" style="margin:0.3rem 0 0;color:#ccc"></p>
+                </div>
+                <button type="button" id="volcano-modal-close" class="modal-close">Close</button>
+            </div>
+            <div id="volcano-modal-body"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         (function() {
             const listContainer = document.getElementById('live-volcano-list');
+            const searchInput = document.getElementById('volcano-search');
+            const modalBackdrop = document.getElementById('volcano-modal-backdrop');
+            const modalTitle = document.getElementById('volcano-modal-title');
+            const modalSubtitle = document.getElementById('volcano-modal-subtitle');
+            const modalBody = document.getElementById('volcano-modal-body');
             const volcanoCards = {};
+            const volcanoMarkers = {};
             let selectedFilter = 'active';
+            let searchTerm = '';
+            let volcanoMap = null;
+            let volcanoLayer = null;
+
+            const GVP_HISTORY = {
+                'Aoba': { last: '2026 activity noted in monitoring feeds; confirm details with Smithsonian GVP.', query: 'Aoba' },
+                'Ambae': { last: '2026 activity noted in monitoring feeds; confirm details with Smithsonian GVP.', query: 'Aoba' },
+                'Bagana': { last: '2025-2026 activity noted in monitoring feeds; confirm details with Smithsonian GVP.', query: 'Bagana' },
+                'Kilauea': { last: '2024-2026 eruptive episodes documented by monitoring agencies; confirm current GVP status.', query: 'Kilauea' },
+                'Popocatepetl': { last: 'Ongoing historical activity; confirm latest GVP eruption interval.', query: 'Popocatepetl' },
+                'Etna': { last: 'Frequent recent eruptions; confirm latest GVP eruption interval.', query: 'Etna' },
+                'Stromboli': { last: 'Persistent historical activity; confirm latest GVP eruption interval.', query: 'Stromboli' },
+                'Sakurajima': { last: 'Frequent recent eruptions; confirm latest GVP eruption interval.', query: 'Sakurajima' },
+                'Semeru': { last: 'Ongoing recent activity; confirm latest GVP eruption interval.', query: 'Semeru' },
+                'Lewotobi': { last: 'Recent eruptive activity; confirm latest GVP eruption interval.', query: 'Lewotobi' },
+                'Ibu': { last: 'Recent eruptive activity; confirm latest GVP eruption interval.', query: 'Ibu' },
+                'Dukono': { last: 'Long-running recent activity; confirm latest GVP eruption interval.', query: 'Dukono' },
+                'Fuego': { last: 'Frequent recent eruptions; confirm latest GVP eruption interval.', query: 'Fuego' },
+                'Nevado del Ruiz': { last: 'Recent unrest/eruption history documented; confirm latest GVP eruption interval.', query: 'Nevado del Ruiz' },
+                'Shiveluch': { last: 'Frequent recent eruptions; confirm latest GVP eruption interval.', query: 'Sheveluch' },
+                'Sheveluch': { last: 'Frequent recent eruptions; confirm latest GVP eruption interval.', query: 'Sheveluch' },
+                'Ebeko': { last: 'Frequent recent eruptions; confirm latest GVP eruption interval.', query: 'Ebeko' },
+                'Karymsky': { last: 'Frequent recent eruptions; confirm latest GVP eruption interval.', query: 'Karymsky' },
+                'Reykjanes': { last: 'Recent Icelandic fissure eruptions; confirm latest GVP eruption interval.', query: 'Reykjanes' },
+                'Grindavik': { last: 'Recent Reykjanes-area fissure activity; confirm latest GVP eruption interval.', query: 'Reykjanes' }
+            };
+
+            const VAAC_LINKS = [
+                { name: 'Anchorage VAAC', test: /alaska|aleutian|kamchatka|kuril/i, url: 'https://www.weather.gov/vaac/' },
+                { name: 'Tokyo VAAC', test: /japan|kuril|sakurajima|suwa|ogasawara|ryukyu/i, url: 'https://ds.data.jma.go.jp/svd/vaac/data/index.html' },
+                { name: 'Darwin VAAC', test: /indonesia|papua|new guinea|vanuatu|solomon|philippines|australia/i, url: 'http://www.bom.gov.au/aviation/volcanic-ash/' },
+                { name: 'Wellington VAAC', test: /new zealand|tonga|samoa|fiji|kermadec/i, url: 'https://vaac.metservice.com/' },
+                { name: 'Washington VAAC', test: /mexico|guatemala|nicaragua|costa rica|colombia|ecuador|peru|chile|andes|caribbean|usa|hawaii/i, url: 'https://www.ospo.noaa.gov/products/atmosphere/vaac/' },
+                { name: 'London VAAC', test: /iceland|azores|canary|atlantic/i, url: 'https://www.metoffice.gov.uk/services/transport/aviation/regulated/vaac' },
+                { name: 'Toulouse VAAC', test: /africa|mediterranean|italy|etna|stromboli|vulcano/i, url: 'https://vaac.meteo.fr/' }
+            ];
+
+            const HAZARD_REGIONS = [
+                { name: 'Indonesia', test: /indonesia|sumatra|java|sunda|sulawesi|halmahera|flores|banda|lembata|ternate|sangihe/i },
+                { name: 'Japan/Kamchatka', test: /japan|kamchatka|kuril|sakurajima|suwa|honshu|kyushu|hokkaido|ogasawara/i },
+                { name: 'Alaska/Aleutians', test: /alaska|aleutian|andreanof|rat islands|fox islands/i },
+                { name: 'Central America', test: /guatemala|el salvador|nicaragua|costa rica|mexico|honduras|panama/i },
+                { name: 'Andes', test: /andes|colombia|ecuador|peru|chile|argentina|bolivia/i },
+                { name: 'Iceland', test: /iceland|reykjanes|grindavik|fagradalsfjall|vatnajokull|katla/i },
+                { name: 'Pacific Islands', test: /vanuatu|papua new guinea|solomon|tonga|samoa|fiji|new zealand|mariana|hawaii/i }
+            ];
 
             function escapeHtml(value) {
                 return String(value)
@@ -257,7 +552,12 @@
             }
 
             function isVisibleUsingFilter(volcano) {
+                const searchable = [volcano.name, volcano.region, volcano.status, volcano.description, volcano.tags.join(' ')].join(' ').toLowerCase();
+                if (searchTerm && !searchable.includes(searchTerm)) return false;
                 if (selectedFilter === 'all') return true;
+                if (selectedFilter === 'erupting') return volcano.level >= 4;
+                if (selectedFilter === 'reactivation') return volcano.reactivationScore > 0;
+                if (selectedFilter === 'ash') return volcano.ash;
                 return volcano.level >= 2;
             }
 
@@ -271,20 +571,251 @@
             function renderVolcanoCounts() {
                 const countErupting = Object.values(volcanoCards).filter(v => v.level === 4).length;
                 const countUnrest = Object.values(volcanoCards).filter(v => v.level === 2 || v.level === 3).length;
+                const countReactivation = Object.values(volcanoCards).filter(v => v.reactivationScore > 0).length;
+                const countAsh = Object.values(volcanoCards).filter(v => v.ash).length;
                 const countNonActive = Object.values(volcanoCards).filter(v => v.level === 0 || v.level === 1).length;
 
                 const eruptingEl = document.getElementById('count-erupting');
                 const unrestEl = document.getElementById('count-unrest');
+                const reactivationEl = document.getElementById('count-reactivation');
+                const ashEl = document.getElementById('count-ash');
                 const nonActiveEl = document.getElementById('count-nonactive');
 
                 if (eruptingEl) eruptingEl.textContent = String(countErupting);
                 if (unrestEl) unrestEl.textContent = String(countUnrest);
+                if (reactivationEl) reactivationEl.textContent = String(countReactivation);
+                if (ashEl) ashEl.textContent = String(countAsh);
                 if (nonActiveEl) nonActiveEl.textContent = String(countNonActive);
+            }
+
+            function levelLabel(level) {
+                if (level >= 4) return 'Erupting';
+                if (level === 3) return 'Strong unrest';
+                if (level === 2) return 'Unrest';
+                if (level === 1) return 'Low activity';
+                return 'No current activity';
+            }
+
+            function uniqueTags(tags) {
+                return Array.from(new Set(tags.filter(Boolean)));
+            }
+
+            function gvpSearchUrl(name) {
+                return 'https://volcano.si.edu/search_volcano.cfm?volcanoName=' + encodeURIComponent(name);
+            }
+
+            function getGvpContext(volcano) {
+                const names = [volcano.name, String(volcano.name || '').replace(/\s+volcano$/i, '')];
+                for (const name of names) {
+                    const direct = GVP_HISTORY[name];
+                    if (direct) return { ...direct, url: gvpSearchUrl(direct.query || name) };
+                }
+                return { last: 'No local last-eruption context available. Use Smithsonian GVP profile search for historical eruption intervals.', query: volcano.name, url: gvpSearchUrl(volcano.name) };
+            }
+
+            function getVaacLinks(volcano) {
+                const text = [volcano.name, volcano.region, volcano.description].join(' ');
+                const matches = VAAC_LINKS.filter(item => item.test.test(text));
+                return matches.length ? matches : [{ name: 'Global VAAC directory', url: 'https://www.weather.gov/vaac/' }];
+            }
+
+            function getHazardGroup(volcano) {
+                const text = [volcano.name, volcano.region, volcano.description].join(' ');
+                const match = HAZARD_REGIONS.find(group => group.test.test(text));
+                return match ? match.name : 'Other / ungrouped';
+            }
+
+            function parseUpdateAgeDays(updated) {
+                const text = String(updated || '');
+                if (!text) return 999;
+                const parsed = Date.parse(text.replace(/\b(\d{1,2})\s+([A-Za-z]{3,})\s+(\d{4})\b/, '$1 $2 $3'));
+                if (Number.isNaN(parsed)) return 90;
+                return Math.max(0, Math.round((Date.now() - parsed) / 86400000));
+            }
+
+            function calculateWatchPriority(volcano) {
+                let score = volcano.level * 18;
+                if (volcano.ash) score += 12;
+                if (volcano.tags.includes('lava/thermal')) score += 10;
+                if (volcano.tags.includes('seismic unrest')) score += 8;
+                if (volcano.tags.includes('deformation')) score += 8;
+                if (volcano.tags.includes('secondary hazard')) score += 6;
+                score += Math.min(15, volcano.reactivationScore * 3);
+                const age = parseUpdateAgeDays(volcano.updated);
+                if (age <= 3) score += 10;
+                else if (age <= 14) score += 6;
+                else if (age <= 45) score += 3;
+                return Math.max(0, Math.min(100, Math.round(score)));
+            }
+
+            function priorityClass(score) {
+                if (score >= 70) return 'priority-high';
+                if (score >= 40) return 'priority-medium';
+                return 'priority-low';
+            }
+
+            function markerColor(volcano) {
+                if (volcano.priority >= 70) return '#ff2020';
+                if (volcano.level >= 4) return '#ff5a1f';
+                if (volcano.level >= 3) return '#ffae00';
+                if (volcano.level >= 2) return '#ffff33';
+                return '#39d353';
+            }
+
+            function initVolcanoMap() {
+                if (volcanoMap || !document.getElementById('volcano-map') || typeof L === 'undefined') return;
+                volcanoMap = L.map('volcano-map', { worldCopyJump: true }).setView([15, 0], 2);
+                const baseLayers = {
+                    'OpenStreetMap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: 'OpenStreetMap contributors'
+                    }),
+                    'Dark': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                        maxZoom: 19,
+                        attribution: 'OpenStreetMap contributors, CARTO'
+                    }),
+                    'Satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        maxZoom: 19,
+                        attribution: 'Tiles Esri'
+                    })
+                };
+                baseLayers.OpenStreetMap.addTo(volcanoMap);
+                volcanoLayer = L.layerGroup().addTo(volcanoMap);
+                L.control.layers(baseLayers, { 'Live volcanoes': volcanoLayer }, { collapsed: true }).addTo(volcanoMap);
+            }
+
+            function renderVolcanoMap() {
+                initVolcanoMap();
+                if (!volcanoMap || !volcanoLayer) return;
+                volcanoLayer.clearLayers();
+                Object.keys(volcanoMarkers).forEach(key => delete volcanoMarkers[key]);
+                const bounds = [];
+                Object.values(volcanoCards).forEach(v => {
+                    const lat = Number(v.lat);
+                    const lng = Number(v.lng);
+                    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+                    const color = markerColor(v);
+                    const marker = L.circleMarker([lat, lng], {
+                        radius: v.priority >= 70 ? 9 : v.level >= 4 ? 8 : v.level >= 2 ? 6 : 4,
+                        color: '#111',
+                        weight: 2,
+                        fillColor: color,
+                        fillOpacity: 0.88,
+                        className: 'volcano-map-icon'
+                    });
+                    marker.bindPopup(`<strong>${escapeHtml(v.name)}</strong><br>${escapeHtml(v.region || 'Global')}<br>${escapeHtml(levelLabel(v.level))}<br>Priority ${v.priority}/100`);
+                    marker.on('click', () => openVolcanoDetail(v.key));
+                    marker.addTo(volcanoLayer);
+                    volcanoMarkers[v.key] = marker;
+                    bounds.push([lat, lng]);
+                });
+                if (bounds.length) volcanoMap.fitBounds(bounds, { padding: [18, 18], maxZoom: 5 });
+            }
+
+            function focusVolcano(key) {
+                const volcano = volcanoCards[key];
+                const marker = volcanoMarkers[key];
+                if (!volcano || !marker || !volcanoMap) return;
+                volcanoMap.setView(marker.getLatLng(), Math.max(volcanoMap.getZoom(), 6), { animate: true });
+                marker.openPopup();
+            }
+
+            function openVolcanoDetail(key) {
+                const v = volcanoCards[key];
+                if (!v || !modalBackdrop || !modalBody) return;
+                focusVolcano(key);
+                const gvp = getGvpContext(v);
+                const vaacLinks = getVaacLinks(v);
+                modalTitle.textContent = v.name;
+                modalSubtitle.textContent = `${v.region || 'Global'} | ${levelLabel(v.level)} | Watch priority ${v.priority}/100`;
+                modalBody.innerHTML = `
+                    <div class="modal-grid">
+                        <div class="modal-panel"><strong>Status</strong><br>${escapeHtml(v.status || 'Unknown')}<br><br><strong>Last update</strong><br>${escapeHtml(v.updated || 'unknown')}</div>
+                        <div class="modal-panel"><strong>Watch Priority</strong><br><span class="priority-pill ${priorityClass(v.priority)}">${v.priority}/100</span><br><br>${escapeHtml(v.prioritySummary)}</div>
+                        <div class="modal-panel"><strong>GVP Historical Context</strong><br>${escapeHtml(gvp.last)}<br><a class="volcano-link" href="${escapeHtml(gvp.url)}" target="_blank" rel="noopener">Open Smithsonian GVP lookup</a></div>
+                        <div class="modal-panel"><strong>VAAC / Ash Aviation Check</strong><br>${vaacLinks.map(link => `<a class="volcano-link" href="${escapeHtml(link.url)}" target="_blank" rel="noopener">${escapeHtml(link.name)}</a>`).join('<br>')}</div>
+                    </div>
+                    <p class="activity-summary"><strong>Activity readout:</strong> ${escapeHtml(v.activitySummary)}</p>
+                    <p><strong>Extracted tags:</strong> ${v.tags.length ? v.tags.map(tag => `<span class="volcano-tag">${escapeHtml(tag)}</span>`).join(' ') : 'No extracted tags'}</p>
+                    <p><strong>Regional hazard group:</strong> ${escapeHtml(v.hazardGroup)}</p>
+                    ${v.moreUrl ? `<a class="volcano-link" href="${escapeHtml(v.moreUrl)}" target="_blank" rel="noopener">Open VolcanoDiscovery details</a>` : ''}
+                `;
+                modalBackdrop.classList.add('open');
+            }
+
+            function closeVolcanoDetail() {
+                if (modalBackdrop) modalBackdrop.classList.remove('open');
+            }
+
+            function analyzeVolcano(volcano) {
+                const text = [volcano.status, volcano.description, volcano.name, volcano.region].join(' ').toLowerCase();
+                const tags = [];
+                if (/ash|vaac|plume|emission|explosion|explosive/.test(text)) tags.push('ash/plume');
+                if (/lava|effusive|flow|incandes|glow|fount/.test(text)) tags.push('lava/thermal');
+                if (/seismic|earthquake|tremor|swarm/.test(text)) tags.push('seismic unrest');
+                if (/deformation|inflation|uplift|ground deformation/.test(text)) tags.push('deformation');
+                if (/gas|so2|sulfur|fumarol|steam|degassing/.test(text)) tags.push('gas/steam');
+                if (/lahar|mudflow|pyroclastic|collapse|avalanche/.test(text)) tags.push('secondary hazard');
+                if (/new|renew|restart|resum|reactivat|first|after|since|increased|elevated|unrest|awak/.test(text)) tags.push('renewed activity signal');
+                if (volcano.level >= 4) tags.push('eruption');
+                if (volcano.level === 2 || volcano.level === 3) tags.push('unrest');
+
+                let reactivationScore = 0;
+                if (/reactivat|awak|renew|restart|resum/.test(text)) reactivationScore += 3;
+                if (/\b(first|after|since)\b/.test(text)) reactivationScore += 2;
+                if (/\bnew\b|increased|elevated|unrest/.test(text)) reactivationScore += 1;
+                if (volcano.level >= 2 && reactivationScore > 0) reactivationScore += 1;
+
+                volcano.tags = uniqueTags(tags);
+                volcano.reactivationScore = reactivationScore;
+                volcano.hazardGroup = getHazardGroup(volcano);
+                volcano.gvp = getGvpContext(volcano);
+                volcano.vaacLinks = getVaacLinks(volcano);
+                volcano.priority = calculateWatchPriority(volcano);
+                volcano.prioritySummary = `Score combines alert level, ash/plume wording, lava/thermal wording, seismic/deformation terms, renewed-activity wording, and report recency.`;
+                volcano.activitySummary = buildActivitySummary(volcano);
+                return volcano;
+            }
+
+            function buildActivitySummary(v) {
+                const pieces = [];
+                pieces.push(`${levelLabel(v.level)} in ${v.region || 'the listed region'}.`);
+                if (v.ash) pieces.push('The source text includes ash, plume, emission, or explosive-language indicators, so aviation and downwind ash impacts are worth checking at the source.');
+                if (v.tags.includes('lava/thermal')) pieces.push('Lava, glow, thermal, or effusive language appears in the report, suggesting surface heat or lava-output indicators.');
+                if (v.tags.includes('seismic unrest')) pieces.push('Seismic or tremor language appears in the report, which can indicate magma/fluid movement or structural adjustment.');
+                if (v.tags.includes('gas/steam')) pieces.push('Gas, steam, fumarolic, or sulfur language appears, useful for tracking pressure and hydrothermal changes.');
+                if (v.reactivationScore > 0) pieces.push('Reactivation watch: the report contains renewed-activity wording such as new, resumed, first, after, since, elevated, unrest, or similar language.');
+                if (!pieces.length) pieces.push('No detailed activity keywords were extracted from the widget description.');
+                return pieces.join(' ');
+            }
+
+            function renderDashboard() {
+                const all = Object.values(volcanoCards);
+                const notable = all.filter(v => v.level >= 3 || v.ash || v.tags.includes('lava/thermal')).sort((a, b) => {
+                    if (b.level !== a.level) return b.level - a.level;
+                    if (Number(b.ash) !== Number(a.ash)) return Number(b.ash) - Number(a.ash);
+                    return a.name.localeCompare(b.name);
+                }).slice(0, 6);
+                const watch = all.filter(v => v.reactivationScore > 0).sort((a, b) => b.reactivationScore - a.reactivationScore || b.level - a.level).slice(0, 6);
+                const regions = {};
+                all.filter(v => v.level >= 2).forEach(v => {
+                    const region = v.hazardGroup || 'Other / ungrouped';
+                    regions[region] = (regions[region] || 0) + 1;
+                });
+                const regional = Object.entries(regions).sort((a, b) => b[1] - a[1]).slice(0, 6);
+
+                const notableEl = document.getElementById('notable-volcano-list');
+                const watchEl = document.getElementById('reactivation-volcano-list');
+                const regionalEl = document.getElementById('regional-volcano-list');
+                if (notableEl) notableEl.innerHTML = notable.length ? notable.map(v => `<li><button type="button" class="volcano-link" data-volcano-detail="${escapeHtml(v.key)}"><strong>${escapeHtml(v.name)}</strong></button> - ${escapeHtml(levelLabel(v.level))}; priority ${v.priority}/100${v.ash ? '; ash noted' : ''}</li>`).join('') : '<li>No notable eruptive indicators found in the loaded feed.</li>';
+                if (watchEl) watchEl.innerHTML = watch.length ? watch.map(v => `<li><button type="button" class="volcano-link" data-volcano-detail="${escapeHtml(v.key)}"><strong>${escapeHtml(v.name)}</strong></button> - ${escapeHtml(v.region || 'Global')}<br><span class="status-note">${escapeHtml(v.tags.join(', '))}</span></li>`).join('') : '<li>No renewed-activity wording detected in the loaded feed.</li>';
+                if (regionalEl) regionalEl.innerHTML = regional.length ? regional.map(([region, count]) => `<li><strong>${escapeHtml(region)}</strong> - ${count} unrest/eruption entr${count === 1 ? 'y' : 'ies'}</li>`).join('') : '<li>No unrest or eruption regions loaded yet.</li>';
             }
 
             function renderVolcanoList() {
                 if (!listContainer) return;
                 renderVolcanoCounts();
+                renderDashboard();
                 const filtered = Object.values(volcanoCards).filter(isVisibleUsingFilter);
                 if (!filtered.length) {
                     listContainer.innerHTML = '<p style="text-align:center; color:#ccc;">No live volcano entries were loaded or they are filtered out.</p>';
@@ -297,35 +828,51 @@
                 });
 
                 listContainer.innerHTML = '<div class="live-volcano-grid">' + sorted.map(v => {
-                    return '<article class="volcano-card">'
+                    return '<article class="volcano-card' + (v.level >= 3 || v.ash ? ' notable' : '') + (v.reactivationScore > 0 ? ' reactivation' : '') + '" tabindex="0" role="button" data-volcano-detail="' + escapeHtml(v.key) + '">'
                         + '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap; gap:0.5rem;">'
                         + '<h3 style="margin:0">' + escapeHtml(v.name) + '</h3>'
-                        + '<span class="volcano-badge status-' + v.level + '">Alert ' + v.level + '</span>'
+                        + '<span class="volcano-badge status-' + v.level + '">' + escapeHtml(levelLabel(v.level)) + '</span>'
                         + '</div>'
                         + '<div class="volcano-meta">' + escapeHtml(v.region || 'Global') + '</div>'
+                        + '<span class="priority-pill ' + priorityClass(v.priority) + '">Watch priority ' + v.priority + '/100</span>'
                         + '<p><strong>Status:</strong> ' + escapeHtml(v.status || 'Unknown') + '</p>'
                         + '<p><strong>Last update:</strong> ' + escapeHtml(v.updated || 'unknown') + '</p>'
-                        + '<p class="status-note">' + (v.ash ? 'Ash emission or ash advisory noted in the report.' : 'No ash reference found in the latest report.') + '</p>'
-                        + (v.moreUrl ? '<a class="volcano-link" href="' + escapeHtml(v.moreUrl) + '" target="_blank" rel="noopener">More details</a>' : '')
+                        + '<p><strong>Hazard group:</strong> ' + escapeHtml(v.hazardGroup) + '</p>'
+                        + '<div class="volcano-tags">' + (v.tags.length ? v.tags.map(tag => '<span class="volcano-tag">' + escapeHtml(tag) + '</span>').join('') : '<span class="volcano-tag">no extracted keywords</span>') + '</div>'
+                        + '<p class="status-note">' + (v.reactivationScore > 0 ? 'Renewed-activity wording detected. Open details for context.' : 'Open details for activity readout, GVP context, and VAAC links.') + '</p>'
+                        + '<div class="volcano-actions">'
+                        + '<button type="button" class="volcano-link" data-volcano-detail="' + escapeHtml(v.key) + '">Open detail card</button>'
+                        + (v.moreUrl ? '<a class="volcano-link" href="' + escapeHtml(v.moreUrl) + '" target="_blank" rel="noopener">VolcanoDiscovery</a>' : '')
+                        + '<a class="volcano-link" href="' + escapeHtml(v.gvp.url) + '" target="_blank" rel="noopener">Smithsonian GVP</a>'
+                        + (v.vaacLinks.length ? '<a class="volcano-link" href="' + escapeHtml(v.vaacLinks[0].url) + '" target="_blank" rel="noopener">VAAC</a>' : '')
+                        + '</div>'
                         + '</article>';
                 }).join('') + '</div>';
+                setupVolcanoDetailLinks();
+                renderVolcanoMap();
             }
 
             function parseVolcanoHtml(html) {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString('<div>' + html + '</div>', 'text/html');
-                const info = { status: 'Unknown', updated: '', ash: false, moreUrl: '' };
+                const info = { status: 'Unknown', updated: '', ash: false, moreUrl: '', description: '' };
                 const statusSpan = doc.querySelector('span');
                 if (statusSpan) {
                     info.status = statusSpan.textContent.trim();
                 }
 
-                const text = doc.body.textContent || '';
+                const text = (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
                 const updateMatch = text.match(/Last update:\s*([^\n\r]+)/i);
                 if (updateMatch) {
-                    info.updated = updateMatch[1].trim();
+                    info.updated = updateMatch[1].replace(/More details.*$/i, '').trim();
                 }
                 info.ash = /ash/i.test(text);
+                info.description = text
+                    .replace(info.status, '')
+                    .replace(/Last update:\s*[^.]+/i, '')
+                    .replace(/More details.*$/i, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
 
                 const moreLink = doc.querySelector('a[target="_parent"]');
                 if (moreLink && moreLink.href) {
@@ -349,6 +896,7 @@
                 volcano.updated = details.updated;
                 volcano.ash = details.ash;
                 volcano.moreUrl = details.moreUrl;
+                volcano.description = details.description;
 
                 const labelMatch = String(label || '').match(/^(.+?)\s*\((.+)\)$/);
                 if (labelMatch) {
@@ -362,6 +910,8 @@
                 const iconMatch = String(iconUrl || '').match(/_([0-9])\.png$/);
                 volcano.level = normalizeAlertLevel(iconMatch ? parseInt(iconMatch[1], 10) : 0);
                 const key = id || volcano.name || label || Math.random().toString(36).slice(2);
+                volcano.key = String(key);
+                analyzeVolcano(volcano);
                 volcanoCards[key] = volcano;
             };
 
@@ -398,14 +948,54 @@
                         updateFilterButtons();
                     });
                 });
+                if (searchInput) {
+                    searchInput.addEventListener('input', () => {
+                        searchTerm = searchInput.value.trim().toLowerCase();
+                        renderVolcanoList();
+                    });
+                }
             }
+
+            function setupVolcanoDetailLinks() {
+                document.querySelectorAll('[data-volcano-detail]').forEach(el => {
+                    if (el.dataset.detailBound === 'true') return;
+                    el.dataset.detailBound = 'true';
+                    el.addEventListener('click', event => {
+                        const link = event.target.closest('a');
+                        if (link && link.href) return;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        openVolcanoDetail(el.getAttribute('data-volcano-detail'));
+                    });
+                    el.addEventListener('keydown', event => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            openVolcanoDetail(el.getAttribute('data-volcano-detail'));
+                        }
+                    });
+                });
+            }
+
+            if (document.getElementById('volcano-modal-close')) {
+                document.getElementById('volcano-modal-close').addEventListener('click', closeVolcanoDetail);
+            }
+            if (modalBackdrop) {
+                modalBackdrop.addEventListener('click', event => {
+                    if (event.target === modalBackdrop) closeVolcanoDetail();
+                });
+            }
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape') closeVolcanoDetail();
+            });
 
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', () => {
+                    initVolcanoMap();
                     setupFilterControls();
                     loadVolcanoFeed();
                 });
             } else {
+                initVolcanoMap();
                 setupFilterControls();
                 loadVolcanoFeed();
             }

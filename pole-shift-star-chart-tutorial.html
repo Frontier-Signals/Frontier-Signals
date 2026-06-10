@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Tutorial for using the Frontier Signals Pole Shift Star Chart, including shifted pole controls, habitat sky views, star navigation basics, print exports, and catalogue-building workflows." />
+    <meta name="keywords" content="pole shift star chart tutorial, celestial navigation tutorial, star navigation, star catalogue, constellation chart, shifted pole model, Frontier Signals" />
+    <meta name="author" content="Frontier Signals" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#08202c" />
+    <link rel="canonical" href="https://frontier-signals.github.io/Frontier-Signals/pole-shift-star-chart-tutorial.html" />
+    <meta property="og:title" content="Pole Shift Star Chart Tutorial | Frontier Signals" />
+    <meta property="og:description" content="Learn how to use the Pole Shift Star Chart and build useful navigation chart exports." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://frontier-signals.github.io/Frontier-Signals/pole-shift-star-chart-tutorial.html" />
+    <meta property="og:image" content="https://frontier-signals.github.io/Frontier-Signals/images/FrontierSignalsBanner.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pole Shift Star Chart Tutorial | Frontier Signals" />
+    <meta name="twitter:description" content="Guide to using shifted-pole star charts, habitat sky views, constellation overlays, and reference catalogue exports." />
+    <meta name="twitter:image" content="https://frontier-signals.github.io/Frontier-Signals/images/FrontierSignalsBanner.png" />
+    <title>Pole Shift Star Chart Tutorial | Frontier Signals</title>
+    <link rel="stylesheet" href="stylesheet.css" />
+    <style>
+        .tutorial-main {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        .tutorial-main section {
+            width: 90%;
+            text-shadow: none;
+        }
+
+        .tutorial-main h1,
+        .tutorial-main h2,
+        .tutorial-main h3 {
+            color: #ffd479;
+            text-align: center;
+        }
+
+        .tutorial-main p,
+        .tutorial-main li {
+            color: #fcf2dc;
+            letter-spacing: 0;
+            font-family: Arial, sans-serif;
+            font-weight: 600;
+            line-height: 1.65;
+        }
+
+        .tutorial-main code {
+            color: #7ce1ff;
+        }
+
+        .tutorial-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .tutorial-card {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            padding: 14px;
+            background: rgba(4, 15, 33, 0.45);
+        }
+
+        @media (max-width: 760px) {
+            .tutorial-main section {
+                width: 100%;
+            }
+
+            .tutorial-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <center><img id="banner" class="bordered-image" src="images/FrontierSignalsBanner.png" alt="Frontier Signals Official Banner"></center>
+        <p style="text-align: center; color: #ff00ff; font-weight: bold; margin: 5px 0;">Beta</p>
+        <hr>
+        <p>Pole Shift Star Chart Tutorial</p>
+    </header>
+
+    <nav aria-label="Main navigation">
+        <div class="hamburger" aria-controls="nav-container" aria-expanded="false" role="button" tabindex="0">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div id="nav-container">
+            <ul class="nav-links">
+                <li><a href="index.html" class="button">Home Page</a></li>
+                <li><a href="historydata.html" class="button">Historical Data &amp; Archives</a></li>
+                <li><a href="peerpapers.html" class="button">Frontier Science Articles</a></li>
+                <li><a href="ancienthistory.html" class="button">Ancient History</a></li>
+                <li><a href="extras.html" class="button">Multimedia &amp; Resource Links</a></li>
+                <li><a href="about.html" class="button">About/Contact</a></li>
+            </ul>
+            <hr>
+            <ul class="nav-links">
+                <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
+                <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
+                <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
+                <li><a href="starcharts.html" class="button">Star Charts</a></li>
+                <li><a href="models.html" class="button">Models</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="tutorial-main">
+        <section>
+            <h1>Pole Shift Star Chart Tutorial</h1>
+            <p>This tool creates a navigational sky chart from a selected pole model and a selected habitat position. The pole controls define the hypothetical north pole. The habitat controls define where the observer lives relative to that pole. The chart then shows the sky from that habitat view, using the selected date and time for sidereal rotation, moon phase, planet context, and ecliptic placement.</p>
+            <p><a class="button" href="pole-shift-star-chart.html">Return to Star Chart</a></p>
+        </section>
+
+        <section>
+            <h2>Basic Workflow</h2>
+            <ol>
+                <li>Choose a pole model with the preset buttons, or enter your own latitude and longitude.</li>
+                <li>Set the habitat latitude and longitude for the observing location you want to model.</li>
+                <li>Select the date and time. This controls local sidereal time, moon phase, and approximate planet positions.</li>
+                <li>Choose a map style and projection. Navigation polar is the practical default.</li>
+                <li>Use object filters to switch between all constellations, zodiac emphasis, or navigation-star emphasis.</li>
+                <li>Export multiple chart versions for field comparison or catalogue building.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Star Navigation Basics</h2>
+            <div class="tutorial-grid">
+                <div class="tutorial-card">
+                    <h3>Pole Guide Star</h3>
+                    <p>The pole guide star is the named reference star closest to the selected pole axis. It may not appear at the center of the chart because the chart center is the habitat zenith, not the pole. Use the angle value as the important clue: smaller angles mean a better pole guide.</p>
+                </div>
+                <div class="tutorial-card">
+                    <h3>Directions</h3>
+                    <p>The outer letters mark horizon directions. If the chart is set to visible sky, the rim behaves like the horizon and the center behaves like overhead sky.</p>
+                </div>
+                <div class="tutorial-card">
+                    <h3>Altitude Rings</h3>
+                    <p>The altitude rings help estimate how high an object sits above the horizon. A star near the center is high overhead; a star near the rim is low and harder to use.</p>
+                </div>
+                <div class="tutorial-card">
+                    <h3>Ecliptic Path</h3>
+                    <p>The dashed ecliptic path is where the Sun, Moon, and planets tend to appear. It is useful for separating wandering objects from fixed stars.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Building A Useful Star Catalogue</h2>
+            <p>A single export is helpful, but a small set of exports is much better. Use the same pole, habitat, date, time, projection, and style, then vary labels and constellation overlays.</p>
+            <ol>
+                <li><strong>Reference chart:</strong> all constellations, constellation labels on, essential star labels.</li>
+                <li><strong>Clean constellation chart:</strong> constellation lines on, constellation labels off, standard star labels.</li>
+                <li><strong>Star identification chart:</strong> constellation lines off, dense star labels on.</li>
+                <li><strong>Zodiac chart:</strong> objects set to Zodiac band, ecliptic visible, labels standard or dense.</li>
+                <li><strong>Navigation chart:</strong> objects set to Navigation stars, horizon grid on, essential labels.</li>
+            </ol>
+            <p>Keep these exports together as a small catalogue. The labelled charts teach the pattern, while the cleaner charts are better for actual visual comparison.</p>
+        </section>
+
+        <section>
+            <h2>Reading Shifted Pole Models</h2>
+            <p>The pole model changes the relationship between Earth geography and the sky. The habitat position determines the observer's sky under that pole arrangement. If a preset places the selected pole far from the modern Arctic, a modern location may end up in the opposite shifted hemisphere, changing which stars are visible and which stars become useful guides.</p>
+            <p>The Earth axis model in the sidebar centers the selected pole and marks the chosen habitat, so it is the quickest way to sanity-check the geometry before exporting.</p>
+        </section>
+
+        <section>
+            <h2>Practical Export Tips</h2>
+            <ul>
+                <li>Use high-contrast styles for screen study and ink print or parchment styles for printed notes.</li>
+                <li>Make exports at the same date and time when comparing different pole models.</li>
+                <li>Make exports at different seasons when building a year-round catalogue.</li>
+                <li>Use the Find control to highlight a star, planet, or constellation before exporting a teaching chart.</li>
+                <li>Remember that planet positions and the Moon are date-sensitive. Fixed star and constellation patterns are the stable reference layer.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Frontier Signals. All rights reserved.</p>
+        <p style="font-size: 12px; margin-top: 10px;">
+            <a href="privacy-policy.html" style="color: #00ffff; text-decoration: none;">Privacy Policy</a> |
+            <a href="terms-of-service.html" style="color: #00ffff; text-decoration: none;">Terms of Service</a>
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

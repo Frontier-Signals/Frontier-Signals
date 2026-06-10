@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -14,13 +14,13 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://frontier-signals.github.io/Frontier-Signals/earthquakes">
     <link rel="canonical" href="https://frontier-signals.github.io/Frontier-Signals/earthquakes">
-    <meta property="og:image" content="https://frontier-signals.github.io/Frontier-Signals/images/FrontierSignalsBanner.png">
+    <meta property="og:image" content="https://frontier-signals.github.io/Frontier-Signals/images/earthquakebanner.png">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Earthquake Monitoring - Frontier Signals">
     <meta name="twitter:description" content="Real-time earthquake monitoring and hazard maps.">
-    <meta name="twitter:image" content="https://frontier-signals.github.io/Frontier-Signals/images/FrontierSignalsBanner.png">
+    <meta name="twitter:image" content="https://frontier-signals.github.io/Frontier-Signals/images/earthquakebanner.png">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -129,6 +129,63 @@ svg .leaflet-draw-guide-line {
   box-shadow: none;
   font-size: 18px;
 }
+.event-marker {
+  align-items: center;
+  border: 2px solid #111;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(0,0,0,0.8);
+  color: #111;
+  display: flex;
+  font-size: 16px;
+  font-weight: bold;
+  height: 24px;
+  justify-content: center;
+  line-height: 1;
+  text-shadow: none;
+  width: 24px;
+}
+.quake-icon {
+  background: transparent;
+  border: 0;
+}
+.quake-low { background: green; }
+.quake-mid { background: orange; }
+.quake-high { background: red; color: #fcf2dc; }
+.earthquake-cluster {
+  align-items: center;
+  background: rgba(0, 128, 0, 0.88);
+  border: 2px solid #111;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(0,0,0,0.75);
+  color: #fcf2dc;
+  display: flex;
+  font-size: 13px;
+  font-weight: bold;
+  height: 34px;
+  justify-content: center;
+  line-height: 1;
+  text-shadow: none;
+  width: 34px;
+}
+.hazard-marker {
+  background: #0b2a3b;
+  border: 2px solid #ff6b35;
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(255, 107, 53, 0.65);
+  display: flex;
+  font-size: 20px;
+  height: 30px;
+  justify-content: center;
+  line-height: 28px;
+  text-shadow: none;
+  width: 30px;
+}
+.map-status {
+  border-left: 3px solid #ff6b35;
+  color: #fcf2dc;
+  margin: 10px 0 0;
+  padding: 8px 10px;
+}
 
 /* Map styling */
 #map {
@@ -170,7 +227,8 @@ svg .leaflet-draw-guide-line {
                 <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
                 <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
                 <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
-                <li><a href="astrologychart.html" class="button">Star Chart</a></li>
+                <li><a href="starcharts.html" class="button">Star Charts</a></li>
+				        <li><a href="models.html" class="button">Models</a></li>
             </ul>
     </nav>
 		<!-- ===== Main Content ===== -->
@@ -178,17 +236,34 @@ svg .leaflet-draw-guide-line {
 	<br><br>
 		<!-- ===== Section One ===== -->
         <section>
-			<h2 style="text-align:center">Live Earth Monitor</h2>
-			<br>
+          <center><img class="bordered-image" src="images/earthquakebanner.png" alt="Live Earth Monitor Banner" style="width:100%; height:auto;"></center>
+        </section>
+        <section>
+			<h2 style="text-align:center">Live Earth Monitor</h2><hr>
 			<h3 style="text-align:center">Quake Tracker + Volcano Display + Measurement Tools</h3>
 			<!-- ===== Selectable Controls ===== -->
 			<div style="background-color: #0b2a3b;" class="controls">
   <label for="feedSelect">Select Earthquake Feed</label>
   <select id="feedSelect">
-    <option value="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson">USGS Past 7 Days - All</option>
-    <option value="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson">USGS Past Hour - All</option>
-    <option value="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson">USGS Past 30 Days - All</option>
+    <option value="usgs_week" selected>USGS Past 7 Days - All</option>
+    <option value="combined_week">Combined Agencies - Past 7 Days</option>
+    <option value="combined_month">Combined Agencies - Past 30 Days</option>
+    <option value="usgs_hour">USGS Past Hour - All</option>
+    <option value="usgs_month">USGS Past 30 Days - All</option>
+    <option value="emsc_week">EMSC Past 7 Days</option>
+    <option value="emsc_month">EMSC Past 30 Days</option>
+    <option value="geofon_week">GFZ/GEOFON Past 7 Days</option>
+    <option value="geofon_month">GFZ/GEOFON Past 30 Days</option>
   </select> 
+  <label for="baseMapSelect">Map Style</label>
+  <select id="baseMapSelect">
+    <option value="osm" selected>OpenStreetMap</option>
+    <option value="usgsTopo">USGS Topographic</option>
+    <option value="esriWorldImagery">Satellite Imagery</option>
+    <option value="cartoDark">Dark Matter</option>
+    <option value="cartoLight">Light Positron</option>
+    <option value="terrain">Terrain</option>
+  </select>
   <label>
   <input type="checkbox" id="toggleEarthquakeFeed" checked>
   Show Earthquake Feed
@@ -214,6 +289,23 @@ svg .leaflet-draw-guide-line {
   <input type="checkbox" id="toggleHolocene" />
   Show Volcanoes
 </label>
+<label>
+  <input type="checkbox" class="hazard-toggle" data-hazard="wildfires" />
+  Show Wildfires
+</label>
+<label>
+  <input type="checkbox" class="hazard-toggle" data-hazard="floods" />
+  Show Floods
+</label>
+<label>
+  <input type="checkbox" class="hazard-toggle" data-hazard="drought" />
+  Show Drought
+</label>
+<label>
+  <input type="checkbox" class="hazard-toggle" data-hazard="tropicalCyclones" />
+  Show Active Tropical Cyclones
+</label>
+<p id="feedStatus" class="map-status">Loading earthquake feed...</p>
 </div>
             <!-- Map container -->
             <center><div id="map" class="leaflet-container" style="height: 400px;"></div></center>
@@ -238,7 +330,7 @@ svg .leaflet-draw-guide-line {
     </tr>
     <tr>
       <td><span class="circle orange"></span></td>
-      <td>Earthquake (Magnitude 3–5.7)</td>
+      <td>Earthquake (Magnitude 3â€“5.7)</td>
     </tr>
     <tr>
       <td><span class="circle red"></span></td>
@@ -250,24 +342,24 @@ svg .leaflet-draw-guide-line {
         </tr>
 		<tr>
             <td class="flood-icon">&#x1F4A7;</td>
-            <td>Flood (coming soon)</td>
+            <td>Flood (NASA EONET active/recent events)</td>
         </tr>
 		<tr>
             <td class="drought-icon">&#x2600;</td>
-            <td>Drought (coming soon)</td>
+            <td>Drought (NASA EONET current events if available)</td>
         </tr>
 		<tr>
             <td class="tropical-icon">&#x1F300;</td>
-            <td>Tropical System (coming soon)</td>
+            <td>Active Tropical Cyclone / Tropical Storm (NASA EONET open events)</td>
         </tr>
 		<tr>
 			<td class="fire-icon">&#x1F525;</td>
-			<td>Fire (coming soon)</td>
+			<td>Wildfire (NASA EONET open events)</td>
 		</tr>
     </tbody>
 </table></div>
 </div>
-<div class="right-side"><p>Live earthquake data is from USGS using the following GeoJsons:<br><a href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson" class="button" target="_blank">https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson</a> USGS Past 7 Days - All<br><a href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson" class="button" target="_blank">https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson</a> USGS Past Hour - All<br><a href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson" class="button" target="_blank">https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson</a> USGS Past 30 Days - All<br><hr><br>Important note: Volcano overlay is static and does not update in real-time. See Volcano Discovery live image on the <a href="volcanos.html" class="button">Volcano Monitoring</a> page for currently active volcanoes. Volcano map overlay is meant for reference only.</p></div>
+<div class="right-side"><p>Live earthquake data can be loaded from USGS, EMSC, GFZ/GEOFON, or a combined deduplicated multi-agency option. ISC is not listed because its event service does not allow browser-side CORS fetches. Wildfire and tropical cyclone overlays use NASA EONET open events. Floods use active/recent EONET flood records because open flood events are not always exposed by the live endpoint. Drought appears only when EONET has current drought events available. Tropical events are filtered to hurricane, cyclone, typhoon, and tropical-storm style systems.<br><br>Important note: Volcano overlay is static and does not update in real-time. See Volcano Discovery live image on the <a href="volcanos.html" class="button">Volcano Monitoring</a> page for currently active volcanoes. Volcano map overlay is meant for reference only.</p></div>
 </div><br>
         </section>	
 		<br></br>
@@ -296,19 +388,57 @@ svg .leaflet-draw-guide-line {
 	// === Initialize Leaflet Map ===
 var map = L.map('map', { worldCopyJump: true }).setView([20, 0], 2);
 
-// USGS Topographic Map - reliable terrain with bathymetry
-L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
-  maxZoom: 16,
-  attribution: '© USGS',
-  crossOrigin: 'anonymous'
-}).addTo(map);
+const baseLayers = {
+  usgsTopo: L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 16,
+    attribution: 'USGS',
+    crossOrigin: 'anonymous'
+  }),
+  osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: 'OpenStreetMap contributors'
+  }),
+  esriWorldImagery: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+    attribution: 'Tiles Esri'
+  }),
+  cartoDark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    attribution: 'OpenStreetMap contributors, CARTO'
+  }),
+  cartoLight: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    attribution: 'OpenStreetMap contributors, CARTO'
+  }),
+  terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    maxZoom: 17,
+    attribution: 'OpenTopoMap contributors'
+  })
+};
+let currentBaseLayer = baseLayers.osm.addTo(map);
+
+document.getElementById('baseMapSelect').addEventListener('change', function() {
+  if (currentBaseLayer) map.removeLayer(currentBaseLayer);
+  currentBaseLayer = baseLayers[this.value] || baseLayers.usgsTopo;
+  currentBaseLayer.addTo(map);
+});
 
 // Clustered layer
 var earthquakesLayerClustered = L.markerClusterGroup({
     disableClusteringAtZoom: 8,
     maxClusterRadius: 50,
     spiderfyOnMaxZoom: true,
-    showCoverageOnHover: false
+    showCoverageOnHover: false,
+    iconCreateFunction: function(cluster) {
+      const maxMag = Math.max(...cluster.getAllChildMarkers().map(marker => marker.options.quakeMag || 0));
+      const clusterClass = maxMag >= 5.8 ? 'quake-high' : (maxMag >= 3 ? 'quake-mid' : 'quake-low');
+      return L.divIcon({
+        html: `<span class="earthquake-cluster ${clusterClass}">${cluster.getChildCount()}</span>`,
+        className: '',
+        iconSize: [34, 34],
+        iconAnchor: [17, 17]
+      });
+    }
 });
 
 // Non-clustered plain layer
@@ -320,6 +450,26 @@ map.addLayer(earthquakesLayerPlain);
 // Data cache
 var cachedData = [];
 var clusteringEnabled = false; // tracks state
+var currentFeedSelection = 'usgs_week';
+const hazardLayers = {};
+const hazardSymbols = {
+  wildfires: '&#x1F525;',
+  floods: '&#x1F4A7;',
+  drought: '&#x2600;',
+  tropicalCyclones: '&#x1F300;'
+};
+const hazardLabels = {
+  wildfires: 'wildfire',
+  floods: 'flood',
+  drought: 'drought',
+  tropicalCyclones: 'active tropical cyclone / tropical storm'
+};
+const eonetCategoryForHazard = {
+  wildfires: 'wildfires',
+  floods: 'floods',
+  drought: 'drought',
+  tropicalCyclones: 'severeStorms'
+};
 
     // Define plate styling
     const plateStyle = {
@@ -424,11 +574,7 @@ document.getElementById('toggleEarthquakeFeed').addEventListener('change', funct
   earthquakeFeedVisible = this.checked;
 
   if (earthquakeFeedVisible) {
-    map.addLayer(earthquakesLayerPlain);
-    if (clusteringEnabled) {
-      map.removeLayer(earthquakesLayerPlain);
-      map.addLayer(earthquakesLayerClustered);
-    }
+    syncEarthquakeLayer();
   } else {
     [earthquakesLayerClustered, earthquakesLayerPlain].forEach(layer => {
   try { map.removeLayer(layer); } catch(e) {}
@@ -436,136 +582,413 @@ document.getElementById('toggleEarthquakeFeed').addEventListener('change', funct
   }
 });
 
+function syncEarthquakeLayer() {
+  [earthquakesLayerClustered, earthquakesLayerPlain].forEach(layer => {
+    try { map.removeLayer(layer); } catch(e) {}
+  });
+  if (!earthquakeFeedVisible) return;
+  if (clusteringEnabled) {
+    map.addLayer(earthquakesLayerClustered);
+  } else {
+    map.addLayer(earthquakesLayerClustered);
+    map.addLayer(earthquakesLayerPlain);
+  }
+}
+
+function isCombinedSelection(selection) {
+  return selection === 'combined_week' || selection === 'combined_month';
+}
+
+function setClustering(enabled) {
+  clusteringEnabled = enabled;
+  const clusterToggle = document.getElementById('toggleCluster');
+  if (clusterToggle) clusterToggle.checked = enabled;
+  syncEarthquakeLayer();
+  renderMarkers();
+}
+
 function getColorByMagnitude(mag) {
   if (mag < 3) return "green";
   else if (mag < 5.8) return "orange";
   else return "red";
 }
 
+function getMagnitudeClass(mag) {
+  if (mag < 3) return 'quake-low';
+  if (mag < 5.8) return 'quake-mid';
+  return 'quake-high';
+}
+
+function formatDateParam(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function dateDaysAgo(days) {
+  const date = new Date();
+  date.setUTCDate(date.getUTCDate() - days);
+  return formatDateParam(date);
+}
+
+function scalarValue(value) {
+  if (value && typeof value === 'object') {
+    return value.value ?? value.mag ?? value.magnitude ?? value.text ?? value.valueOf();
+  }
+  return value;
+}
+
+function feedSourcesForSelection(selection) {
+  const now = new Date().toISOString();
+  const week = dateDaysAgo(7);
+  const month = dateDaysAgo(30);
+  const sourceTemplates = {
+    usgs: (start, limit = 20000) => ({
+      agency: 'USGS',
+      format: 'json',
+      url: `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&limit=${limit}&starttime=${start}&endtime=${now}`
+    }),
+    emsc: (start, limit = 20000) => ({
+      agency: 'EMSC',
+      format: 'json',
+      url: `https://www.seismicportal.eu/fdsnws/event/1/query?format=json&orderby=time&limit=${limit}&starttime=${start}&endtime=${now}`
+    }),
+    geofon: (start, limit = 20000) => ({
+      agency: 'GFZ/GEOFON',
+      format: 'xml',
+      url: `https://geofon.gfz-potsdam.de/fdsnws/event/1/query?format=xml&orderby=time&limit=${limit}&starttime=${start}&endtime=${now}`
+    }),
+  };
+
+  const presets = {
+    combined_week: [sourceTemplates.usgs(week), sourceTemplates.emsc(week), sourceTemplates.geofon(week)],
+    combined_month: [sourceTemplates.usgs(month), sourceTemplates.emsc(month), sourceTemplates.geofon(month)],
+    usgs_hour: [{
+      agency: 'USGS',
+      format: 'json',
+      url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson'
+    }],
+    usgs_week: [sourceTemplates.usgs(week)],
+    usgs_month: [sourceTemplates.usgs(month)],
+    emsc_week: [sourceTemplates.emsc(week)],
+    emsc_month: [sourceTemplates.emsc(month)],
+    geofon_week: [sourceTemplates.geofon(week)],
+    geofon_month: [sourceTemplates.geofon(month)]
+  };
+
+  return presets[selection] || presets.combined_week;
+}
+
+async function fetchCatalog(source) {
+  const response = await fetch(source.url);
+  if (!response.ok) throw new Error(`${source.agency} returned ${response.status}`);
+  return source.format === 'xml' ? response.text() : response.json();
+}
+
+function normalizeEarthquakeData(data, agency) {
+  if (Array.isArray(data.features)) {
+    return data.features.map(feature => {
+      const props = feature.properties || {};
+      const coords = feature.geometry && feature.geometry.coordinates ? feature.geometry.coordinates : [];
+      const timeValue = scalarValue(props.time ?? props.time_utc ?? props.datetime ?? props.timestamp);
+      return {
+        mag: Number(scalarValue(props.mag ?? props.magnitude ?? props.mag_value)),
+        place: props.place || props.flynn_region || props.description || props.region || 'Unknown Location',
+        time: typeof timeValue === 'number' ? timeValue : Date.parse(timeValue),
+        coordinates: [Number(coords[0]), Number(coords[1]), Number(scalarValue(coords[2] ?? props.depth ?? 0))],
+        agencies: [agency]
+      };
+    });
+  }
+
+  const events = Array.isArray(data.events) ? data.events : (Array.isArray(data) ? data : []);
+  return events.map(event => {
+    const props = event.properties || event;
+    const geom = event.geometry && event.geometry.coordinates ? event.geometry.coordinates : [];
+    const timeValue = scalarValue(props.time ?? props.time_utc ?? props.datetime ?? props.timestamp);
+    return {
+      mag: Number(scalarValue(props.mag ?? props.magnitude ?? props.mag_value)),
+      place: props.flynn_region || props.region || props.place || props.description || props.location || 'Unknown Location',
+      time: typeof timeValue === 'number' ? timeValue : Date.parse(timeValue),
+      coordinates: [
+        Number(geom[0] ?? props.lon ?? props.longitude ?? props.lng),
+        Number(geom[1] ?? props.lat ?? props.latitude),
+        Number(scalarValue(geom[2] ?? props.depth ?? 0))
+      ],
+      agencies: [agency]
+    };
+  });
+}
+
+function childText(node, name) {
+  const child = node ? (node.getElementsByTagNameNS('*', name)[0] || node.getElementsByTagName(name)[0]) : null;
+  return child ? child.textContent.trim() : '';
+}
+
+function nestedValue(node, name) {
+  const child = node ? (node.getElementsByTagNameNS('*', name)[0] || node.getElementsByTagName(name)[0]) : null;
+  return child ? childText(child, 'value') : '';
+}
+
+function normalizeQuakeMl(xmlText, agency) {
+  const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+  return Array.from(doc.getElementsByTagNameNS('*', 'event')).map(eventNode => {
+    const origin = eventNode.getElementsByTagNameNS('*', 'origin')[0];
+    const magnitude = eventNode.getElementsByTagNameNS('*', 'magnitude')[0];
+    const description = eventNode.getElementsByTagNameNS('*', 'description')[0];
+    const place = description ? childText(description, 'text') : 'Unknown Location';
+    return {
+      mag: Number(nestedValue(magnitude, 'mag')),
+      place,
+      time: Date.parse(nestedValue(origin, 'time')),
+      coordinates: [
+        Number(nestedValue(origin, 'longitude')),
+        Number(nestedValue(origin, 'latitude')),
+        Number(nestedValue(origin, 'depth')) / 1000
+      ],
+      agencies: [agency]
+    };
+  });
+}
+
+function distanceKm(a, b) {
+  const toRad = degrees => degrees * Math.PI / 180;
+  const earthRadius = 6371;
+  const dLat = toRad(b.coordinates[1] - a.coordinates[1]);
+  const dLon = toRad(b.coordinates[0] - a.coordinates[0]);
+  const lat1 = toRad(a.coordinates[1]);
+  const lat2 = toRad(b.coordinates[1]);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  return 2 * earthRadius * Math.asin(Math.sqrt(h));
+}
+
+function dedupeEarthquakes(events) {
+  const clean = events
+    .filter(event => Number.isFinite(event.time) && Number.isFinite(event.mag) && Number.isFinite(event.coordinates[0]) && Number.isFinite(event.coordinates[1]))
+    .sort((a, b) => b.time - a.time);
+
+  return clean.reduce((merged, event) => {
+    const duplicate = merged.find(existing =>
+      Math.abs(existing.time - event.time) <= 90000 &&
+      Math.abs(existing.mag - event.mag) <= 0.35 &&
+      distanceKm(existing, event) <= 75
+    );
+
+    if (duplicate) {
+      duplicate.agencies = Array.from(new Set([...duplicate.agencies, ...event.agencies])).sort();
+      if (event.mag > duplicate.mag) {
+        duplicate.mag = event.mag;
+      }
+      if ((event.place || '').length > (duplicate.place || '').length) duplicate.place = event.place;
+    } else {
+      merged.push(event);
+    }
+    return merged;
+  }, []);
+}
+
+function createEarthquakeMarker(event) {
+  const mag = Number(event.properties.mag || 0);
+  const coords = event.geometry.coordinates;
+  const marker = L.circleMarker([coords[1], coords[0]], {
+    radius: mag < 3 ? Math.max(3, mag + 2) : Math.max(5, Math.min(18, mag * 2.2)),
+    fillColor: getColorByMagnitude(mag),
+    color: '#111',
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0.9,
+    quakeMag: mag
+  }).bindPopup(
+    `<strong>${event.properties.place}</strong><br>
+     Magnitude: ${mag.toFixed(1)}<br>
+     Depth: ${Number(coords[2] || 0).toFixed(1)} km<br>
+     Agencies: ${event.properties.agencies.join(', ')}<br>
+     Time: ${new Date(event.properties.time).toLocaleString()}`
+  );
+
+  if ((coords[2] || 0) > 200) {
+    marker.bindTooltip('D', {
+      permanent: true,
+      direction: 'top',
+      offset: [0, -15],
+      className: 'depth-label'
+    });
+  }
+  return marker;
+}
+
 function renderMarkers() {
   earthquakesLayerClustered.clearLayers();
   earthquakesLayerPlain.clearLayers();
 
-  let minMag = parseFloat(document.getElementById('magRange').value);
-  let maxAgeDays = parseInt(document.getElementById('timeRange').value);
-  let now = Date.now();
+  const minMag = parseFloat(document.getElementById('magRange').value);
+  const maxAgeDays = parseInt(document.getElementById('timeRange').value);
+  const now = Date.now();
 
   cachedData.forEach(feature => {
-    let mag = feature.properties.mag || 0;
-    let time = feature.properties.time || 0;
-    let ageDays = (now - time) / (1000 * 60 * 60 * 24);
+    const mag = feature.properties.mag || 0;
+    const time = feature.properties.time || 0;
+    const ageDays = (now - time) / (1000 * 60 * 60 * 24);
 
     if (mag >= minMag && ageDays <= maxAgeDays) {
-      let coords = feature.geometry.coordinates;
-      let lat = coords[1], lon = coords[0];
-      let color = getColorByMagnitude(mag);
-
-      let marker = L.circleMarker([lat, lon], {
-  radius: Math.max(3, mag * 2),
-  fillColor: color,
-  color: "#000",
-  weight: 1,
-  opacity: 1,
-  fillOpacity: 0.8
-}).bindPopup(
-  `<strong>${feature.properties.place}</strong><br>
-   Magnitude: ${mag}<br>
-   Depth: ${coords[2] || 'N/A'} km<br>
-   Time: ${new Date(time).toLocaleString()}`
-);
-
-// Add depth label for earthquakes deeper than 200km
-let depth = coords[2] || 0;
-if (depth > 200) {
-  marker.bindTooltip('D', {
-    permanent: true,
-    direction: 'top',
-    offset: [0, -15],
-    className: 'depth-label'
-  });
-}
-// refresh images every 5 min to pull latest data
-  setInterval(() => {
-    document.querySelectorAll("img").forEach(img => {
-      img.src = img.src.split("?")[0] + "?t=" + Date.now();
-    });
-  }, 300000);
-
-      if (clusteringEnabled) {
+      const marker = createEarthquakeMarker(feature);
+      const combinedMode = isCombinedSelection(currentFeedSelection);
+      if (mag < 3 || (clusteringEnabled && !combinedMode)) {
         earthquakesLayerClustered.addLayer(marker);
       } else {
         earthquakesLayerPlain.addLayer(marker);
       }
     }
   });
+  syncEarthquakeLayer();
 }
-  
-function loadFeed(url) {
+
+async function loadFeed(selection) {
+  currentFeedSelection = selection;
+  const status = document.getElementById('feedStatus');
   earthquakesLayerClustered.clearLayers();
   earthquakesLayerPlain.clearLayers();
   cachedData = [];
+  status.textContent = 'Loading earthquake feed...';
 
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      let features = [];
+  const sources = feedSourcesForSelection(selection);
+  const settled = await Promise.allSettled(sources.map(source => fetchCatalog(source).then(data => ({ source, data }))));
+  const failures = settled.filter(result => result.status === 'rejected').map(result => result.reason.message);
+  const events = settled
+    .filter(result => result.status === 'fulfilled')
+    .flatMap(result => result.value.source.format === 'xml' ? normalizeQuakeMl(result.value.data, result.value.source.agency) : normalizeEarthquakeData(result.value.data, result.value.source.agency));
 
-      // --- Detect different feed formats ---
-      if (data.features) {
-        // ✅ USGS / Geoscience Australia / IRIS / FDSN
-        features = data.features.map(f => ({
-          mag: f.properties.mag,
-          place: f.properties.place || f.properties.description || "Unknown Location",
-          time: f.properties.time,
-          coordinates: f.geometry.coordinates
-        }));
-      } else if (Array.isArray(data)) {
-        // ✅ EMSC-type JSON feeds
-        features = data.map(e => ({
-          mag: e.magnitude || e.mag,
-          place: e.region || e.location || "Unknown Location",
-          // Convert ISO time to milliseconds if needed:
-          time: new Date(e.timestamp || e.time).getTime(),
-          coordinates: [e.lng || e.lon, e.lat, e.depth || 0]
-        }));
-      } else if (data.events) {
-        // ✅ GEOFON-style feeds
-        features = data.events.map(ev => ({
-          mag: ev.mag || ev.Magnitude || 0,
-          place: ev.region || ev.area || "Unknown",
-          time: new Date(ev.time).getTime(),
-          coordinates: [ev.lon, ev.lat, ev.depth]
-        }));
-      } else {
-        console.warn("Unknown feed format for", url, data);
-      }
+  const deduped = dedupeEarthquakes(events);
+  const duplicateCount = Math.max(0, events.length - deduped.length);
+  cachedData = deduped.map(event => ({
+    properties: {
+      mag: event.mag,
+      place: event.place,
+      time: event.time,
+      agencies: event.agencies
+    },
+    geometry: { coordinates: event.coordinates }
+  }));
 
-      cachedData = features.map(f => ({
-        properties: { mag: f.mag, place: f.place, time: f.time },
-        geometry: { coordinates: f.coordinates }
-      }));
-
-      renderMarkers();
-    })
-    .catch(err => console.error("Feed error:", err));
+  renderMarkers();
+  const agencies = Array.from(new Set(cachedData.flatMap(event => event.properties.agencies))).sort();
+  status.textContent = `Loaded ${cachedData.length.toLocaleString()} earthquake events from ${agencies.join(', ') || 'no agencies'}${duplicateCount ? ` (${duplicateCount.toLocaleString()} duplicate reports merged)` : ''}.${failures.length ? ' Unavailable feed(s): ' + failures.join('; ') : ''}`;
 }
 
-document.getElementById('toggleCluster').addEventListener('change', function() {
-  clusteringEnabled = this.checked;
+function latestPointGeometry(event) {
+  const geometries = Array.isArray(event.geometry) ? event.geometry : [];
+  const point = geometries
+    .slice()
+    .reverse()
+    .find(geometry => Array.isArray(geometry.coordinates));
+  if (!point) return null;
 
-  // Remove both layers, then add the correct one
-  [earthquakesLayerClustered, earthquakesLayerPlain].forEach(layer => {
-  try { map.removeLayer(layer); } catch(e) {}
+  const coords = point.coordinates;
+  if (point.type === 'Point' && Number.isFinite(Number(coords[0])) && Number.isFinite(Number(coords[1]))) {
+    return [Number(coords[1]), Number(coords[0])];
+  }
+  if (point.type === 'Polygon' || point.type === 'MultiPolygon') {
+    const findPair = value => {
+      if (!Array.isArray(value)) return null;
+      if (value.length >= 2 && Number.isFinite(Number(value[0])) && Number.isFinite(Number(value[1]))) return value;
+      for (const child of value) {
+        const pair = findPair(child);
+        if (pair) return pair;
+      }
+      return null;
+    };
+    const pair = findPair(coords);
+    return pair ? [Number(pair[1]), Number(pair[0])] : null;
+  }
+  return null;
+}
+
+function createHazardMarker(event, category) {
+  const latlng = latestPointGeometry(event);
+  if (!latlng) return null;
+  const latestGeometry = Array.isArray(event.geometry) ? event.geometry[event.geometry.length - 1] : null;
+  return L.marker(latlng, {
+    icon: L.divIcon({
+      html: `<span class="hazard-marker">${hazardSymbols[category]}</span>`,
+      className: '',
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    })
+  }).bindPopup(
+    `<strong>${event.title || 'Natural hazard event'}</strong><br>
+     Type: ${category}<br>
+     Updated: ${latestGeometry && latestGeometry.date ? new Date(latestGeometry.date).toLocaleString() : 'N/A'}<br>
+     Source: NASA EONET`
+  );
+}
+
+function latestGeometryDate(event) {
+  const geometries = Array.isArray(event.geometry) ? event.geometry : [];
+  const latest = geometries
+    .slice()
+    .reverse()
+    .find(geometry => geometry.date);
+  return latest ? Date.parse(latest.date) : 0;
+}
+
+function isCurrentEonetEvent(event) {
+  if (event.closed) {
+    const closedTime = Date.parse(event.closed);
+    if (Number.isFinite(closedTime) && closedTime < Date.now()) return false;
+  }
+  const latest = latestGeometryDate(event);
+  if (!latest) return true;
+  const ageDays = (Date.now() - latest) / (1000 * 60 * 60 * 24);
+  return ageDays <= 45;
+}
+
+function isTropicalCycloneEvent(event) {
+  return /hurricane|typhoon|cyclone|tropical storm|tropical cyclone/i.test(event.title || '');
+}
+
+async function loadHazardLayer(category) {
+  if (hazardLayers[category]) return hazardLayers[category];
+
+  const layer = L.layerGroup();
+  hazardLayers[category] = layer;
+
+  const eonetCategory = eonetCategoryForHazard[category] || category;
+  const eonetStatus = category === 'floods' ? 'all' : 'open';
+  const response = await fetch(`https://eonet.gsfc.nasa.gov/api/v3/events?status=${eonetStatus}&category=${eonetCategory}&limit=100`);
+  if (!response.ok) throw new Error(`EONET ${category} returned ${response.status}`);
+  const data = await response.json();
+  (data.events || [])
+    .filter(isCurrentEonetEvent)
+    .filter(event => category !== 'tropicalCyclones' || isTropicalCycloneEvent(event))
+    .forEach(event => {
+    const marker = createHazardMarker(event, category);
+    if (marker) layer.addLayer(marker);
+  });
+  layer.eventCount = layer.getLayers().length;
+  return layer;
+}
+
+document.querySelectorAll('.hazard-toggle').forEach(toggle => {
+  toggle.addEventListener('change', async function() {
+    const category = this.dataset.hazard;
+    try {
+      if (this.checked) {
+        const layer = await loadHazardLayer(category);
+        layer.addTo(map);
+        const count = layer.eventCount || 0;
+        document.getElementById('feedStatus').textContent = count
+          ? `Loaded ${count} ${hazardLabels[category]} event${count === 1 ? '' : 's'}.`
+          : `No current ${hazardLabels[category]} events are available from the selected source.`;
+      } else if (hazardLayers[category]) {
+        map.removeLayer(hazardLayers[category]);
+      }
+    } catch (error) {
+      this.checked = false;
+      document.getElementById('feedStatus').textContent = `Unable to load ${category}: ${error.message}`;
+    }
+  });
 });
 
-  if (clusteringEnabled) {
-    map.addLayer(earthquakesLayerClustered);
-  } else {
-    map.addLayer(earthquakesLayerPlain);
-  }
-
-  // Redraw markers in the current view
-  renderMarkers();
+document.getElementById('toggleCluster').addEventListener('change', function() {
+  setClustering(this.checked);
 });
 
 // Event listeners
@@ -661,3 +1084,4 @@ map.on('draw:created', function(e) {
 
 </body>
 </html>
+

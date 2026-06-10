@@ -14,13 +14,13 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://frontier-signals.github.io/Frontier-Signals/astrologychart.html">
     <link rel="canonical" href="https://frontier-signals.github.io/Frontier-Signals/astrologychart.html">
-    <meta property="og:image" content="https://frontier-signals.github.io/Frontier-Signals/images/FrontierSignalsBanner.png">
+    <meta property="og:image" content="https://frontier-signals.github.io/Frontier-Signals/images/western-astrology-banner.jpg">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Astrological Chart - Frontier Signals">
     <meta name="twitter:description" content="Astrological Chart - Frontier Signals">
-    <meta name="twitter:image" content="https://frontier-signals.github.io/Frontier-Signals/images/FrontierSignalsBanner.png">
+    <meta name="twitter:image" content="https://frontier-signals.github.io/Frontier-Signals/images/western-astrology-banner.jpg">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -270,7 +270,7 @@
 
     <!-- ===== Header ===== -->
     <header>
-        <center><img id="banner" class="bordered-image" src="images/FrontierSignalsBanner.png" alt="Frontier Signals Official Banner"></center>
+        <center><img id="banner" class="bordered-image" src="images/western-astrology-banner.jpg" alt="Western Astrology Chart Banner"></center>
         <p style="text-align: center; color: #ff00ff; font-weight: bold; margin: 5px 0;">Beta</p>
         <hr>
         <p>Star Chart</p>
@@ -297,7 +297,8 @@
                 <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
                 <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
                 <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
-                <li><a href="astrologychart.html" class="button">Star Chart</a></li>
+                <li><a href="starcharts.html" class="button">Star Charts</a></li>
+				        <li><a href="models.html" class="button">Models</a></li>
             </ul>
     </nav>
 
@@ -566,6 +567,95 @@ const ASPECT_MEANINGS = {
   'Mercury⚹Venus':  'Graceful thought. Words charm naturally; social ease.'
 };
 
+const BODY_THEMES = {
+  Sun: { core:'identity, vitality, visibility, leadership, and the conscious will', shadow:'ego rigidity, over-identification, pride, or burnout' },
+  Moon: { core:'instinct, emotional memory, habit patterns, needs, family imprinting, and bodily rhythm', shadow:'reactivity, mood dependency, clinging, or unconscious repetition' },
+  Mercury: { core:'thinking, speech, writing, trade, learning, tools, timing, and pattern recognition', shadow:'over-analysis, nervous scatter, rumor, trickery, or shallow conclusions' },
+  Venus: { core:'attraction, affection, aesthetics, pleasure, money, values, diplomacy, and relational harmony', shadow:'avoidance, vanity, indulgence, people-pleasing, or unclear worth' },
+  Mars: { core:'desire, courage, conflict, defense, heat, libido, competition, and decisive action', shadow:'impatience, anger, recklessness, coercion, or wasted force' },
+  Jupiter: { core:'growth, faith, law, teaching, travel, generosity, pattern-scale, and future confidence', shadow:'excess, exaggeration, moral certainty, waste, or inflated promises' },
+  Saturn: { core:'structure, discipline, limits, time, duty, authority, mastery, and consequence', shadow:'fear, delay, isolation, pessimism, rigidity, or inherited burden' },
+  Uranus: { core:'breakthrough, liberation, invention, shock, rebellion, networks, electricity, and deviation from the norm', shadow:'instability, contrarianism, rupture, impatience, or nervous volatility' },
+  Neptune: { core:'imagination, dreams, compassion, spirituality, film, music, symbols, and dissolution of hard boundaries', shadow:'confusion, fantasy, fog, denial, addiction, or misplaced sacrifice' },
+  Pluto: { core:'power, taboo material, compulsion, crisis, depth psychology, purging, and irreversible transformation', shadow:'control, obsession, manipulation, fear, or hidden pressure' },
+  NorthNode: { core:'growth direction, unfamiliar skill, karmic momentum, appetite for evolution, and life path adjustment', shadow:'overreaching, bypassing the present, or chasing significance before integration' },
+  Chiron: { core:'sensitivity, old wounds, teaching medicine, mentoring, repair, and wisdom earned through vulnerability', shadow:'reopening pain, over-identifying with injury, or rescuing others to avoid self-care' },
+  Ascendant: { core:'presentation, first response, physical style, body language, and how experience enters the chart', shadow:'defensiveness, image management, or acting before the deeper self has caught up' }
+};
+
+const ASPECT_ARCHETYPES = {
+  Conjunction: {
+    core:'A conjunction fuses the two principles into one concentrated field. The expression is strong, immediate, and hard to separate.',
+    use:'Use it deliberately: the gift is focus and embodiment; the risk is that one planet overwhelms the other before conscious choice enters.'
+  },
+  Opposition: {
+    core:'An opposition polarizes the two principles across the chart, making them visible through contrast, projection, and relationship.',
+    use:'Work it as a negotiation: the gift is awareness and objectivity; the risk is swinging between extremes or assigning one side to someone else.'
+  },
+  Trine: {
+    core:'A trine lets the two principles cooperate with less resistance, usually through shared elemental logic and natural timing.',
+    use:'Develop the talent on purpose: the gift is ease and fluency; the risk is coasting, assuming the pattern will carry itself.'
+  },
+  Square: {
+    core:'A square creates pressure, friction, and a need for action. The planets challenge each other until a more capable pattern is built.',
+    use:'Treat it as productive tension: the gift is strength and skill under pressure; the risk is forcing an outcome before the lesson is understood.'
+  },
+  Sextile: {
+    core:'A sextile opens a cooperative opportunity. It is supportive, but it usually asks for conscious engagement before it becomes visible.',
+    use:'Act on the opening: the gift is practical synergy and teachable progress; the risk is missing the window because it feels too subtle.'
+  }
+};
+
+const PAIR_READING_OVERRIDES = {
+  'Moon-Sun':'This is a core identity-and-instinct alignment. It describes how the conscious self and the private emotional body either reinforce each other or ask for integration.',
+  'Saturn-Sun':'This emphasizes maturity, responsibility, and earned authority. Confidence grows through consistency, but the pattern can feel heavy until self-respect replaces self-judgment.',
+  'Neptune-Sun':'Identity is filtered through imagination, faith, and sensitivity. Inspiration is high, but clarity depends on separating vision from projection.',
+  'Pluto-Sun':'The life force is pressed toward depth, truth, and renewal. Power dynamics become harder to ignore, and superficial roles tend to shed quickly.',
+  'Moon-Saturn':'Emotional safety is tied to reliability, boundaries, and history. The pattern can feel guarded, but it also supports deep loyalty and durable care.',
+  'Moon-Neptune':'The feeling nature is porous and symbolic. Empathy, dreams, and intuition increase, but emotional hygiene matters because moods can absorb the room.',
+  'Moon-Pluto':'Private emotions carry intensity and memory. This can expose buried material, sharpen instincts, and make emotional honesty non-negotiable.',
+  'Mars-Mercury':'The mind accelerates and speech gains heat. Useful for decisive thinking, argument, strategy, and technical problem-solving; less useful for patience.',
+  'Mercury-Neptune':'Language, image, and intuition blur together. Excellent for poetry, music, prayer, and symbolism; weak for vague promises or unverified claims.',
+  'Mercury-Pluto':'The mind wants causes, motives, hidden data, and the thing beneath the thing. Investigative work benefits, but obsession can narrow the lens.',
+  'Mars-Venus':'Attraction and action are joined. Desire becomes visible, creative momentum rises, and relationship dynamics are more physical, direct, and charged.',
+  'Saturn-Venus':'Love, money, and pleasure are measured against commitment and durability. This can cool spontaneity, but it favors loyalty, craft, and long-term value.',
+  'Neptune-Venus':'Romance, beauty, and compassion become idealized. Art and devotion are heightened, but fantasy must be checked before it becomes avoidance.',
+  'Pluto-Venus':'Relating becomes magnetic, intense, and revealing. This can deepen intimacy, but it also exposes attachment, jealousy, and power exchanges.',
+  'Mars-Saturn':'Force meets restraint. Progress is slower but stronger when disciplined; frustration rises when urgency refuses structure.',
+  'Mars-Uranus':'Action becomes sudden, rebellious, and hard to contain. Breakthroughs are possible, but haste and volatility need grounding.',
+  'Mars-Pluto':'Drive becomes relentless and transformative. It is powerful for endurance and decisive change, but it must avoid coercion or scorched-earth tactics.',
+  'Jupiter-Saturn':'Expansion and contraction are negotiating the future. This is the classic builder pattern: vision has to prove itself through limits and timing.',
+  'Jupiter-Neptune':'Belief, imagination, and meaning expand. It can be spiritually generous and artistically fertile, while also vulnerable to exaggeration or misplaced faith.',
+  'Saturn-Uranus':'Old systems and new freedoms are in direct conversation. Reform works best when it respects structure without becoming trapped by it.',
+  'Neptune-Saturn':'Dreams meet reality testing. It can give form to spiritual or artistic work, but it also reveals where ideals have been too vague to stand.',
+  'Pluto-Saturn':'Pressure concentrates around control, endurance, and structural transformation. Weak foundations show strain; strong commitments become formidable.',
+  'Neptune-Uranus':'Collective imagination and technological or spiritual change overlap. The pattern is visionary, disruptive, and often generational.',
+  'Pluto-Uranus':'Breakdown and breakthrough are linked. Systems that cannot adapt tend to fracture, while hidden power seeks a new outlet.',
+  'Neptune-Pluto':'Deep collective myth, spirituality, shadow, and transformation move below the surface. It is subtle personally but powerful in cultural atmosphere.',
+  'Chiron-NorthNode':'Growth is tied to repair, teaching, and integrating a sensitive point instead of hiding it. The path forward often comes through honest medicine.'
+};
+
+function normalizePairKey(nameA, nameB) {
+  return [nameA, nameB].sort().join('-');
+}
+
+function readingIntensity(orb) {
+  const value = Number(orb);
+  if (Number.isNaN(value)) return 'Orb strength: active.';
+  if (value < 0.75) return 'Orb strength: exact. This is one of the loudest signatures in the current chart.';
+  if (value < 1.5) return 'Orb strength: very tight. The symbolism is focused and easy to notice.';
+  if (value < 3) return 'Orb strength: tight. The theme is active without needing much trigger.';
+  return 'Orb strength: moderate. The theme is present, but it may need context or repetition to stand out.';
+}
+
+function buildAspectReading(body1Name, body2Name, aspectType, orb) {
+  const b1 = BODY_THEMES[body1Name] || { core:`the ${body1Name} principle`, shadow:'overuse or unconscious expression' };
+  const b2 = BODY_THEMES[body2Name] || { core:`the ${body2Name} principle`, shadow:'overuse or unconscious expression' };
+  const aspect = ASPECT_ARCHETYPES[aspectType] || ASPECT_ARCHETYPES.Conjunction;
+  const pairNote = PAIR_READING_OVERRIDES[normalizePairKey(body1Name, body2Name)] || `${body1Name} brings ${b1.core}; ${body2Name} brings ${b2.core}. Together they describe how these two life-functions interact right now.`;
+  return `${pairNote}<br><br>${aspect.core} ${aspect.use}<br><br><b>${body1Name}</b>: ${b1.core}. Watch for ${b1.shadow}.<br><b>${body2Name}</b>: ${b2.core}. Watch for ${b2.shadow}.<br><span style="color:#aaa">${readingIntensity(orb)}</span>`;
+}
+
 // ============================================================
 //  HELPERS
 // ============================================================
@@ -725,7 +815,7 @@ function getDailyMotion(bodyId, date) {
 // ============================================================
 //  ASPECT DETECTION & MEANINGS
 // ============================================================
-function getAspectMeaning(body1Name, body2Name, aspectType) {
+function getAspectMeaning(body1Name, body2Name, aspectType, orb) {
   const symbolMap = {
     'Conjunction': '☌',
     'Opposition':  '☍',
@@ -736,17 +826,8 @@ function getAspectMeaning(body1Name, body2Name, aspectType) {
   const symbol = symbolMap[aspectType] || '·';
   const key = `${body1Name}${symbol}${body2Name}`;
   
-  if (ASPECT_MEANINGS[key]) return ASPECT_MEANINGS[key];
-  
-  // Fallback generic meanings
-  const fallbacks = {
-    'Conjunction': `**${body1Name}** and **${body2Name}** merge energies. Amplified themes; inseparable drives.`,
-    'Opposition':  `**${body1Name}** and **${body2Name}** face off across the zodiac, creating polarized awareness.`,
-    'Trine':       `**${body1Name}** and **${body2Name}** flow in effortless harmony with elemental resonance.`,
-    'Square':      `**${body1Name}** and **${body2Name}** form dynamic friction that catalyzes growth.`,
-    'Sextile':     `**${body1Name}** and **${body2Name}** open a gentle window of opportunity.`
-  };
-  return fallbacks[aspectType] || '';
+  const legacy = ASPECT_MEANINGS[key] ? `<b>Traditional shorthand:</b> ${ASPECT_MEANINGS[key]}<br><br>` : '';
+  return `${legacy}${buildAspectReading(body1Name, body2Name, aspectType, orb)}`;
 }
 
 function detectAspects(positions) {
@@ -771,7 +852,7 @@ function detectAspects(positions) {
               body1,
               body2,
               orb: orbActual.toFixed(2),
-              meaning: getAspectMeaning(body1.name, body2.name, asp.name)
+              meaning: getAspectMeaning(body1.name, body2.name, asp.name, orbActual)
             });
           }
           break;
@@ -811,29 +892,35 @@ function detectStarConjunctions(positions, starPositions) {
 //  RETROGRADE & CHIRON MEANINGS
 // ============================================================
 const RETROGRADE_MEANINGS = {
-  'Mercury': 'Communication, technology, travel may experience delays, misunderstandings. Review, don\'t initiate.',
-  'Venus':   'Relationships and values are reconsidered. Self-worth re-evaluated.',
-  'Mars':    'Drive turns inward. Frustration with progress. Strategize rather than charge forward.',
-  'Jupiter': 'Growth slows. Re-examine beliefs, education, philosophical leanings.',
-  'Saturn':  'Structures and boundaries are reviewed. Karmic lessons revisited.',
-  'Uranus':  'Inner revolution. Restlessness intensifies internally.',
-  'Neptune': 'Spiritual and creative introspection deepens. Dreams vivid and meaningful.',
-  'Pluto':   'Deep psychological transformation turns inward. Power dynamics resurface.',
-  'Chiron':  'Past wounds resurface for healing. Vulnerability is the path forward.'
+  'Mercury': 'Mercury retrograde turns attention back toward language, tools, schedules, documents, and assumptions. It is better for review, repair, rechecking sources, recovering lost context, and correcting systems than for rushing a fragile launch. Conversations need more precision because tone and timing distort easily.',
+  'Venus':   'Venus retrograde reviews affection, desire, money, taste, and self-worth. Old relationship patterns may return for comparison, not necessarily reunion. It favors renegotiating value, noticing where pleasure has become performance, and separating genuine attraction from habit or nostalgia.',
+  'Mars':    'Mars retrograde internalizes heat, anger, ambition, libido, and conflict strategy. Direct force can stall or backfire, so the stronger move is to study motive, conserve energy, and choose battles carefully. Suppressed frustration needs a clean outlet before it becomes sabotage.',
+  'Jupiter': 'Jupiter retrograde slows outer expansion so belief, ethics, teaching, and long-range plans can be audited. The question becomes whether growth is meaningful or simply larger. It favors revising philosophy, returning to study, and strengthening judgment before taking a bigger risk.',
+  'Saturn':  'Saturn retrograde revisits duty, boundaries, authority, aging, consequence, and structure. Delays often reveal weak framing rather than failure. It is a disciplined review cycle for commitments, legal or professional obligations, and the systems that must hold weight over time.',
+  'Uranus':  'Uranus retrograde turns rebellion inward. Restlessness, nervous pressure, and the need for freedom may intensify below the surface before external change appears. It favors technical redesign, private breakthroughs, and questioning automatic loyalty to stale systems.',
+  'Neptune': 'Neptune retrograde thins illusion and can make dreams, symbols, spiritual hunger, and creative sensitivity more vivid. It also exposes vague hopes that were never supported by reality. Strong boundaries help separate compassion from rescue fantasies or wishful thinking.',
+  'Pluto':   'Pluto retrograde draws power struggles, compulsions, fear patterns, and buried material into private examination. It is a deep purge cycle rather than a cosmetic one. Control tactics become more visible, and transformation works best when it starts with honest self-confrontation.',
+  'Chiron':  'Chiron retrograde reopens sensitive material for integration rather than punishment. The chart points toward the place where experience can become medicine, teaching, or humility. Healing is strongest when vulnerability is neither hidden nor turned into identity.'
 };
 
 function getMoonPhaseMeaning(phaseName) {
   const meanings = {
-    'New Moon':        'New beginnings, seed-planting, setting intentions. Potential is gathering.',
-    'Waxing Crescent': 'Initial momentum. Challenges to commitment; push through doubt.',
-    'First Quarter':   'Crisis of action. Decisions must be made; obstacles test resolve.',
-    'Waxing Gibbous':  'Refinement and adjustment. Fine-tune your approach.',
-    'Full Moon':       'Culmination and illumination. Peak visibility; emotions run high.',
-    'Waning Gibbous':  'Gratitude and sharing wisdom. Begin to release.',
-    'Last Quarter':    'Crisis of consciousness. Re-evaluate beliefs; release what no longer serves.',
-    'Waning Crescent': 'Surrender and reflection. Old cycle dissolves; prepare for renewal.'
+    'New Moon':        'The Moon is aligned with the Sun, so the lunar principle is hidden, quiet, and seed-like. In traditional astrology this is the lowest-visibility phase: useful for intention, retreat, private planning, and beginning a cycle before it has public shape. Because the emotional field is still forming, avoid demanding final clarity too early.',
+    'Waxing Crescent': 'Light is returning and the first evidence of the new cycle appears. This phase favors commitment, early action, and protecting a fragile idea from distraction. Doubt is normal here; the test is whether the intention receives enough practical support to keep growing.',
+    'First Quarter':   'The Moon squares the Sun, creating a visible action crisis. Momentum meets resistance, and choices become harder to postpone. This phase is best for decisive movement, problem-solving, and proving whether the new cycle can survive contact with pressure.',
+    'Waxing Gibbous':  'The cycle is nearly full, but not finished. This phase emphasizes refinement, skill, editing, calibration, and listening to feedback before culmination. It is productive but exacting: small adjustments matter more than dramatic reinvention.',
+    'Full Moon':       'The Moon opposes the Sun and receives maximum light. Themes become visible, emotions crest, and hidden contrast is easier to name. This is a culmination phase for revelation, harvest, relationship mirrors, and decisions that require seeing both sides at once.',
+    'Waning Gibbous':  'The peak has passed and the meaning of the peak is being distributed. This phase favors teaching, gratitude, reporting, sharing wisdom, and separating the useful harvest from excess stimulation. It is less about acquisition and more about interpretation.',
+    'Last Quarter':    'The Moon squares the Sun again, now as a release crisis. Old commitments, assumptions, and emotional habits are tested against what the cycle has taught. This phase favors closure, course correction, pruning, and conscious refusal of patterns that no longer deserve energy.',
+    'Waning Crescent': 'The cycle is dissolving into rest, memory, and preparation for renewal. This is the most inward phase: useful for solitude, dreamwork, spiritual practice, endings, forgiveness, and clearing residue. Forcing momentum here can feel draining because the lunar current is composting the old cycle.'
   };
   return meanings[phaseName] || '';
+}
+
+function getFixedStarReading(planet, star, orb) {
+  const planetTheme = BODY_THEMES[planet.name]?.core || `${planet.name} themes`;
+  const tightness = Number(orb) < 1 ? 'The orb is very tight, so this fixed-star contact should be treated as a high-emphasis modifier.' : 'The contact is within the active fixed-star orb, so it works as a noticeable modifier rather than the whole story.';
+  return `${planet.name} carries ${planetTheme} through <b>${star.name}</b> in ${star.constellation}. ${star.desc}.<br><br>Traditional nature: ${star.nature}. In practice, read the star as coloring how ${planet.name} expresses: it can sharpen talent, intensify reputation themes, or make the planet feel more fated and visible than usual. ${tightness}`;
 }
 
 // ============================================================
@@ -1207,8 +1294,7 @@ function update() {
         <span style="color:#888;font-weight:normal;font-size:0.85em">(orb ${sc.orb}°)${tight}</span>
       </div>
       <div class="event-detail">
-        ${sc.planet.name} aligns with <b>${sc.star.name}</b> in ${sc.star.constellation}. ${sc.star.desc}
-        <br><span style="color:#aaa">Traditional nature: ${sc.star.nature}</span>
+        ${getFixedStarReading(sc.planet, sc.star, sc.orb)}
       </div>`;
     container.appendChild(card);
   }

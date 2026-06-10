@@ -1,22 +1,27 @@
 const hamburger = document.querySelector('.hamburger');
         const navContainer = document.getElementById('nav-container');
+        const navElement = hamburger ? hamburger.closest('nav') : null;
 
         function toggleMenu() {
+            if (!navContainer && !navElement) return;
             // open/close entire container instead of each list
-            navContainer.classList.toggle('open');
+            if (navContainer) navContainer.classList.toggle('open');
+            if (navElement) navElement.classList.toggle('open');
             // update ARIA attribute for accessibility
-            const expanded = hamburger.getAttribute('aria-expanded') === 'true';
-            hamburger.setAttribute('aria-expanded', (!expanded).toString());
+            const expanded = hamburger && hamburger.getAttribute('aria-expanded') === 'true';
+            if (hamburger) hamburger.setAttribute('aria-expanded', (!expanded).toString());
         }
 
-        hamburger.addEventListener('click', toggleMenu);
-        // also allow keyboard activation
-        hamburger.addEventListener('keydown', e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleMenu();
-            }
-        });
+        if (hamburger) {
+            hamburger.addEventListener('click', toggleMenu);
+            // also allow keyboard activation
+            hamburger.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleMenu();
+                }
+            });
+        }
 				// === JS for Collapsible Menus ===
 var coll = document.getElementsByClassName("collapsible");
 var i;
@@ -47,6 +52,22 @@ for (i = 0; i < coll.length; i++) {
     }, 350); // Match the 0.4s transition time from CSS (400ms), use 350 to be safe
   });
 }
+
+// Add mobile card labels to data tables from their column headers.
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('table').forEach(table => {
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+        if (!headers.length) return;
+        table.classList.add('data-table');
+        table.querySelectorAll('tbody tr').forEach(row => {
+            Array.from(row.children).forEach((cell, index) => {
+                if (!cell.hasAttribute('data-label')) {
+                    cell.setAttribute('data-label', headers[index] || '');
+                }
+            });
+        });
+    });
+});
 
 // ===== Lazy-load images on narrow screens =====
 function enableLazyImages() {

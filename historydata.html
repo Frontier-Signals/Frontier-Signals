@@ -36,17 +36,14 @@
 
     <style>
         .table-chart-container {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 1fr);
             align-items: flex-start;
             gap: 20px;
         }
         .table-section {
-            flex: 1;
             min-width: 0;
-            max-height: 1000px;
-            overflow-y: auto;
-            overflow-x: visible;
+            overflow: visible;
         }
         .table-section table {
             width: 100%;
@@ -60,7 +57,7 @@
             gap: 20px;
         }
         .chart-section {
-            flex: 1;
+            min-width: 0;
         }
         .chart-section canvas {
             max-width: 100%;
@@ -68,6 +65,63 @@
             border: 2px solid #ff6b35;
             border-radius: 5px;
             box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
+        }
+        .event-scroll-box {
+            max-height: 360px;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            border: 2px solid #ff6b35;
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.25);
+        }
+        .event-scroll-box table {
+            border: none;
+            box-shadow: none;
+        }
+        .regional-event-box {
+            max-height: 560px;
+        }
+        .volcano-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .volcano-stack .charts-column {
+            order: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .volcano-stack .table-section {
+            order: 2;
+            width: 100%;
+        }
+        .volcano-table {
+            max-width: 100%;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .volcano-table table {
+            min-width: 940px;
+        }
+        .volcano-table th,
+        .volcano-table td {
+            padding: 8px 10px;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        @media (max-width: 900px) {
+            .table-chart-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .volcano-table table {
+                min-width: 0;
+            }
+            .volcano-table th,
+            .volcano-table td {
+                white-space: normal;
+            }
         }
     </style>
 </head>
@@ -104,21 +158,95 @@
                 <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
                 <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
                 <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
-                <li><a href="astrologychart.html" class="button">Star Chart</a></li>
+                <li><a href="starcharts.html" class="button">Star Charts</a></li>
+				<li><a href="models.html" class="button">Models</a></li>
             </ul>
     </nav>
 
     <!-- ===== Main Content ===== -->
     <main>
+        <br><br>
+        <section>
+            <center><img class="bordered-image" src="images/historydatabanner.png" alt="Historical Data Archives Banner" style="width:100%;height:auto;max-width:100%;display:block;margin:auto"></center>
+        </section>
         <section>
             <h2 style="text-align:center">Historical Data Archives</h2>
             <h3 style="text-align:center">Earthquakes - Volcanoes - Solar Activity - Charts</h3>
         </section>
         <br><br>
 		<!-- ===== Section 1 ===== -->
+         <section>
+            <h2 style="text-align:center">Historical Solar Data</h2><hr>
+            <h3 style="text-align:center">Last Solar Cycles Comparison</h3>
+            <p>This chart compares the current solar cycle activity with the last few solar cycles.</p><br>
+                <center><img class="bordered-image" src="https://solen.info/solar/images/comparison_recent_cycles.png" alt="Solar Cycle Comparison Chart" style="width:100%; height:auto;"></center><br>
+			<p>Image from <a href="https://solen.info" target="_blank">Solen.info</a></p>
+
+            <button type="button" class="collapsible">Space Weather Event History (experimental)</button>
+            <div class="content">
+                <p>Solar flare and coronal hole propagation data is loaded from NASA DONKI as far back as the public DONKI event API supports, beginning in 2010. X flares, M flares, and high-speed streams from coronal holes are summarized by year below.</p>
+                <div class="data-tools">
+                    <label for="spaceStartDate">Start Date
+                        <input id="spaceStartDate" type="date">
+                    </label>
+                    <label for="spaceEndDate">End Date
+                        <input id="spaceEndDate" type="date">
+                    </label>
+                    <label for="spaceCadence">Graph By
+                        <select id="spaceCadence">
+                            <option value="year">Year</option>
+                            <option value="month">Month</option>
+                        </select>
+                    </label>
+                    <button type="button" class="button" id="loadSpaceWeather">Load Space Weather</button>
+                </div>
+                <p class="status-note">Note: NASA DONKI data can take a while to load for long date ranges, especially multi-year searches.</p>
+                <p id="spaceWeatherStatus" class="status-note">Space weather data has not been loaded yet.</p>
+                <div class="summary-grid" id="spaceWeatherSummary"></div>
+                <div class="table-chart-container">
+                    <div class="table-section">
+                        <div class="table-container">
+                            <table id="spaceWeatherTable">
+                                <caption>Solar Flares and Coronal Hole Propagation</caption>
+                                <thead>
+                                    <tr>
+                                        <th>Period</th>
+                                        <th>X Flares</th>
+                                        <th>M Flares</th>
+                                        <th>Coronal Hole HSS</th>
+                                        <th>Total Events</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="chart-section">
+                        <canvas id="spaceWeatherChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+                <div class="table-container event-scroll-box">
+                    <table id="spaceWeatherEventsTable">
+                        <caption>Recent Matching Space Weather Events</caption>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Class</th>
+                                <th>Source Region</th>
+                                <th>Linked CME</th>
+                                <th>Source</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section><br><br>
+        <!-- ===== Section 2 ===== -->
         <section>
             <h2 style="text-align:center">Historical Earthquake Data</h2><hr>
-            <p>This section will be for catalogued earthquake data for reference.</p>
+            <p>This section combines the existing USGS historical summaries with live regional catalog searches. The regional tool queries USGS, EMSC, and ISC feeds, normalizes the records, and removes likely duplicate events before table and chart rendering.</p>
 			<h3>Past Earthquakes Year By Year</h3>
 			<br>
 			<h3> </h3>
@@ -188,9 +316,73 @@
                     </div>
                 </div>
              </div><br><hr><br>
+            <button type="button" class="collapsible">Regional Multi-Agency Earthquake Tool (experimental)</button>
+            <div class="content">
+                <div class="data-tools">
+                    <label for="earthquakeRegion">Region
+                        <select id="earthquakeRegion">
+                            <option value="global">Global</option>
+                            <option value="northAmerica">North America</option>
+                            <option value="southAmerica">South America</option>
+                            <option value="centralAmerica">Central America & Caribbean</option>
+                            <option value="alaskaAleutians">Alaska & Aleutians</option>
+                            <option value="cascadia">Cascadia</option>
+                            <option value="californiaNevada">California & Nevada</option>
+                            <option value="japanKurilKamchatka">Japan, Kuril & Kamchatka</option>
+                            <option value="indonesiaPNG">Indonesia & Papua New Guinea</option>
+                            <option value="mediterranean">Mediterranean</option>
+                            <option value="newZealand">New Zealand & Kermadec</option>
+                            <option value="midAtlanticRidge">Mid-Atlantic Ridge</option>
+                        </select>
+                    </label>
+                    <label for="quakeStartDate">Start Date
+                        <input id="quakeStartDate" type="date">
+                    </label>
+                    <label for="quakeEndDate">End Date
+                        <input id="quakeEndDate" type="date">
+                    </label>
+                    <label for="quakeMinMagnitude">Min Magnitude
+                        <input id="quakeMinMagnitude" type="number" min="0" max="10" step="0.1" value="2.5">
+                    </label>
+                    <label for="quakeDepthMode">Catalog
+                        <select id="quakeDepthMode">
+                            <option value="all">All depths</option>
+                            <option value="deep">Deep events 400+ km</option>
+                        </select>
+                    </label>
+                    <button type="button" class="button" id="loadRegionalQuakes">Load Earthquakes</button>
+                </div>
+                <p class="status-note">Note: Multi-agency earthquake searches can take a while to load depending on region, magnitude threshold, and date range.</p>
+                <p id="regionalQuakeStatus" class="status-note">Regional earthquake data has not been loaded yet.</p>
+                <div class="summary-grid" id="regionalQuakeSummary"></div>
+                <div class="table-chart-container">
+                    <div class="table-section">
+                        <div class="table-container event-scroll-box regional-event-box">
+                            <table id="regionalQuakeTable">
+                                <caption>Deduplicated Multi-Agency Earthquake Events</caption>
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Magnitude</th>
+                                        <th>Depth km</th>
+                                        <th>Location</th>
+                                        <th>Latitude</th>
+                                        <th>Longitude</th>
+                                        <th>Agencies</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="chart-section">
+                        <canvas id="regionalQuakeChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div><br><hr><br>
         </section>
         <br><br>
-		<!-- ===== Section 2 ===== -->
+		<!-- ===== Section 3 ===== -->
         <section>
             <h2 style="text-align:center">Historical Volcano Data</h2>
             <button type="button" class="collapsible">Smithsonian Global Volcanism Program (GVP) Annual Statistics.</button>
@@ -198,9 +390,9 @@
                 <h3 style="text-align:center">Volcanic Eruptions Year By Year </h3><hr><br>
                 <a href="https://volcano.si.edu/faq/index.cfm?question=eruptionsbyyear" class="button" target="_blank">https://volcano.si.edu/faq/index.cfm?question=eruptionsbyyear</a><br>
             <p>Table from that source has been recreated line for line for ease of use below.<br>Global Volcanism Program, 2025. [Database] Volcanoes of the World (v. 5.3.4; 30 Dec 2025).<br> Distributed by Smithsonian Institution, compiled by Venzke, E.<br> <a href="https://doi.org/10.5479/si.GVP.VOTW5-2025.5.3" target="_blank">https://doi.org/10.5479/si.GVP.VOTW5-2025.5.3</a></p><br>
-                <div class="table-chart-container">
+                <div class="table-chart-container volcano-stack">
                     <div class="table-section">
-                        <div class="table-container"><table>
+                        <div class="table-container volcano-table"><table>
     <thead>
       <tr>
         <th>Year</th>
@@ -302,13 +494,7 @@
         </section>
         <br><br>
 		<!-- ===== Section 3 ===== -->
-        <section>
-            <h2 style="text-align:center">Historical Solar Data</h2><hr>
-            <h3 style="text-align:center">Last Solar Cycles Comparison</h3>
-            <p>This chart compares the current solar cycle activity with the last few solar cycles.</p><br>
-                <center><img class="bordered-image" src="https://solen.info/solar/images/comparison_recent_cycles.png" alt="Solar Cycle Comparison Chart" style="width:100%; height:auto;"></center><br>
-			<p>Image from <a href="https://solen.info" target="_blank">Solen.info</a></p>
-        </section>
+        
     </main>
 
     <!-- ===== Footer ===== -->
@@ -321,6 +507,473 @@
     </footer>
 
     <script>
+        const chartTextColor = '#fcf2dc';
+        const chartGridColor = 'rgba(255, 107, 53, 0.2)';
+        const nasaApiKey = 'DEMO_KEY';
+        let regionalQuakeChartInstance = null;
+        let spaceWeatherChartInstance = null;
+
+        function setTableBody(tableId, rows) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            if (!tbody) return;
+            tbody.innerHTML = rows;
+            applyMobileTableLabels(document.getElementById(tableId));
+            refreshOpenCollapsibleHeights();
+        }
+
+        function applyMobileTableLabels(table) {
+            if (!table) return;
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+            if (!headers.length) return;
+            table.classList.add('data-table');
+            table.querySelectorAll('tbody tr').forEach(row => {
+                Array.from(row.children).forEach((cell, index) => {
+                    cell.setAttribute('data-label', headers[index] || '');
+                });
+            });
+        }
+
+        function refreshOpenCollapsibleHeights() {
+            document.querySelectorAll('.collapsible.active + .content').forEach(content => {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            });
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function isoDate(date) {
+            return date.toISOString().slice(0, 10);
+        }
+
+        function addDays(dateString, days) {
+            const date = new Date(`${dateString}T00:00:00Z`);
+            date.setUTCDate(date.getUTCDate() + days);
+            return isoDate(date);
+        }
+
+        function formatNumber(value, digits = 0) {
+            if (value === null || value === undefined || Number.isNaN(Number(value))) return 'N/A';
+            return Number(value).toLocaleString(undefined, { maximumFractionDigits: digits });
+        }
+
+        function scalarValue(value) {
+            if (value && typeof value === 'object') {
+                return value.value ?? value.mag ?? value.magnitude ?? value.text ?? value.valueOf();
+            }
+            return value;
+        }
+
+        function baseChartOptions(title) {
+            return {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: chartTextColor,
+                            font: { family: 'Lucida Console', weight: 'bold' }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: title,
+                        color: chartTextColor,
+                        font: { family: 'Lucida Console', size: 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: chartTextColor, maxRotation: 60, minRotation: 0 },
+                        grid: { color: chartGridColor }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: chartTextColor },
+                        grid: { color: chartGridColor }
+                    }
+                }
+            };
+        }
+
+        function renderSummary(containerId, items) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = items.map(item => `
+                <div class="summary-tile">
+                    <span>${escapeHtml(item.label)}</span>
+                    <strong>${escapeHtml(item.value)}</strong>
+                </div>
+            `).join('');
+            refreshOpenCollapsibleHeights();
+        }
+
+        const earthquakeRegions = {
+            global: { label: 'Global' },
+            northAmerica: { label: 'North America', minlat: 5, maxlat: 85, minlon: -170, maxlon: -45 },
+            southAmerica: { label: 'South America', minlat: -60, maxlat: 15, minlon: -90, maxlon: -30 },
+            centralAmerica: { label: 'Central America & Caribbean', minlat: 5, maxlat: 28, minlon: -100, maxlon: -55 },
+            alaskaAleutians: { label: 'Alaska & Aleutians', minlat: 48, maxlat: 72, minlon: -180, maxlon: -125 },
+            cascadia: { label: 'Cascadia', minlat: 39, maxlat: 53, minlon: -132, maxlon: -115 },
+            californiaNevada: { label: 'California & Nevada', minlat: 31, maxlat: 43, minlon: -126, maxlon: -113 },
+            japanKurilKamchatka: { label: 'Japan, Kuril & Kamchatka', minlat: 24, maxlat: 62, minlon: 128, maxlon: 170 },
+            indonesiaPNG: { label: 'Indonesia & Papua New Guinea', minlat: -12, maxlat: 8, minlon: 92, maxlon: 155 },
+            mediterranean: { label: 'Mediterranean', minlat: 28, maxlat: 47, minlon: -12, maxlon: 42 },
+            newZealand: { label: 'New Zealand & Kermadec', minlat: -50, maxlat: -20, minlon: 160, maxlon: 190 },
+            midAtlanticRidge: { label: 'Mid-Atlantic Ridge', minlat: -55, maxlat: 70, minlon: -45, maxlon: 15 }
+        };
+
+        function paramsFromRegion(region) {
+            if (!region || !Number.isFinite(region.minlat)) return '';
+            return `&minlatitude=${region.minlat}&maxlatitude=${region.maxlat}&minlongitude=${region.minlon}&maxlongitude=${region.maxlon}`;
+        }
+
+        function buildEarthquakeFeeds(options) {
+            const region = earthquakeRegions[options.region] || earthquakeRegions.global;
+            const bbox = paramsFromRegion(region);
+            const depth = options.depthMode === 'deep' ? '&mindepth=400' : '';
+            const start = encodeURIComponent(options.startDate);
+            const end = encodeURIComponent(addDays(options.endDate, 1));
+            const mag = encodeURIComponent(options.minMagnitude);
+            return [
+                {
+                    agency: 'USGS',
+                    url: `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&limit=20000&starttime=${start}&endtime=${end}&minmagnitude=${mag}${depth}${bbox}`
+                },
+                {
+                    agency: 'ISC',
+                    format: 'xml',
+                    url: `https://www.isc.ac.uk/fdsnws/event/1/query?format=xml&orderby=time&limit=20000&starttime=${start}&endtime=${end}&minmagnitude=${mag}${depth}${bbox}`
+                },
+                {
+                    agency: 'EMSC',
+                    format: 'json',
+                    url: `https://www.seismicportal.eu/fdsnws/event/1/query?format=json&orderby=time&limit=20000&starttime=${start}&endtime=${end}&minmagnitude=${mag}${depth}${bbox}`
+                }
+            ];
+        }
+
+        async function fetchJson(source) {
+            const response = await fetch(source.url);
+            if (!response.ok) throw new Error(`${source.agency} returned ${response.status}`);
+            return response.json();
+        }
+
+        async function fetchCatalog(source) {
+            const response = await fetch(source.url);
+            if (!response.ok) throw new Error(`${source.agency} returned ${response.status}`);
+            return source.format === 'xml' ? response.text() : response.json();
+        }
+
+        function normalizeEarthquakeData(data, agency) {
+            if (Array.isArray(data.features)) {
+                return data.features.map(feature => {
+                    const props = feature.properties || {};
+                    const coords = feature.geometry && feature.geometry.coordinates ? feature.geometry.coordinates : [];
+                    const timeValue = scalarValue(props.time ?? props.time_utc ?? props.datetime ?? props.timestamp);
+                    return {
+                        time: typeof timeValue === 'number' ? timeValue : Date.parse(timeValue),
+                        mag: Number(scalarValue(props.mag ?? props.magnitude ?? props.mag_value)),
+                        depth: Number(scalarValue(coords[2] ?? props.depth)),
+                        lat: Number(coords[1] ?? props.lat),
+                        lon: Number(coords[0] ?? props.lon),
+                        place: props.place || props.flynn_region || props.description || props.region || 'Unknown location',
+                        agencies: [agency]
+                    };
+                });
+            }
+
+            const emscEvents = Array.isArray(data.features) ? data.features : (Array.isArray(data.events) ? data.events : []);
+            return emscEvents.map(event => {
+                const props = event.properties || event;
+                const geom = event.geometry && event.geometry.coordinates ? event.geometry.coordinates : [];
+                const timeValue = scalarValue(props.time ?? props.time_utc ?? props.datetime ?? props.timestamp);
+                return {
+                    time: typeof timeValue === 'number' ? timeValue : Date.parse(timeValue),
+                    mag: Number(scalarValue(props.mag ?? props.magnitude ?? props.mag_value)),
+                    depth: Number(scalarValue(geom[2] ?? props.depth)),
+                    lat: Number(geom[1] ?? props.lat ?? props.latitude),
+                    lon: Number(geom[0] ?? props.lon ?? props.longitude),
+                    place: props.flynn_region || props.region || props.place || props.description || 'Unknown location',
+                    agencies: [agency]
+                };
+            });
+        }
+
+        function childText(node, name) {
+            const child = node.getElementsByTagNameNS('*', name)[0] || node.getElementsByTagName(name)[0];
+            return child ? child.textContent.trim() : '';
+        }
+
+        function nestedValue(node, name) {
+            const child = node ? (node.getElementsByTagNameNS('*', name)[0] || node.getElementsByTagName(name)[0]) : null;
+            return child ? childText(child, 'value') : '';
+        }
+
+        function normalizeIscXml(xmlText) {
+            const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+            return Array.from(doc.getElementsByTagNameNS('*', 'event')).map(eventNode => {
+                const origin = eventNode.getElementsByTagNameNS('*', 'origin')[0];
+                const magnitude = eventNode.getElementsByTagNameNS('*', 'magnitude')[0];
+                const description = eventNode.getElementsByTagNameNS('*', 'description')[0];
+                const region = description ? childText(description, 'text') : 'Unknown location';
+                return {
+                    time: Date.parse(nestedValue(origin, 'time')),
+                    mag: Number(nestedValue(magnitude, 'mag')),
+                    depth: Number(nestedValue(origin, 'depth')) / 1000,
+                    lat: Number(nestedValue(origin, 'latitude')),
+                    lon: Number(nestedValue(origin, 'longitude')),
+                    place: region,
+                    agencies: ['ISC']
+                };
+            });
+        }
+
+        function distanceKm(a, b) {
+            const toRad = degrees => degrees * Math.PI / 180;
+            const earthRadius = 6371;
+            const dLat = toRad(b.lat - a.lat);
+            const dLon = toRad(b.lon - a.lon);
+            const lat1 = toRad(a.lat);
+            const lat2 = toRad(b.lat);
+            const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+            return 2 * earthRadius * Math.asin(Math.sqrt(h));
+        }
+
+        function dedupeEarthquakes(events) {
+            const clean = events
+                .filter(event => Number.isFinite(event.time) && Number.isFinite(event.mag) && Number.isFinite(event.lat) && Number.isFinite(event.lon))
+                .sort((a, b) => b.time - a.time);
+
+            return clean.reduce((merged, event) => {
+                const duplicate = merged.find(existing =>
+                    Math.abs(existing.time - event.time) <= 90000 &&
+                    Math.abs(existing.mag - event.mag) <= 0.35 &&
+                    distanceKm(existing, event) <= 75
+                );
+
+                if (duplicate) {
+                    duplicate.agencies = Array.from(new Set([...duplicate.agencies, ...event.agencies])).sort();
+                    if ((event.place || '').length > (duplicate.place || '').length) duplicate.place = event.place;
+                    duplicate.mag = Math.max(duplicate.mag, event.mag);
+                    duplicate.depth = Number.isFinite(duplicate.depth) ? duplicate.depth : event.depth;
+                } else {
+                    merged.push(event);
+                }
+                return merged;
+            }, []);
+        }
+
+        function recentEventsForChart(events) {
+            return events
+                .slice(0, 250)
+                .sort((a, b) => a.time - b.time);
+        }
+
+        async function loadRegionalEarthquakes() {
+            const status = document.getElementById('regionalQuakeStatus');
+            const options = {
+                region: document.getElementById('earthquakeRegion').value,
+                startDate: document.getElementById('quakeStartDate').value,
+                endDate: document.getElementById('quakeEndDate').value,
+                minMagnitude: document.getElementById('quakeMinMagnitude').value || '2.5',
+                depthMode: document.getElementById('quakeDepthMode').value
+            };
+            const regionLabel = earthquakeRegions[options.region].label;
+            status.textContent = `Loading ${regionLabel} earthquake catalogs...`;
+            const sources = buildEarthquakeFeeds(options);
+            const settled = await Promise.allSettled(sources.map(source => fetchCatalog(source).then(data => ({ source, data }))));
+            const failures = settled.filter(result => result.status === 'rejected').map(result => result.reason.message);
+            const normalized = settled
+                .filter(result => result.status === 'fulfilled')
+                .flatMap(result => result.value.source.format === 'xml' ? normalizeIscXml(result.value.data) : normalizeEarthquakeData(result.value.data, result.value.source.agency));
+            const deduped = dedupeEarthquakes(normalized);
+            const deepCount = deduped.filter(event => event.depth >= 400).length;
+            const agencySet = Array.from(new Set(deduped.flatMap(event => event.agencies))).sort();
+
+            renderSummary('regionalQuakeSummary', [
+                { label: 'Events', value: formatNumber(deduped.length) },
+                { label: 'Deep 400+ km', value: formatNumber(deepCount) },
+                { label: 'Agencies', value: agencySet.join(', ') || 'None' },
+                { label: 'Region', value: regionLabel }
+            ]);
+
+            setTableBody('regionalQuakeTable', deduped.slice(0, 250).map(event => `
+                <tr>
+                    <td>${escapeHtml(new Date(event.time).toLocaleString())}</td>
+                    <td>${formatNumber(event.mag, 1)}</td>
+                    <td>${formatNumber(event.depth, 1)}</td>
+                    <td>${escapeHtml(event.place)}</td>
+                    <td>${formatNumber(event.lat, 3)}</td>
+                    <td>${formatNumber(event.lon, 3)}</td>
+                    <td>${escapeHtml(event.agencies.join(', '))}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="7">No matching events found.</td></tr>');
+
+            const chartEvents = recentEventsForChart(deduped);
+            if (regionalQuakeChartInstance) regionalQuakeChartInstance.destroy();
+            regionalQuakeChartInstance = new Chart(document.getElementById('regionalQuakeChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: chartEvents.map(event => new Date(event.time).toLocaleDateString()),
+                    datasets: [{
+                        label: 'Event magnitude',
+                        data: chartEvents.map(event => event.mag),
+                        backgroundColor: chartEvents.map(event => event.depth >= 400 ? 'rgba(255, 0, 255, 0.55)' : 'rgba(0, 255, 255, 0.35)'),
+                        borderColor: '#00ffff',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        tension: 0.12
+                    }]
+                },
+                options: baseChartOptions(`${regionLabel} Earthquake Events by Magnitude`)
+            });
+
+            status.textContent = `Loaded ${formatNumber(deduped.length)} deduplicated events from ${agencySet.join(', ') || 'no agencies'}. ${failures.length ? 'Unavailable feed(s): ' + failures.join('; ') : ''}`;
+            refreshOpenCollapsibleHeights();
+        }
+
+        function normalizeDonkiFlare(event) {
+            const classType = String(event.classType || '').toUpperCase();
+            if (!classType.startsWith('M') && !classType.startsWith('X')) return null;
+            return {
+                id: event.flrID || `${event.peakTime || event.beginTime}-${classType}`,
+                date: event.peakTime || event.beginTime || event.endTime,
+                type: classType.startsWith('X') ? 'X flare' : 'M flare',
+                classType,
+                sourceRegion: event.sourceLocation || event.activeRegionNum || 'N/A',
+                linkedCme: Array.isArray(event.linkedEvents) && event.linkedEvents.some(link => String(link.activityID || '').includes('CME')) ? 'Yes' : 'No',
+                source: 'NASA DONKI FLR'
+            };
+        }
+
+        function normalizeDonkiHss(event) {
+            return {
+                id: event.hssID || event.activityID || event.eventTime,
+                date: event.eventTime || event.startTime || event.activityID,
+                type: 'Coronal hole HSS',
+                classType: 'HSS',
+                sourceRegion: 'Coronal hole / high-speed stream',
+                linkedCme: 'No',
+                source: 'NASA DONKI HSS'
+            };
+        }
+
+        function dedupeSpaceWeather(events) {
+            const seen = new Set();
+            return events.filter(event => {
+                const key = event.id || `${event.type}-${event.classType}-${event.date}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+        }
+
+        function periodKey(dateString, cadence) {
+            const date = new Date(dateString);
+            if (Number.isNaN(date.getTime())) return 'Unknown';
+            return cadence === 'month' ? date.toISOString().slice(0, 7) : String(date.getUTCFullYear());
+        }
+
+        function summarizeSpaceWeather(events, cadence) {
+            const buckets = new Map();
+            events.forEach(event => {
+                const key = periodKey(event.date, cadence);
+                if (!buckets.has(key)) buckets.set(key, { period: key, x: 0, m: 0, hss: 0 });
+                const bucket = buckets.get(key);
+                if (event.type === 'X flare') bucket.x += 1;
+                if (event.type === 'M flare') bucket.m += 1;
+                if (event.type === 'Coronal hole HSS') bucket.hss += 1;
+            });
+            return Array.from(buckets.values()).sort((a, b) => a.period.localeCompare(b.period));
+        }
+
+        async function loadSpaceWeather() {
+            const status = document.getElementById('spaceWeatherStatus');
+            const startDate = document.getElementById('spaceStartDate').value || '2010-01-01';
+            const endDate = document.getElementById('spaceEndDate').value || isoDate(new Date());
+            const cadence = document.getElementById('spaceCadence').value;
+            status.textContent = 'Loading NASA DONKI space weather events...';
+
+            const flareUrl = `https://api.nasa.gov/DONKI/FLR?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&api_key=${nasaApiKey}`;
+            const hssUrl = `https://api.nasa.gov/DONKI/HSS?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&api_key=${nasaApiKey}`;
+            const settled = await Promise.allSettled([fetch(flareUrl).then(res => res.json()), fetch(hssUrl).then(res => res.json())]);
+            const flares = settled[0].status === 'fulfilled' && Array.isArray(settled[0].value) ? settled[0].value.map(normalizeDonkiFlare).filter(Boolean) : [];
+            const hssEvents = settled[1].status === 'fulfilled' && Array.isArray(settled[1].value) ? settled[1].value.map(normalizeDonkiHss).filter(event => event.date) : [];
+            const events = dedupeSpaceWeather([...flares, ...hssEvents]).sort((a, b) => new Date(b.date) - new Date(a.date));
+            const summary = summarizeSpaceWeather(events, cadence);
+            const xCount = events.filter(event => event.type === 'X flare').length;
+            const mCount = events.filter(event => event.type === 'M flare').length;
+            const hssCount = events.filter(event => event.type === 'Coronal hole HSS').length;
+
+            renderSummary('spaceWeatherSummary', [
+                { label: 'X Flares', value: formatNumber(xCount) },
+                { label: 'M Flares', value: formatNumber(mCount) },
+                { label: 'Coronal Hole HSS', value: formatNumber(hssCount) },
+                { label: 'Range', value: `${startDate} to ${endDate}` }
+            ]);
+
+            setTableBody('spaceWeatherTable', summary.map(row => `
+                <tr>
+                    <td>${escapeHtml(row.period)}</td>
+                    <td>${formatNumber(row.x)}</td>
+                    <td>${formatNumber(row.m)}</td>
+                    <td>${formatNumber(row.hss)}</td>
+                    <td>${formatNumber(row.x + row.m + row.hss)}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="5">No matching events found.</td></tr>');
+
+            setTableBody('spaceWeatherEventsTable', events.slice(0, 250).map(event => `
+                <tr>
+                    <td>${escapeHtml(new Date(event.date).toLocaleString())}</td>
+                    <td>${escapeHtml(event.type)}</td>
+                    <td>${escapeHtml(event.classType)}</td>
+                    <td>${escapeHtml(event.sourceRegion)}</td>
+                    <td>${escapeHtml(event.linkedCme)}</td>
+                    <td>${escapeHtml(event.source)}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="6">No matching events found.</td></tr>');
+
+            if (spaceWeatherChartInstance) spaceWeatherChartInstance.destroy();
+            spaceWeatherChartInstance = new Chart(document.getElementById('spaceWeatherChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: summary.map(row => row.period),
+                    datasets: [
+                        { label: 'X flares', data: summary.map(row => row.x), borderColor: '#ff0000', backgroundColor: 'rgba(255, 0, 0, 0.12)', tension: 0.1 },
+                        { label: 'M flares', data: summary.map(row => row.m), borderColor: '#ff6b35', backgroundColor: 'rgba(255, 107, 53, 0.12)', tension: 0.1 },
+                        { label: 'Coronal hole HSS', data: summary.map(row => row.hss), borderColor: '#00ffff', backgroundColor: 'rgba(0, 255, 255, 0.12)', tension: 0.1 }
+                    ]
+                },
+                options: baseChartOptions('Space Weather Events')
+            });
+
+            const unavailable = settled
+                .map((result, index) => result.status === 'rejected' ? (index === 0 ? 'FLR' : 'HSS') : null)
+                .filter(Boolean);
+            status.textContent = `Loaded ${formatNumber(events.length)} NASA DONKI events. ${unavailable.length ? 'Unavailable endpoint(s): ' + unavailable.join(', ') : ''}`;
+            refreshOpenCollapsibleHeights();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = isoDate(new Date());
+            const oneYearAgo = new Date();
+            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+            document.getElementById('quakeStartDate').value = isoDate(oneYearAgo);
+            document.getElementById('quakeEndDate').value = today;
+            document.getElementById('spaceStartDate').value = isoDate(oneYearAgo);
+            document.getElementById('spaceEndDate').value = today;
+            document.getElementById('loadRegionalQuakes').addEventListener('click', loadRegionalEarthquakes);
+            document.getElementById('loadSpaceWeather').addEventListener('click', loadSpaceWeather);
+        });
+
         // Chart.js configuration for earthquake data
         document.addEventListener('DOMContentLoaded', function() {
             const ctx = document.getElementById('earthquakeChart').getContext('2d');

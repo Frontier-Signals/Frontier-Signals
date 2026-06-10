@@ -34,7 +34,173 @@
 	<link rel="stylesheet" href="stylesheet.css">
 
     <style>
-
+        .media-intro {
+            max-width: 980px;
+            margin: 0 auto;
+            text-align: center;
+            color: #fcf2dc;
+        }
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 18px;
+        }
+        .media-card {
+            border: 1px solid #00ffff;
+            background: rgba(8, 32, 44, 0.92);
+            padding: 12px;
+            min-width: 0;
+        }
+        .media-card img {
+            width: 100%;
+            height: 230px;
+            object-fit: cover;
+            background: #000;
+            border: 1px solid #ff5a1f;
+            display: block;
+        }
+        .media-image-button {
+            display: block;
+            width: 100%;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: zoom-in;
+        }
+        .media-image-button:focus-visible {
+            outline: 3px solid #00ffff;
+            outline-offset: 4px;
+        }
+        .media-card.chart-card img {
+            object-fit: contain;
+            background: #fff;
+        }
+        .media-card h3 a {
+            color: #ff5a1f;
+            text-decoration: none;
+        }
+        .media-card h3 a:hover {
+            color: #ffff00;
+            text-decoration: underline;
+        }
+        .media-card h3 {
+            color: #ff5a1f;
+            margin: 12px 0 8px;
+        }
+        .media-card p {
+            color: #fcf2dc;
+            line-height: 1.55;
+            font-size: 0.95rem;
+        }
+        .media-source {
+            border-left: 3px solid #00ffff;
+            background: rgba(0, 255, 255, 0.07);
+            padding: 8px;
+            margin-top: 10px;
+            color: #fcf2dc;
+            font-size: 0.85rem;
+        }
+        .media-source a {
+            color: #ffff00;
+        }
+        .media-tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .media-tag {
+            border: 1px solid rgba(0,255,255,0.45);
+            border-radius: 999px;
+            padding: 4px 8px;
+            color: #00ffff;
+            font-size: 0.78rem;
+        }
+        .credibility-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+        .credibility-card {
+            border-left: 3px solid #ff5a1f;
+            background: rgba(255, 90, 31, 0.08);
+            padding: 10px;
+            color: #fcf2dc;
+        }
+        .gallery-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin: 14px 0;
+        }
+        .gallery-controls a {
+            border: 1px solid #00ffff;
+            color: #fcf2dc;
+            background: rgba(0,255,255,0.08);
+            padding: 8px 10px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+        .gallery-loading {
+            border: 1px dashed rgba(0,255,255,0.45);
+            color: #fcf2dc;
+            padding: 18px;
+            text-align: center;
+            background: rgba(0,255,255,0.04);
+        }
+        .media-zoom-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.88);
+            padding: 18px;
+        }
+        .media-zoom-overlay.open {
+            display: flex;
+        }
+        .media-zoom-panel {
+            width: min(1180px, 96vw);
+            max-height: 94vh;
+            overflow: auto;
+            border: 2px solid #00ffff;
+            background: #061b25;
+            padding: 12px;
+        }
+        .media-zoom-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .media-zoom-header h2 {
+            margin: 0;
+            color: #ff5a1f;
+        }
+        .media-zoom-close {
+            border: 1px solid #00ffff;
+            background: transparent;
+            color: #00ffff;
+            padding: 6px 10px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .media-zoom-panel img {
+            display: block;
+            width: 100%;
+            max-height: 76vh;
+            object-fit: contain;
+            background: #000;
+        }
+        .media-zoom-panel p {
+            color: #fcf2dc;
+        }
     </style>
 </head>
 <body>
@@ -70,12 +236,17 @@
                 <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
                 <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
                 <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
-                <li><a href="astrologychart.html" class="button">Star Chart</a></li>
+                <li><a href="starcharts.html" class="button">Star Charts</a></li>
+				<li><a href="models.html" class="button">Models</a></li>
             </ul>
     </nav>
 
     <!-- ===== Main Content ===== -->
     <main>
+        <br><br>
+        <section>
+            <center><img class="bordered-image" src="images/multimediabanner.png" alt="Multimedia & Resource Links Banner" style="width:100%;height:auto;max-width:100%;display:block;margin:auto"></center>
+        </section>
 	<!-- ===== Section One ===== -->
         <section>
             <h2 style="text-align:center">Links To More Resources</h2>
@@ -100,6 +271,8 @@
                 <h3>Solar Terrestrial Activity Report</h3>
             <a href="https://www.solen.info/solar/" class="button" target="_blank">https://www.solen.info/solar/</a>
             <hr>
+                <h3>Space Weather Health</h3>
+            <a href="https://auroraspace.health" class="button" target="_blank">https://auroraspace.health</a>
             <h3></h3>
 
             </div>
@@ -138,6 +311,9 @@
                 <h3>Another Wind Map</h3>
             <a href="https://www.ventusky.com" class="button" target="_blank">https://www.ventusky.com</a>
             <hr>
+                <h3>Wild Fires</h3>
+            <a href="https://egp.wildfire.gov/maps/" class="button" target="_blank">https://egp.wildfire.gov/maps/</a>
+            <hr>
                 <h3>National Weather Service Radar</h3>
             <a href="https://radar.weather.gov" class="button" target="_blank">https://radar.weather.gov</a>
             <hr>
@@ -168,19 +344,46 @@
                 <h3>Ark Bunkers</h3>
                 <a href="https://arkbunkers.com" class="button" target="_blank">https://arkbunkers.com</a>
                 <hr>
-
             </div>
-        <br><hr><br>
+            <br><hr><br>
+            <button type="button" class="collapsible">Agriculture & Gardening Center</button>
+            <div class="content">
+                <h3>Permies</h3>
+            <a href="https://permies.com" class="button" target="_blank">https://permies.com</a>
+            <hr>
+                <h3>CSU Agriculture Resources</h3>
+            <a href="https://boulder.extension.colostate.edu/agriculture/" class="button" target="_blank">https://boulder.extension.colostate.edu/agriculture/</a>
+            <hr>
+                <h3>Burpee Seeds</h3>
+            <a href="https://www.burpee.com" class="button" target="_blank">https://www.burpee.com</a>
+            <hr>
+                <h3>Seed Savers Exchange</h3>
+            <a href="https://www.seedsavers.org" class="button" target="_blank">https://www.seedsavers.org</a>
+            <hr>
+                <h3>Gardener's Supply Company</h3>
+            <a href="https://www.gardeners.com" class="button" target="_blank">https://www.gardeners.com</a>
+            <hr>
+                <h3>Greenhouse Megastore</h3>
+            <a href="https://www.greenhousemegastore.com" class="button" target="_blank">https://www.greenhousemegastore.com</a>
+            <hr>
+                <h3>Pastures of Liberty</h3>
+            <a href="https://www.pasturesofliberty.com" class="button" target="_blank">https://www.pasturesofliberty.com</a>
+            <hr>
+            </div>
+            <br><hr><br>
             <button type="button" class="collapsible">Earth-Disaster Cycle Research and Advanced Survival Networking</button>
             <div class="content"><br>
-                <h3>Advanced Disaster Geoscore</h3>
-            <a href="https://geoscore.world/" class="button" target="_blank">https://geoscore.world/</a>
-            <hr>
                 <h3>Suspicious Observers Community (SO)</h3>
             <a href="https://www.suspicious0bservers.org" class="button" target="_blank">https://www.suspicious0bservers.org</a>
             <hr>
                 <h3>Find Global Survival Communities (SO)</h3>
             <a href="https://www.Solarkillshot.org" class="button" target="_blank">https://www.Solarkillshot.org</a>
+            <hr>
+                <h3>Advanced Disaster Geoscore</h3>
+            <a href="https://geoscore.world/" class="button" target="_blank">https://geoscore.world/</a>
+            <hr> 
+                <h3>HavenBound</h3>
+            <a href="https://havenbound.co" class="button" target="_blank">https://havenbound.co</a>
             <hr>
                 <h3>Ethical Skeptic's Website</h3>
             <a href="https://www.theethicalskeptic.com" class="button" target="_blank">https://www.theethicalskeptic.com</a>
@@ -204,66 +407,70 @@
             <hr>
                 <h3>Zacharias on X</h3>
             <a href="https://x.com/zachariaspro" class="button" target="_blank">https://x.com/zachariaspro</a>
+            <hr>
+                <h3>HashZappa On X</h3>
+            <a href="https://x.com/HashZappa" class="button" target="_blank">https://x.com/HashZappa</a>
             </div><br><hr><br>
             <p style="text-align:center; font-style: italic;">If you have any suggestions for additional resources or links to include, please feel free to contact me through the <a href="about.html">About/Contact</a> page. I am always looking to expand and update the resource list to provide the most valuable information for visitors.<br></p>
         <br>    
         </section><br><br>
-	<!-- ===== Space Imagery ===== -->
-        <section>
-            <h2 style="text-align:center">Space Imagery</h2>
-            <p></p>
-			<hr>
-            <h3> Historical Space Events </h3>
-			<button type="button" class="collapsible">Feb. 24th, 2014 X4.9 Solar Flare</button>
-			<div class="content">
-                <h3>Following images from <a href="https://svs.gsfc.nasa.gov/11493/#section_credits" class="button" target="_blank">https://svs.gsfc.nasa.gov/11493/#section_credits</a></h3>
-                <p>Article and image description credit<br>NASA's Goddard Space Flight Center.<br>Producer: Scott Wiessinger (USRA)<br>Writer: Karen Fox (ADNET Systems, Inc.)</p>
-                <hr>
-                <h3>Composite Image of Flare</h3><br>
-			<button type="button" class="collapsible">Show Image</button>
-			<div class="content">
-                <center><img class="bordered-image" src="images/Feb_25_X-5_Flare-171-131_crop.jpg" style="width:80%;height:80%;" alt="Composite Image of Flare" ></center>
-                <p>An X-class solar flare erupted on the left side of the sun on the evening of Feb. 24, 2014. This composite image, captured at 7:59 p.m. EST, shows the sun in ultraviolet light with wavelength of both 131 and 171 angstroms. Cropped.</p>
-                <h3>Image credit: NASA/SDO</h3><br>
-                </div>
-                <hr>
-                <h3>Combined Image of Various Wavelengths</h3><br>
-			<button type="button" class="collapsible">Show Image</button>
-			<div class="content">
-                <center><img class="bordered-image" src="images/Multi_Wavelength_Feb_25_Pre-Flare.jpg" style="width:80%;height:80%;" alt="Combined image of various wavelengths" ></center>
-                <p>These images from NASA's Solar Dynamics Observatory at 7:25 p.m. EST on Feb. 24, 2014, show the first moments of an X-class flare in different wavelengths of light – seen as the bright spot that appears on the left limb of the sun. Hot solar material can be seen hovering above the active region in the sun's atmosphere, the corona.</p>
-                <h3>Image credit: NASA/SDO</h3><br>
-			</div>
+	<!-- ===== Curated Educational Media ===== -->
+        <section id="media-credibility">
+            <h2 style="text-align:center">Curated Educational Media Library</h2>
             <hr>
-            <h3>Coronagraph Image</h3><br>
-			<button type="button" class="collapsible">Show Image</button>
-			<div class="content">
-                <center><img class="bordered-image" src="images/20140225_0125_c2_1024_copy.jpg" style="width:80%;height:80%;" alt="Placeholder image for future content." ></center>
-                <p>SOHO LASCO C2 Coronagraph view of the O-type CME associated with the X4.9 flare.</p>
-                <h3>Image credit: NASA&ESA/SOHO</h3><br>
-                <br>
-			</div>
-            <br>
-			</div>
-            <br><hr><br>
-            <h3>Misc Solar Images</h3><br>
-			<button type="button" class="collapsible">Image of Sun Combining Multiple Angstroms</button>
-			<div class="content">
-			<center><img class="bordered-image" src="images/SunWavelengths.png" style="width:80%;height:80%;" alt="Image of the sun combining multiple angstroms of Extreme ultraviolet (EUV) and X-rays. Shows off magnetic polarities. Screenshot from spaceweathernews yt channel." ></center>
-			<p style="text-align:center">Image referenced from space weather news (SO) Youtube Channel.<br><br>View of the sun combining multiple angstroms provides visual contrast of magnetic attributes in sunspot groups. </p>
-			</div>
-		</section><br><br>
-		<!-- ===== Section Two ===== -->
-        <section>
-            <h2 style="text-align:center">Volcano Imagery</h2>
-            <p>Coming soon.</p>
+            <p class="media-intro">This section prioritizes media from NASA, NOAA, USGS, Smithsonian-linked sources, ESA/Hubble, and Wikimedia Commons records with clear reuse terms. Each card includes a source and license note so the image can be evaluated before reuse in a non-commercial educational context.</p>
+            <div class="gallery-controls">
+                <a href="#ancient-media">Ancient Sites</a>
+                <a href="#volcano-media">Volcanic History</a>
+                <a href="#space-media">Space Imagery</a>
+                <a href="#chart-media">Geophysics Charts</a>
+            </div>
+            <div class="credibility-grid">
+                <div class="credibility-card"><strong>NASA / SDO / JWST / Hubble:</strong> U.S. government NASA imagery is generally usable for educational and informational purposes when properly credited, unless a specific item says otherwise. <a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noopener">NASA media guidance</a></div>
+                <div class="credibility-card"><strong>USGS and NOAA:</strong> U.S. federal science agency media is commonly public domain, but cards still point back to the source record whenever possible. <a href="https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits" target="_blank" rel="noopener">USGS credits</a> / <a href="https://www.noaa.gov/disclaimer" target="_blank" rel="noopener">NOAA disclaimer</a></div>
+                <div class="credibility-card"><strong>Wikimedia Commons:</strong> Heritage-site photography often uses CC BY or CC BY-SA licensing. Attribution and license preservation are required for those cards. <a href="https://commons.wikimedia.org/wiki/Commons:Reusing_content_outside_Wikimedia" target="_blank" rel="noopener">Commons reuse guide</a></div>
+            </div>
         </section><br><br>
-		<!-- ===== Section Three ===== -->
-        <section>
-            <h2 style="text-align:center">Geophysics Charts</h2>
-            <p>Coming soon.</p>
+
+        <section id="ancient-media">
+            <h2 style="text-align:center">Ancient Megalithic Sites</h2>
+            <hr>
+            <p class="media-intro">Prominent stone monuments, ceremonial landscapes, engineered terraces, and underground architecture from around the world. These cards are useful for the ancient-history section and visual cross-linking.</p>
+            <div id="ancient-gallery" class="media-grid"><div class="gallery-loading">Gallery will load when this section enters view.</div></div>
         </section><br><br>
-    </main>
+
+        <section id="volcano-media">
+            <h2 style="text-align:center">Volcanic Imagery and Historic Eruptions</h2>
+            <hr>
+            <p class="media-intro">Historic eruption photographs, lava fountains, volcanic-island formation, and classic eruption illustrations from public-domain science archives and verified reuse records.</p>
+            <div id="volcano-gallery" class="media-grid"><div class="gallery-loading">Gallery will load when this section enters view.</div></div>
+        </section><br><br>
+
+        <section id="space-media">
+            <h2 style="text-align:center">Space Imagery</h2>
+            <hr>
+            <p class="media-intro">Solar activity, coronagraph events, deep-space nebulae, galaxies, comets, and Earth imagery from NASA, ESA/Hubble, SDO, SOHO, and public science archives.</p>
+            <div id="space-gallery" class="media-grid"><div class="gallery-loading">Gallery will load when this section enters view.</div></div>
+        </section><br><br>
+
+        <section id="chart-media">
+            <h2 style="text-align:center">Geophysics and Space Charts</h2>
+            <hr>
+            <p class="media-intro">Useful charts and diagrams for explaining faults, focal mechanisms, plate tectonics, solar-cycle behavior, space-weather measurements, electromagnetic observation bands, and current geophysical monitoring products.</p>
+            <div id="chart-gallery" class="media-grid"><div class="gallery-loading">Gallery will load when this section enters view.</div></div>
+        </section><br><br>    </main>
+
+    <div id="media-zoom-overlay" class="media-zoom-overlay" role="dialog" aria-modal="true" aria-labelledby="media-zoom-title">
+        <div class="media-zoom-panel">
+            <div class="media-zoom-header">
+                <h2 id="media-zoom-title">Media Preview</h2>
+                <button id="media-zoom-close" class="media-zoom-close" type="button">Close</button>
+            </div>
+            <img id="media-zoom-image" src="" alt="">
+            <p id="media-zoom-description"></p>
+            <p id="media-zoom-source"></p>
+        </div>
+    </div>
 
     <!-- ===== Footer ===== -->
     <footer>
@@ -275,7 +482,421 @@
     </footer>
 
     <script>
+        const mediaLibraries = {
+            ancient: [
+                {
+                    title: 'Stonehenge, England',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Stonehenge_Sunset_-_geograph.org.uk_-_1316664.jpg',
+                    desc: 'A Late Neolithic and Bronze Age stone circle aligned with solstitial sightlines. It remains one of the best-known examples of prehistoric monument planning and ritual landscape design.',
+                    source: 'Wikimedia Commons / Geograph',
+                    license: 'CC BY-SA 2.0, Michael Preston',
+                    link: 'https://commons.wikimedia.org/wiki/File:Stonehenge_Sunset_-_geograph.org.uk_-_1316664.jpg',
+                    tags: ['Megalithic', 'Astronomical alignment', 'Britain']
+                },
+                {
+                    title: 'Gobekli Tepe, Turkey',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/The_archaeological_site_of_G%C3%B6bekli_Tepe_-_main_excavation_area.png',
+                    desc: 'A Pre-Pottery Neolithic ritual complex with carved T-shaped pillars. Its age and monumentality make it a key site for studying early ceremonial architecture before full urban settlement.',
+                    source: 'German Archaeological Institute via Wikimedia Commons',
+                    license: 'CC BY 4.0, photo E. Kucuk',
+                    link: 'https://commons.wikimedia.org/wiki/File:The_archaeological_site_of_G%C3%B6bekli_Tepe_-_main_excavation_area.png',
+                    tags: ['Neolithic', 'Carved pillars', 'Anatolia']
+                },
+                {
+                    title: 'Machu Picchu, Peru',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/4/43/Peru_Machu_Picchu_Sunrise.jpg',
+                    desc: 'A 15th-century Inca citadel built into a steep Andean setting. Its terraces, water management, and stonework make it a strong visual case study in high-altitude engineering.',
+                    source: 'Wikimedia Commons',
+                    license: 'Public domain, Allard Schmidt',
+                    link: 'https://commons.wikimedia.org/wiki/File:Peru_Machu_Picchu_Sunrise.jpg',
+                    tags: ['Inca', 'Terracing', 'Andes']
+                },
+                {
+                    title: 'Great Pyramid of Giza, Egypt',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/8/86/Pyramid_of_Cheops_-_side.jpg',
+                    desc: 'The largest pyramid at Giza and a central monument of Old Kingdom Egyptian engineering. It is useful for discussing masonry scale, surveying, orientation, and labor organization.',
+                    source: 'Wikimedia Commons',
+                    license: 'CC BY-SA 3.0, kallerna',
+                    link: 'https://commons.wikimedia.org/wiki/File:Pyramid_of_Cheops_-_side.jpg',
+                    tags: ['Old Kingdom', 'Limestone masonry', 'Egypt']
+                },
+                {
+                    title: 'Chichen Itza, Mexico',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/4/4d/El_Castillo_Stitch_2008_Edit_2.jpg',
+                    desc: 'El Castillo is a stepped pyramid associated with Maya calendrical and ceremonial architecture. The site is ideal for illustrating astronomy, civic planning, and symbolic architecture.',
+                    source: 'Wikimedia Commons',
+                    license: 'CC BY-SA 3.0, Fcb981',
+                    link: 'https://commons.wikimedia.org/wiki/File:El_Castillo_Stitch_2008_Edit_2.jpg',
+                    tags: ['Maya', 'Calendar symbolism', 'Yucatan']
+                },
+                {
+                    title: 'Baalbek Trilithon, Lebanon',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/4/40/Trilithon_of_Baalbek_3.jpg',
+                    desc: 'The Roman temple platform at Baalbek includes some of the largest worked stone blocks in ancient construction. It is a striking example for discussing quarrying, transport, and monumental foundations.',
+                    source: 'Wikimedia Commons',
+                    license: 'CC BY-SA 3.0, Brattarb',
+                    link: 'https://commons.wikimedia.org/wiki/File:Trilithon_of_Baalbek_3.jpg',
+                    tags: ['Roman platform', 'Megalithic blocks', 'Levant']
+                },
+                {
+                    title: 'Rano Raraku Moai, Rapa Nui',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Moai_Rano_raraku.jpg',
+                    desc: 'Rano Raraku was the main quarry for many moai statues on Easter Island. The image shows unfinished and partially buried figures, useful for explaining production context and landscape archaeology.',
+                    source: 'Wikimedia Commons',
+                    license: 'Public domain, Aurbina',
+                    link: 'https://commons.wikimedia.org/wiki/File:Moai_Rano_raraku.jpg',
+                    tags: ['Moai', 'Quarry', 'Rapa Nui']
+                },
+                {
+                    title: 'Newgrange, Ireland',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/1/18/Newgrange_Passage_Tomb_-_geograph.org.uk_-_2857133.jpg',
+                    desc: 'A Neolithic passage tomb famous for its winter-solstice illumination. It connects monumental architecture with horizon astronomy and ceremonial timing.',
+                    source: 'Wikimedia Commons / Geograph',
+                    license: 'CC BY-SA 2.0, Graham Hogg',
+                    link: 'https://commons.wikimedia.org/wiki/File:Newgrange_Passage_Tomb_-_geograph.org.uk_-_2857133.jpg',
+                    tags: ['Passage tomb', 'Solstice', 'Ireland']
+                },
+                {
+                    title: 'Sacsayhuaman, Peru',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/9/94/Sacsayhuam%C3%A1n%2C_Cusco%2C_Per%C3%BA%2C_2015-07-31%2C_DD_28-30_PAN.JPG',
+                    desc: 'A monumental Inca complex above Cusco, known for precisely fitted polygonal masonry. It is valuable for discussing seismic-resistant stone construction and imperial landscape design.',
+                    source: 'Wikimedia Commons',
+                    license: 'CC BY-SA 4.0, Diego Delso',
+                    link: 'https://commons.wikimedia.org/wiki/File:Sacsayhuam%C3%A1n,_Cusco,_Per%C3%BA,_2015-07-31,_DD_28-30_PAN.JPG',
+                    tags: ['Inca masonry', 'Cusco', 'Polygonal stonework']
+                },
+                {
+                    title: 'Derinkuyu Underground City, Turkey',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/3/39/Derinkuyu_Underground_City_9831_Nevit.jpg',
+                    desc: 'A multi-level underground settlement in Cappadocia. It showcases ancient subterranean planning, ventilation, defensive corridors, and long-duration refuge architecture.',
+                    source: 'Wikimedia Commons',
+                    license: 'CC BY-SA 3.0, Nevit Dilmen',
+                    link: 'https://commons.wikimedia.org/wiki/File:Derinkuyu_Underground_City_9831_Nevit.jpg',
+                    tags: ['Subterranean', 'Cappadocia', 'Refuge architecture']
+                }
+            ],
+            volcano: [
+                {
+                    title: 'Mount St. Helens Plume, 1980',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/2/21/MSH80_eruption_mount_st_helens_plume_05-18-80.jpg',
+                    desc: 'The May 18, 1980 eruption produced a lateral blast, debris avalanche, and high eruption column. It became a defining modern case study in volcano monitoring and hazard mapping.',
+                    source: 'USGS via Wikimedia Commons',
+                    license: 'Public domain, Donald A. Swanson',
+                    link: 'https://commons.wikimedia.org/wiki/File:MSH80_eruption_mount_st_helens_plume_05-18-80.jpg',
+                    tags: ['Plinian column', 'Lateral blast', 'USGS']
+                },
+                {
+                    title: 'Kilauea Iki Lava Fountain, 1959',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/1/11/Kilauea_Iki_lava_fountain_11_december_1959.jpg',
+                    desc: 'Kilauea Iki produced spectacular lava fountains, with some episodes reaching hundreds of meters high. The eruption is a classic example of basaltic lava-lake and fountain behavior.',
+                    source: 'USGS Hawaiian Volcano Observatory via Wikimedia Commons',
+                    license: 'Public domain, Jerry Eaton / USGS',
+                    link: 'https://commons.wikimedia.org/wiki/File:Kilauea_Iki_lava_fountain_11_december_1959.jpg',
+                    tags: ['Lava fountain', 'Basaltic eruption', 'Hawaii']
+                },
+                {
+                    title: 'Pinatubo Early Eruption, 1991',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Pinatubo_early_eruption_1991.jpg',
+                    desc: 'Mount Pinatubo erupted catastrophically in June 1991, injecting aerosols into the stratosphere and measurably cooling global temperatures for a short period.',
+                    source: 'USGS via Wikimedia Commons',
+                    license: 'Public domain, T. J. Casadevall / USGS',
+                    link: 'https://commons.wikimedia.org/wiki/File:Pinatubo_early_eruption_1991.jpg',
+                    tags: ['Stratospheric aerosol', 'VEI 6', 'Philippines']
+                },
+                {
+                    title: 'Novarupta Lava Dome, Alaska',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/0/09/Novarupta_lava_dome_viewed_from_Mount_Katmai.jpg',
+                    desc: 'The 1912 Novarupta eruption was the largest volcanic eruption of the 20th century. The dome and surrounding ash deposits are central to understanding the Valley of Ten Thousand Smokes.',
+                    source: 'Alaska Division of Geological and Geophysical Surveys via Wikimedia Commons',
+                    license: 'Public domain, C. Nye',
+                    link: 'https://commons.wikimedia.org/wiki/File:Novarupta_lava_dome_viewed_from_Mount_Katmai.jpg',
+                    tags: ['1912 eruption', 'Ash-flow deposits', 'Alaska']
+                },
+                {
+                    title: 'Krakatoa Eruption Lithograph, 1883',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/4/49/Krakatoa_eruption_lithograph.jpg',
+                    desc: 'The 1883 Krakatoa eruption generated devastating tsunamis and atmospheric effects observed worldwide. Historical illustrations help show how major eruptions were documented before modern photography.',
+                    source: 'Wikimedia Commons',
+                    license: 'Public domain, Parker & Coward lithograph',
+                    link: 'https://commons.wikimedia.org/wiki/File:Krakatoa_eruption_lithograph.jpg',
+                    tags: ['Historic eruption', 'Tsunami', 'Indonesia']
+                },
+                {
+                    title: 'Surtsey Eruption, 1963',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Surtsey_eruption_2.jpg',
+                    desc: 'Surtsey emerged from the sea during a submarine eruption south of Iceland. It became a natural laboratory for island formation, tephra interaction with seawater, and ecological succession.',
+                    source: 'NOAA via Wikimedia Commons',
+                    license: 'Public domain, NOAA',
+                    link: 'https://commons.wikimedia.org/wiki/File:Surtsey_eruption_2.jpg',
+                    tags: ['New island', 'Phreatomagmatic', 'Iceland']
+                }
+            ],
+            space: [
+                {
+                    title: 'Feb. 24, 2014 X4.9 Solar Flare',
+                    src: 'images/Feb_25_X-5_Flare-171-131_crop.jpg',
+                    desc: 'A strong X-class flare seen by SDO in extreme ultraviolet wavelengths. Multi-wavelength solar images help distinguish hot flare plasma from cooler coronal loops.',
+                    source: 'NASA/SDO local archive copy',
+                    license: 'NASA public-domain media policy applies unless otherwise noted',
+                    link: 'https://svs.gsfc.nasa.gov/11493/',
+                    tags: ['Solar flare', 'SDO', 'EUV']
+                },
+                {
+                    title: 'SOHO LASCO CME, 2014',
+                    src: 'images/20140225_0125_c2_1024_copy.jpg',
+                    desc: 'A coronagraph view associated with the 2014 X4.9 flare. Coronagraphs block the solar disk so faint CME fronts can be tracked moving through the outer corona.',
+                    source: 'NASA/ESA SOHO local archive copy',
+                    license: 'NASA/ESA SOHO credit required',
+                    link: 'https://soho.nascom.nasa.gov/',
+                    tags: ['CME', 'Coronagraph', 'SOHO']
+                },
+                {
+                    title: 'Pillars of Creation, JWST NIRCam',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/b/b4/Pillars_of_Creation_%28NIRCam_Image%29.png',
+                    desc: 'JWSTs near-infrared view reveals young stars and dusty columns in the Eagle Nebula. It is excellent for explaining star formation inside dense molecular clouds.',
+                    source: 'NASA, ESA, CSA, STScI via Wikimedia Commons',
+                    license: 'Public domain',
+                    link: 'https://commons.wikimedia.org/wiki/File:Pillars_of_Creation_(NIRCam_Image).png',
+                    tags: ['JWST', 'Star formation', 'Nebula']
+                },
+                {
+                    title: 'Cosmic Cliffs, Carina Nebula',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/2/2d/%E2%80%9CCosmic_Cliffs%E2%80%9D_in_the_Carina_Nebula_%28NIRCam_and_MIRI_Composite_Image%29.png',
+                    desc: 'A JWST composite showing a star-forming region sculpted by radiation and stellar winds. The image makes infrared astronomy and dust penetration visually intuitive.',
+                    source: 'NASA, ESA, CSA, STScI via Wikimedia Commons',
+                    license: 'Public domain',
+                    link: 'https://commons.wikimedia.org/wiki/File:%E2%80%9CCosmic_Cliffs%E2%80%9D_in_the_Carina_Nebula_(NIRCam_and_MIRI_Composite_Image).png',
+                    tags: ['JWST', 'Infrared', 'Carina']
+                },
+                {
+                    title: 'Crab Nebula',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/0/00/Crab_Nebula.jpg',
+                    desc: 'The remnant of a supernova observed in 1054 CE. The expanding nebula and central pulsar make it a useful bridge between ancient sky records and modern astrophysics.',
+                    source: 'NASA, ESA, J. Hester and A. Loll via Wikimedia Commons',
+                    license: 'Public domain',
+                    link: 'https://commons.wikimedia.org/wiki/File:Crab_Nebula.jpg',
+                    tags: ['Supernova remnant', 'Pulsar', 'Hubble']
+                },
+                {
+                    title: 'Comet NEOWISE',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/CometC2020F3-Neowise-20200716.png',
+                    desc: 'A Hubble image of comet C/2020 F3 NEOWISE after its close solar passage. Comet imagery is useful for teaching dust tails, ion tails, and solar-wind interaction.',
+                    source: 'NASA, ESA, STScI, Q. Zhang via Wikimedia Commons',
+                    license: 'Public domain',
+                    link: 'https://commons.wikimedia.org/wiki/File:CometC2020F3-Neowise-20200716.png',
+                    tags: ['Comet', 'Solar wind', 'Hubble']
+                },
+                {
+                    title: 'Blue Marble Eastern Hemisphere',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Blue_Marble_Eastern_Hemisphere.jpg',
+                    desc: 'A global Earth composite based on NASA and NOAA data. It is a strong visual anchor for discussions of planetary systems, climate, atmosphere, ocean, and land-surface observation.',
+                    source: 'NASA / NOAA via Wikimedia Commons',
+                    license: 'Public domain',
+                    link: 'https://commons.wikimedia.org/wiki/File:Blue_Marble_Eastern_Hemisphere.jpg',
+                    tags: ['Earth systems', 'Remote sensing', 'NASA/NOAA']
+                },
+                {
+                    title: 'Andromeda Galaxy Mosaic',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/2/26/Andromeda_Galaxy_Hubble_M31Mosaic_2025_42208x9870.jpg',
+                    desc: 'A Hubble mosaic of M31, the nearest large spiral galaxy. It helps compare galactic structure, star populations, dust lanes, and the scale of nearby galaxies.',
+                    source: 'NASA, ESA, Hubble team via Wikimedia Commons',
+                    license: 'Public domain',
+                    link: 'https://commons.wikimedia.org/wiki/File:Andromeda_Galaxy_Hubble_M31Mosaic_2025_42208x9870.jpg',
+                    tags: ['Galaxy', 'Hubble', 'M31']
+                }
+            ],
+            chart: [
+                {
+                    title: 'Fault Types and Beach-Ball Plots',
+                    src: 'images/fault-types-and-beach-ball-plots-l-2510097770.jpg',
+                    desc: 'Explains normal, reverse, and strike-slip faulting alongside focal-mechanism beach balls. Useful for reading earthquake source mechanisms and tectonic stress regimes.',
+                    source: 'Local educational chart archive',
+                    license: 'Verify original source before republication outside this educational page',
+                    link: 'images/fault-types-and-beach-ball-plots-l-2510097770.jpg',
+                    tags: ['Faulting', 'Earthquakes', 'Mechanisms']
+                },
+                {
+                    title: 'Focal Mechanism Examples',
+                    src: 'images/focalmechs-3678084037.png',
+                    desc: 'Shows how compressional and dilatational quadrants encode earthquake fault geometry. This helps interpret whether an event was thrust, normal, or strike-slip.',
+                    source: 'Local educational chart archive',
+                    license: 'Verify original source before republication outside this educational page',
+                    link: 'images/focalmechs-3678084037.png',
+                    tags: ['Seismology', 'Moment tensor', 'Beach balls']
+                },
+                {
+                    title: 'World Tectonic Plate Map',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/a/ad/World_tectonic_plate_map_large.png',
+                    desc: 'A global reference map of major tectonic plates and boundaries. Useful for linking earthquake belts, volcanic arcs, trenches, ridges, and transform systems.',
+                    source: 'USGS-derived map via Wikimedia Commons',
+                    license: 'Public domain',
+                    link: 'https://commons.wikimedia.org/wiki/File:World_tectonic_plate_map_large.png',
+                    tags: ['Plate tectonics', 'Global map', 'USGS']
+                },
+                {
+                    title: 'P and S Wave Diagram',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Pswaves_ro.jpg',
+                    desc: 'Demonstrates primary and secondary seismic-wave motion. Helpful for explaining arrival times, wave speeds, and why S waves do not pass through liquid outer-core material.',
+                    source: 'USGS via Wikimedia Commons',
+                    license: 'Public domain',
+                    link: 'https://commons.wikimedia.org/wiki/File:Pswaves_ro.jpg',
+                    tags: ['Seismic waves', 'Earth structure', 'USGS']
+                },
+                {
+                    title: 'Solar Cycle Progression',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/1/19/SSN_Predict_SWPC.gif',
+                    desc: 'NOAA/SWPC sunspot-number progression and prediction chart. Useful for placing current flare and active-region behavior in the larger solar-cycle context.',
+                    source: 'NOAA/SWPC via Wikimedia Commons',
+                    license: 'Public domain',
+                    link: 'https://commons.wikimedia.org/wiki/File:SSN_Predict_SWPC.gif',
+                    tags: ['Solar cycle', 'Sunspots', 'NOAA']
+                },
+                {
+                    title: 'SWPC Space Weather Overview',
+                    src: 'https://services.swpc.noaa.gov/images/swx-overview-large.gif',
+                    desc: 'Combines X-ray flux, proton flux, and geomagnetic activity in one operational chart. Useful for quickly assessing radio blackout, radiation storm, and geomagnetic risk.',
+                    source: 'NOAA Space Weather Prediction Center',
+                    license: 'NOAA public information product',
+                    link: 'https://www.swpc.noaa.gov/',
+                    tags: ['X-ray flux', 'Protons', 'Kp']
+                },
+                {
+                    title: 'ACE MAG and SWEPAM Solar Wind',
+                    src: 'https://services.swpc.noaa.gov/images/ace-mag-swepam-3-day.gif',
+                    desc: 'Tracks interplanetary magnetic field, solar wind density, speed, and temperature. Southward Bz combined with elevated speed is a key geomagnetic-storm signal.',
+                    source: 'NOAA Space Weather Prediction Center',
+                    license: 'NOAA public information product',
+                    link: 'https://www.swpc.noaa.gov/products/ace-real-time-solar-wind',
+                    tags: ['Solar wind', 'Bz', 'Geomagnetic storms']
+                },
+                {
+                    title: 'Electromagnetic Spectrum Reference',
+                    src: 'https://upload.wikimedia.org/wikipedia/commons/e/ed/Spectrum_Diagram_%284513%29.png',
+                    desc: 'Shows the electromagnetic spectrum used by ground and space observatories. Useful for explaining why radio, visible, ultraviolet, X-ray, and infrared instruments reveal different physics.',
+                    source: 'NASA / STScI via Wikimedia Commons',
+                    license: 'Public domain',
+                    link: 'https://commons.wikimedia.org/wiki/File:Spectrum_Diagram_(4513).png',
+                    tags: ['Spectrum', 'Remote sensing', 'Astronomy']
+                }
+            ]
+        };
 
+        const galleryConfig = [
+            { key: 'ancient', targetId: 'ancient-gallery', chartMode: false },
+            { key: 'volcano', targetId: 'volcano-gallery', chartMode: false },
+            { key: 'space', targetId: 'space-gallery', chartMode: false },
+            { key: 'chart', targetId: 'chart-gallery', chartMode: true }
+        ];
+        const renderedGalleries = new Set();
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function galleryImageSrc(item, chartMode) {
+            if (item.src.startsWith('images/')) {
+                return item.src.replace('images/', 'images/thumbs/');
+            }
+            if (item.src.includes('upload.wikimedia.org')) {
+                const fileName = item.src.split('/').pop();
+                const width = chartMode ? 500 : 500;
+                return `https://commons.wikimedia.org/wiki/Special:Redirect/file/${fileName}?width=${width}`;
+            }
+            return item.src;
+        }
+
+        function renderMediaCards(config) {
+            const { key, targetId, chartMode } = config;
+            const target = document.getElementById(targetId);
+            if (!target) return;
+            const items = mediaLibraries[key] || [];
+            target.innerHTML = items.map(item => `
+                <article class=\"media-card ${chartMode ? 'chart-card' : ''}\">
+                    <button class=\"media-image-button\" type=\"button\" data-gallery=\"${key}\" data-title=\"${escapeHtml(item.title)}\">
+                        <img src=\"${galleryImageSrc(item, chartMode)}\" alt=\"${escapeHtml(item.title)}\" loading=\"lazy\" decoding=\"async\" referrerpolicy=\"no-referrer\">
+                    </button>
+                    <h3><a href=\"${item.link}\" target=\"_blank\" rel=\"noopener\">${item.title}</a></h3>
+                    <p>${item.desc}</p>
+                    <div class=\"media-tag-row\">${item.tags.map(tag => `<span class=\"media-tag\">${tag}</span>`).join('')}</div>
+                    <div class=\"media-source\"><strong>Source:</strong> ${item.source}<br><strong>Reuse:</strong> ${item.license}<br><strong>Source record:</strong> <a href=\"${item.link}\" target=\"_blank\" rel=\"noopener\">${item.title}</a></div>
+                </article>
+            `).join('');
+        }
+
+        function renderGalleryOnce(config) {
+            if (renderedGalleries.has(config.key)) return;
+            renderedGalleries.add(config.key);
+            renderMediaCards(config);
+        }
+
+        function setupLazyGalleries() {
+            if (!('IntersectionObserver' in window)) {
+                galleryConfig.forEach(renderGalleryOnce);
+                return;
+            }
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    const config = galleryConfig.find(item => item.targetId === entry.target.id);
+                    if (config) {
+                        renderGalleryOnce(config);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '500px 0px' });
+            galleryConfig.forEach(config => {
+                const target = document.getElementById(config.targetId);
+                if (target) observer.observe(target);
+            });
+        }
+
+        function getMediaItem(gallery, title) {
+            return (mediaLibraries[gallery] || []).find(item => item.title === title);
+        }
+
+        function setupMediaZoom() {
+            const overlay = document.getElementById('media-zoom-overlay');
+            const close = document.getElementById('media-zoom-close');
+            const title = document.getElementById('media-zoom-title');
+            const image = document.getElementById('media-zoom-image');
+            const description = document.getElementById('media-zoom-description');
+            const source = document.getElementById('media-zoom-source');
+            if (!overlay || !image) return;
+
+            function closeZoom() {
+                overlay.classList.remove('open');
+                image.src = '';
+            }
+
+            document.addEventListener('click', event => {
+                const button = event.target.closest('.media-image-button');
+                if (!button) return;
+                const item = getMediaItem(button.dataset.gallery, button.dataset.title);
+                if (!item) return;
+                title.textContent = item.title;
+                image.src = item.src;
+                image.alt = item.title;
+                description.textContent = item.desc;
+                source.innerHTML = `<strong>Source:</strong> ${escapeHtml(item.source)}<br><strong>Reuse:</strong> ${escapeHtml(item.license)}<br><a class=\"button\" href=\"${item.link}\" target=\"_blank\" rel=\"noopener\">${escapeHtml(item.title)}</a>`;
+                overlay.classList.add('open');
+            });
+
+            if (close) close.addEventListener('click', closeZoom);
+            overlay.addEventListener('click', event => {
+                if (event.target === overlay) closeZoom();
+            });
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && overlay.classList.contains('open')) closeZoom();
+            });
+        }
+
+        setupLazyGalleries();
+        setupMediaZoom();
     </script>
     <script src="script.js"></script>
 

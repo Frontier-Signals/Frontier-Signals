@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pole Shift Star Chart | Frontier Signals</title>
+    <meta name="description" content="Interactive pole shift star chart for navigational astronomy with shifted pole presets, habitat sky views, constellations, zodiac path, planets, moon phase, and a calibrated Earth axis model." />
+    <meta name="keywords" content="pole shift star chart, celestial navigation, navigational astronomy, pole shift map, north star, Polaris, star map, constellations, zodiac, ecliptic, planet positions, moon phase, Earth axis, Frontier Signals" />
+    <meta name="author" content="Frontier Signals" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#08202c" />
+    <link rel="canonical" href="https://frontier-signals.github.io/Frontier-Signals/pole-shift-star-chart.html" />
+    <meta property="og:title" content="Pole Shift Star Chart | Frontier Signals" />
+    <meta property="og:description" content="Explore hypothetical pole shift navigation with an interactive star chart, real star catalog data, habitat sky orientation, planets, moon phase, and calibrated Earth axis model." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://frontier-signals.github.io/Frontier-Signals/pole-shift-star-chart.html" />
+    <meta property="og:image" content="https://frontier-signals.github.io/Frontier-Signals/images/pole-shift-star-chart-banner.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pole Shift Star Chart | Frontier Signals" />
+    <meta name="twitter:description" content="Interactive shifted-pole star map for constellation study, habitat sky views, and navigational astronomy reference exports." />
+    <meta name="twitter:image" content="https://frontier-signals.github.io/Frontier-Signals/images/pole-shift-star-chart-banner.jpg" />
+    <link rel="stylesheet" href="stylesheet.css" />
+    <link rel="stylesheet" href="pole-shift-star-chart.css" />
+</head>
+<body class="pssc-page">
+    <header>
+        <center><img id="banner" class="bordered-image" src="images/pole-shift-star-chart-banner.jpg" alt="Pole Shift Star Chart Banner"></center>
+        <p style="text-align: center; color: #ff00ff; font-weight: bold; margin: 5px 0;">Beta</p>
+        <hr>
+        <p>Pole Shift Star Chart - Navigational Astronomy Tool</p>
+    </header>
+
+    <nav aria-label="Main navigation">
+        <div class="hamburger" aria-controls="nav-container" aria-expanded="false" role="button" tabindex="0">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div id="nav-container">
+            <ul class="nav-links">
+                <li><a href="index.html" class="button">Home Page</a></li>
+                <li><a href="historydata.html" class="button">Historical Data &amp; Archives</a></li>
+                <li><a href="peerpapers.html" class="button">Frontier Science Articles</a></li>
+                <li><a href="ancienthistory.html" class="button">Ancient History</a></li>
+                <li><a href="extras.html" class="button">Multimedia &amp; Resource Links</a></li>
+                <li><a href="about.html" class="button">About/Contact</a></li>
+            </ul>
+            <hr>
+            <ul class="nav-links">
+                <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
+                <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
+                <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
+                <li><a href="starcharts.html" class="button">Star Charts</a></li>
+                <li><a href="models.html" class="button">Models</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="pssc-app">
+        <aside class="pssc-sidebar">
+            <section class="pssc-panel pssc-globe-panel">
+                <div class="pssc-panel-header">
+                    <h2>Earth Axis Model</h2>
+                    <span class="pssc-label">Calibrated pole face</span>
+                </div>
+                <div class="pssc-earth-canvas-wrap">
+                    <canvas id="pssc-earth-canvas" width="280" height="250" aria-label="Earth axis model"></canvas>
+                </div>
+                <div class="pssc-panel-body">
+                    <div class="pssc-small-info"><strong>North pole:</strong> <span id="pssc-pole-label">90&deg; N, 0&deg; E</span></div>
+                    <div class="pssc-small-info"><strong>Axis tilt:</strong> <span id="pssc-axis-tilt-label">0&deg; @ 0&deg;</span></div>
+                    <div class="pssc-small-info"><strong>Pole guide star:</strong> <span id="pssc-north-star-label">Polaris</span></div>
+                </div>
+            </section>
+
+            <section class="pssc-panel">
+                <div class="pssc-panel-header">
+                    <h2>Pole Orientation</h2>
+                </div>
+                <div class="pssc-control-row">
+                    <label for="pssc-latitude">Latitude</label>
+                    <input id="pssc-latitude" type="range" min="-90" max="90" step="0.25" value="90" />
+                    <input id="pssc-lat-input" type="number" min="-90" max="90" step="0.25" value="90" />
+                </div>
+                <div class="pssc-control-row">
+                    <label for="pssc-longitude">Longitude</label>
+                    <input id="pssc-longitude" type="range" min="-180" max="180" step="0.25" value="0" />
+                    <input id="pssc-lon-input" type="number" min="-180" max="180" step="0.25" value="0" />
+                </div>
+                <div class="pssc-small-info pssc-control-label">Pole Shift Presets</div>
+                <div class="pssc-row-buttons">
+                    <button class="pssc-preset-button" type="button" data-lat="90" data-lon="0">Default</button>
+                    <button class="pssc-preset-button" type="button" data-lat="-14" data-lon="31">Ethical Skeptic</button>
+                    <button class="pssc-preset-button" type="button" data-lat="15" data-lon="90">Ben Davidson</button>
+                    <button class="pssc-preset-button" type="button" data-lat="-0.91" data-lon="3.42">Zacharias</button>
+                </div>
+            </section>
+
+            <section class="pssc-panel">
+                <div class="pssc-panel-header">
+                    <h2>Sky & Season</h2>
+                </div>
+                <div class="pssc-control-row">
+                    <label for="pssc-habitat-latitude">Habitat lat</label>
+                    <input id="pssc-habitat-latitude" type="range" min="-90" max="90" step="0.25" value="40" />
+                    <input id="pssc-habitat-lat-input" type="number" min="-90" max="90" step="0.25" value="40" />
+                </div>
+                <div class="pssc-control-row">
+                    <label for="pssc-habitat-longitude">Habitat lon</label>
+                    <input id="pssc-habitat-longitude" type="range" min="-180" max="180" step="0.25" value="-100" />
+                    <input id="pssc-habitat-lon-input" type="number" min="-180" max="180" step="0.25" value="-100" />
+                </div>
+                <div class="pssc-control-row pssc-select-row">
+                    <label for="pssc-habitat-preset">Habitat</label>
+                    <select id="pssc-habitat-preset">
+                        <option value="custom">Custom</option>
+                        <option value="40,-100" selected>North America</option>
+                        <option value="50,10">Europe</option>
+                        <option value="25,20">North Africa</option>
+                        <option value="22,78">India</option>
+                        <option value="35,105">East Asia</option>
+                        <option value="-25,135">Australia</option>
+                        <option value="-15,-60">South America</option>
+                    </select>
+                </div>
+                <div class="pssc-small-info"><strong>Shifted habitat:</strong> <span id="pssc-habitat-label">40&deg; N, 100&deg; W</span></div>
+                <div class="pssc-datetime-row">
+                    <label for="pssc-observe-date">Date</label>
+                    <input id="pssc-observe-date" type="date" />
+                    <label for="pssc-observe-time">Time</label>
+                    <input id="pssc-observe-time" type="time" step="900" />
+                </div>
+                <div class="pssc-small-info"><strong>Sidereal:</strong> <span id="pssc-lst-label">--</span></div>
+                <div class="pssc-small-info"><strong>Moon phase:</strong> <span id="pssc-moon-age-label">--</span></div>
+                <div class="pssc-segmented" aria-label="Season">
+                    <button class="pssc-season-button is-active" type="button" data-season="winter">Winter</button>
+                    <button class="pssc-season-button" type="button" data-season="spring">Spring</button>
+                    <button class="pssc-season-button" type="button" data-season="summer">Summer</button>
+                    <button class="pssc-season-button" type="button" data-season="autumn">Autumn</button>
+                </div>
+            </section>
+
+            <section class="pssc-panel">
+                <div class="pssc-panel-header">
+                    <h2>Map Settings</h2>
+                </div>
+                <div class="pssc-checkbox-row">
+                    <label><input id="pssc-show-constellations" type="checkbox" checked /> Constellation lines</label>
+                    <label><input id="pssc-show-constellation-labels" type="checkbox" checked /> Constellation labels</label>
+                </div>
+                <div class="pssc-control-row pssc-select-row">
+                    <label for="pssc-theme">Map style</label>
+                    <select id="pssc-theme">
+                        <option value="frontier">Frontier contrast</option>
+                        <option value="grayscale">Gray scale</option>
+                        <option value="bluegold">Blue / gold</option>
+                        <option value="parchment">Parchment scroll</option>
+                        <option value="nightvision">Red night vision</option>
+                        <option value="mariner">Mariner deck</option>
+                        <option value="inkprint">Ink print</option>
+                        <option value="observatory">Observatory dark</option>
+                        <option value="astrolabe">Astrolabe brass</option>
+                    </select>
+                </div>
+                <div class="pssc-control-row pssc-select-row">
+                    <label for="pssc-projection">Projection</label>
+                    <select id="pssc-projection">
+                        <option value="orthographic">Orthographic</option>
+                        <option value="equidistant" selected>Navigation polar</option>
+                        <option value="stereographic">Stereographic</option>
+                    </select>
+                </div>
+                <div class="pssc-control-row pssc-select-row">
+                    <label for="pssc-label-mode">Labels</label>
+                    <select id="pssc-label-mode">
+                        <option value="essential" selected>Essential</option>
+                        <option value="standard">Standard</option>
+                        <option value="dense">Dense</option>
+                    </select>
+                </div>
+                <div class="pssc-control-row pssc-select-row">
+                    <label for="pssc-sky-filter">Objects</label>
+                    <select id="pssc-sky-filter">
+                        <option value="all" selected>All constellations</option>
+                        <option value="navigation">Navigation stars</option>
+                        <option value="zodiac">Zodiac band</option>
+                    </select>
+                </div>
+                <div class="pssc-control-row pssc-select-row">
+                    <label for="pssc-visible-mode">Sky extent</label>
+                    <select id="pssc-visible-mode">
+                        <option value="visible" selected>Visible sky</option>
+                        <option value="full">Full celestial sphere</option>
+                    </select>
+                </div>
+                <div class="pssc-control-row pssc-select-row">
+                    <label for="pssc-object-search">Find</label>
+                    <select id="pssc-object-search">
+                        <option value="">Select object</option>
+                    </select>
+                </div>
+                <div class="pssc-checkbox-row">
+                    <label><input id="pssc-export-inset" type="checkbox" checked /> Export inset</label>
+                    <label><input id="pssc-show-ra-grid" type="checkbox" checked /> RA/Dec grid</label>
+                    <label><input id="pssc-show-alt-grid" type="checkbox" checked /> Horizon grid</label>
+                </div>
+            </section>
+
+            <section class="pssc-panel pssc-sources-panel">
+                <div class="pssc-panel-header">
+                    <h2>Legend & Notes</h2>
+                </div>
+                <ul>
+                    <li>Bright Star Catalog field with traditional constellation figure overlays.</li>
+                    <li>Approximate planet positions use low-precision orbital elements for chart context.</li>
+                    <li>Hypothetical pole presets are speculative; catalog coordinates are astronomical.</li>
+                </ul>
+                <a class="button pssc-full-button" href="pole-shift-star-chart-tutorial.html">Open Star Chart Tutorial</a>
+                <div class="pssc-export-actions">
+                    <button id="pssc-download" class="button" type="button">Download Star Chart</button>
+                    <button id="pssc-print-chart" class="button" type="button">Print / PDF Chart</button>
+                </div>
+            </section>
+        </aside>
+
+        <section class="pssc-main-panel">
+            <div class="pssc-map-toolbar">
+                <div class="pssc-map-metadata">
+                    <p><strong>Orientation</strong>: <span id="pssc-current-orientation">90&deg; N, 0&deg; E</span></p>
+                    <p><strong>Hemisphere</strong>: <span id="pssc-hemisphere-label">North</span></p>
+                    <p><strong>Projection</strong>: <span id="pssc-projection-label">Navigation polar</span></p>
+                    <p><strong>LST</strong>: <span id="pssc-toolbar-lst">0h</span></p>
+                    <p><strong>Sun longitude</strong>: <span id="pssc-sun-longitude">0&deg;</span></p>
+                    <p><strong>Moon longitude</strong>: <span id="pssc-moon-longitude">0&deg;</span></p>
+                </div>
+            </div>
+            <div class="pssc-canvas-frame">
+                <canvas id="pssc-map-canvas" width="1200" height="1200" aria-label="Pole shift star chart"></canvas>
+                <div class="pssc-context-tip">
+                    Adjust pole and habitat coordinates, then export the chart.<br />Projection, time, labels, and object filters tune the navigation view.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script src="pole-shift-star-chart.js"></script>
+</body>
+</html>

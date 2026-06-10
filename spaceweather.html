@@ -14,13 +14,13 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://frontier-signals.github.io/Frontier-Signals/spaceweather">
     <link rel="canonical" href="https://frontier-signals.github.io/Frontier-Signals/spaceweather">
-    <meta property="og:image" content="https://frontier-signals.github.io/Frontier-Signals/images/FrontierSignalsBanner.png">
+    <meta property="og:image" content="https://frontier-signals.github.io/Frontier-Signals/images/spaceweatherbanner.png">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Frontier Signals">
     <meta name="twitter:description" content="Real-time monitoring of space weather, geological events, and their impacts on Earth">
-    <meta name="twitter:image" content="https://frontier-signals.github.io/Frontier-Signals/images/FrontierSignalsBanner.png">
+    <meta name="twitter:image" content="https://frontier-signals.github.io/Frontier-Signals/images/spaceweatherbanner.png">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -34,11 +34,476 @@
 	<link rel="stylesheet" href="stylesheet.css">
 
     <style>
-
+      .video-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .video-panel video {
+        width: 100%;
+        max-width: 600px;
+        height: auto;
+        display: block;
+      }
+      .video-panel:fullscreen,
+      .video-panel:-webkit-full-screen,
+      .video-panel:-moz-full-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: none !important;
+        max-height: none !important;
+        padding: 8px !important;
+        box-sizing: border-box;
+        background: #08202c;
+      }
+      .video-panel:fullscreen video,
+      .video-panel:-webkit-full-screen video,
+      .video-panel:-moz-full-screen video {
+        width: 100% !important;
+        max-width: none !important;
+        height: calc(100vh - 140px) !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        min-width: 0 !important;
+        object-fit: contain;
+      }
+      .video-panel:fullscreen div,
+      .video-panel:-webkit-full-screen div,
+      .video-panel:-moz-full-screen div {
+        width: 100%;
+      }
+      video:fullscreen,
+      canvas:fullscreen,
+      video:-webkit-full-screen,
+      canvas:-webkit-full-screen {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: none !important;
+        max-height: none !important;
+        object-fit: contain;
+        background: #000;
+        border: 0 !important;
+      }
+      .sdo-tool {
+        display: grid;
+        gap: 14px;
+      }
+      .sdo-selector {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+      }
+      .sdo-selector button {
+        border: 1px solid #00ffff;
+        background: rgba(0, 255, 255, 0.08);
+        color: #fcf2dc;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .sdo-selector button.active {
+        background: #00ffff;
+        color: #00131a;
+      }
+      .sdo-viewer-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+        gap: 16px;
+        align-items: start;
+      }
+      .sdo-media-panel,
+      .sdo-info-panel {
+        border: 1px solid #00ffff;
+        background: rgba(8, 32, 44, 0.92);
+        padding: 14px;
+      }
+      .sdo-media-panel video {
+        width: 100%;
+        height: auto;
+        display: block;
+        background: #000;
+      }
+      .sdo-controls {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+        align-items: center;
+      }
+      .sdo-controls button,
+      .sdo-controls select {
+        padding: 6px 10px;
+        border: 1px solid #00ffff;
+        background: #103744;
+        color: #fcf2dc;
+        font-weight: 700;
+      }
+      .sdo-controls button {
+        cursor: pointer;
+      }
+      .sdo-scrubber {
+        width: 100%;
+        margin-top: 10px;
+        accent-color: #00ffff;
+      }
+      .sdo-field-image {
+        width: 100%;
+        height: auto;
+        max-height: 520px;
+        object-fit: contain;
+        background: #000;
+      }
+      .sdo-characteristics {
+        display: grid;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .sdo-chip {
+        border-left: 3px solid #ff5a1f;
+        background: rgba(255, 90, 31, 0.08);
+        padding: 7px 9px;
+        color: #fcf2dc;
+      }
+      @media (max-width: 850px) {
+        .sdo-viewer-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .coronagraph-tool {
+        display: grid;
+        gap: 14px;
+      }
+      .coronagraph-viewer {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+        gap: 16px;
+        align-items: start;
+      }
+      .coronagraph-media,
+      .coronagraph-info {
+        border: 1px solid #00ffff;
+        background: rgba(8, 32, 44, 0.92);
+        padding: 14px;
+      }
+      .coronagraph-media video,
+      .coronagraph-media canvas {
+        width: 100%;
+        max-width: 720px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        background: #000;
+      }
+      .coronagraph-controls {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+        align-items: center;
+      }
+      .coronagraph-controls button,
+      .coronagraph-controls select {
+        padding: 6px 10px;
+        border: 1px solid #00ffff;
+        background: #103744;
+        color: #fcf2dc;
+        font-weight: 700;
+      }
+      .coronagraph-controls button {
+        cursor: pointer;
+      }
+      .coronagraph-scrubber {
+        width: 100%;
+        margin-top: 10px;
+        accent-color: #00ffff;
+      }
+      @media (max-width: 850px) {
+        .coronagraph-viewer {
+          grid-template-columns: 1fr;
+        }
+      }
+      .feed-collage {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 14px;
+      }
+      .feed-card {
+        border: 1px solid #00ffff;
+        background: rgba(8, 32, 44, 0.9);
+        padding: 12px;
+        min-width: 0;
+      }
+      .feed-card h3 {
+        margin: 0 0 8px;
+        color: #fcf2dc;
+        text-align: center;
+      }
+      .feed-card img {
+        width: 100%;
+        height: auto;
+        max-height: 420px;
+        object-fit: contain;
+        cursor: zoom-in;
+        background: #000;
+      }
+      .feed-card p {
+        font-size: 0.92rem;
+        line-height: 1.5;
+        color: #fcf2dc;
+      }
+      .feed-card button {
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: zoom-in;
+      }
+      .feed-card button:focus-visible {
+        outline: 3px solid #ff5a1f;
+        outline-offset: 4px;
+      }
+      .compact-feed-note {
+        max-width: 920px;
+        margin: 0 auto 16px;
+        text-align: center;
+        color: #fcf2dc;
+      }
+      .feed-source-line {
+        text-align: center;
+        color: #00ffff;
+        font-size: 0.9rem;
+        margin-top: 14px;
+      }
+      .enlil-free-panel {
+        display: grid;
+        gap: 12px;
+        justify-items: center;
+      }
+      .enlil-free-controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+        align-items: center;
+      }
+      .enlil-free-controls button,
+      .enlil-free-controls select {
+        padding: 6px 12px;
+        border: 1px solid #00ffff;
+        background: #103744;
+        color: #fcf2dc;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .enlil-guide {
+        max-width: 980px;
+        margin: 0 auto;
+        border-left: 3px solid #ff5a1f;
+        background: rgba(255, 90, 31, 0.08);
+        padding: 10px 12px;
+        color: #fcf2dc;
+      }
+      .enlil-scrubber {
+        width: 100%;
+        cursor: pointer;
+        accent-color: #00ffff;
+      }
+      .risk-console {
+        display: grid;
+        gap: 16px;
+      }
+      .risk-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 12px;
+      }
+      .risk-card,
+      .risk-panel {
+        border: 1px solid #00ffff;
+        background: rgba(8, 32, 44, 0.92);
+        padding: 12px;
+        min-width: 0;
+      }
+      .risk-card h3,
+      .risk-panel h3 {
+        margin: 0 0 8px;
+        color: #fcf2dc;
+        text-align: center;
+      }
+      .risk-value {
+        color: #ff5a1f;
+        font-size: 1.65rem;
+        font-weight: 800;
+        text-align: center;
+      }
+      .risk-subtext {
+        color: #fcf2dc;
+        font-size: 0.85rem;
+        text-align: center;
+        margin-top: 6px;
+      }
+      .badge-grid,
+      .delta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+      }
+      .alert-badge {
+        border: 1px solid rgba(255,255,255,0.28);
+        border-left: 5px solid #00ffff;
+        background: rgba(255,255,255,0.05);
+        padding: 9px;
+      }
+      .alert-badge strong,
+      .delta-item strong {
+        display: block;
+        color: #fcf2dc;
+        margin-bottom: 4px;
+      }
+      .alert-quiet { border-left-color: #00ff66; }
+      .alert-watch { border-left-color: #ffe600; }
+      .alert-elevated { border-left-color: #ff9d00; }
+      .alert-storm { border-left-color: #ff3333; }
+      .alert-unknown { border-left-color: #999; }
+      .delta-item {
+        border-left: 3px solid #00ffff;
+        background: rgba(0, 255, 255, 0.06);
+        padding: 8px;
+        color: #fcf2dc;
+      }
+      .control-strip {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: end;
+        gap: 10px;
+      }
+      .control-strip label {
+        display: grid;
+        gap: 4px;
+        color: #fcf2dc;
+        font-size: 0.85rem;
+      }
+      .control-strip select,
+      .control-strip button {
+        border: 1px solid #00ffff;
+        background: #103744;
+        color: #fcf2dc;
+        padding: 7px 10px;
+        font-weight: 700;
+      }
+      .control-strip button {
+        cursor: pointer;
+      }
+      .region-table-wrap {
+        width: 100%;
+        overflow: auto;
+        border: 1px solid rgba(0,255,255,0.35);
+      }
+      .region-table {
+        width: 100%;
+        min-width: 760px;
+        border-collapse: collapse;
+        color: #fcf2dc;
+      }
+      .region-table th,
+      .region-table td {
+        border-bottom: 1px solid rgba(255,255,255,0.16);
+        padding: 8px;
+        text-align: left;
+      }
+      .region-table th {
+        color: #00ffff;
+        background: rgba(0,255,255,0.08);
+      }
+      .sunspot-module-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        align-items: start;
+      }
+      .sunspot-module {
+        border: 1px solid #00ffff;
+        background: rgba(8, 32, 44, 0.92);
+        padding: 14px;
+        min-width: 0;
+      }
+      .sunspot-module img,
+      .sunspot-module canvas {
+        width: 100%;
+        height: auto;
+        max-height: 680px;
+        object-fit: contain;
+        background: #000;
+      }
+      .sunspot-module p {
+        color: #fcf2dc;
+        line-height: 1.5;
+      }
+      .region-link {
+        border: 1px solid #00ffff;
+        background: rgba(0,255,255,0.08);
+        color: #00ffff;
+        padding: 4px 7px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .zoom-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.86);
+        padding: 18px;
+      }
+      .zoom-overlay.open {
+        display: flex;
+      }
+      .zoom-panel {
+        width: min(1180px, 96vw);
+        max-height: 94vh;
+        border: 2px solid #00ffff;
+        background: #061b25;
+        padding: 12px;
+        overflow: auto;
+      }
+      .zoom-panel img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 78vh;
+        object-fit: contain;
+        background: #000;
+      }
+      .zoom-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        color: #fcf2dc;
+        margin-bottom: 8px;
+      }
+      .zoom-close {
+        border: 1px solid #00ffff;
+        background: transparent;
+        color: #00ffff;
+        padding: 6px 10px;
+        cursor: pointer;
+        font-weight: 700;
+      }
     </style>
 </head>
 <body>
-
     <!-- ===== Header ===== -->
     <header>
         <center><img id="banner" class="bordered-image" src="images/FrontierSignalsBanner.png" alt="Frontier Signals Official Banner"></center>
@@ -70,10 +535,17 @@
                 <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
                 <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
                 <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
-                <li><a href="astrologychart.html" class="button">Star Chart</a></li>
+                <li><a href="starcharts.html" class="button">Star Charts</a></li>
+				        <li><a href="models.html" class="button">Models</a></li>
             </ul>
     </nav>
     <!-- ===== Main Content ===== -->
+    <br><br>
+    <section>
+      <center><img class="bordered-image" src="images/spaceweatherbanner.png" alt="Space Weather Banner" style="width:100%; height:auto;"></center>
+      <h2 style="text-align:center">All in One Space Weather Dashboard</h2><hr>
+      <p style="text-align:center">Learn how every feed and chart functions. Know the science.</p>
+    </section>
     <main>
         <br><br>
         <section>
@@ -81,507 +553,346 @@
             <h3 style="text-align:center">KP - SDO Feeds - Sunspot Images - Satellite Hazard - Aurora Forecast</h3><hr>
             <p style="text-align:center">When SDO is down, use NOAA<br><a href="https://www.swpc.noaa.gov/communities/space-weather-enthusiasts-dashboard" class="button" target="_blank">NOAA Space Weather</a></p>
         </section>
+        <br><br>
+        <section>
+          <h2 style="text-align:center">Current Space Weather Risk Console</h2>
+          <hr>
+          <p class="compact-feed-note">A compact readout built from public NOAA/SWPC JSON products. Values refresh when the page loads and gracefully show unavailable if a source blocks or times out.</p>
+          <div class="risk-console">
+            <div class="risk-grid">
+              <article class="risk-card">
+                <h3>X-ray Class</h3>
+                <div id="risk-xray" class="risk-value">--</div>
+                <div id="risk-xray-note" class="risk-subtext">GOES 0.1-0.8 nm</div>
+              </article>
+              <article class="risk-card">
+                <h3>Proton Flux</h3>
+                <div id="risk-proton" class="risk-value">--</div>
+                <div id="risk-proton-note" class="risk-subtext">&gt;=10 MeV pfu</div>
+              </article>
+              <article class="risk-card">
+                <h3>Planetary Kp</h3>
+                <div id="risk-kp" class="risk-value">--</div>
+                <div id="risk-kp-note" class="risk-subtext">1-minute estimate</div>
+              </article>
+              <article class="risk-card">
+                <h3>Bz</h3>
+                <div id="risk-bz" class="risk-value">--</div>
+                <div id="risk-bz-note" class="risk-subtext">GSM north/south IMF</div>
+              </article>
+              <article class="risk-card">
+                <h3>Solar Wind</h3>
+                <div id="risk-speed" class="risk-value">--</div>
+                <div id="risk-speed-note" class="risk-subtext">km/s</div>
+              </article>
+            </div>
 
-    <!-- ===== Section - KP Index ===== -->
+            <div class="risk-panel">
+              <h3>Alert Thresholds</h3>
+              <div id="space-alert-badges" class="badge-grid">
+                <div class="alert-badge alert-unknown"><strong>Loading</strong> Checking live SWPC thresholds...</div>
+              </div>
+            </div>
+
+            <div class="risk-panel">
+              <h3>What Changed In The Last Hour?</h3>
+              <div id="space-delta-grid" class="delta-grid">
+                <div class="delta-item"><strong>Loading</strong> Comparing recent feed values...</div>
+              </div>
+            </div>
+
+            <div class="risk-panel">
+              <h3>CME Comparison Mode</h3>
+              <p class="compact-feed-note">Use this to quickly align the page around a CME workflow: SDO for source-region context, coronagraph for ejecta, and ENLIL for modeled propagation.</p>
+              <div class="control-strip">
+                <label>SDO channel
+                  <select id="compare-sdo">
+                    <option value="193" selected>193 A - coronal holes/CME context</option>
+                    <option value="304">304 A - filaments/prominences</option>
+                    <option value="211">211 A - hot corona</option>
+                    <option value="131">131 A - flare plasma</option>
+                  </select>
+                </label>
+                <label>Coronagraph
+                  <select id="compare-coronagraph">
+                    <option value="lasco-c2" selected>LASCO C2 - early CME</option>
+                    <option value="lasco-c3">LASCO C3 - wider propagation</option>
+                    <option value="ccor1">GOES-19 CCOR-1 - operational</option>
+                  </select>
+                </label>
+                <button id="compare-apply" type="button">Load Comparison</button>
+                <button id="compare-play" type="button">Play All</button>
+                <button id="compare-pause" type="button">Pause All</button>
+              </div>
+              <p id="compare-status" class="feed-source-line">Ready to align SDO, coronagraph, and ENLIL viewers.</p>
+            </div>
+
+            <div class="risk-panel">
+              <h3>Active Region Watch</h3>
+              <p id="region-probability-note" class="compact-feed-note">Loading NOAA active regions and flare probabilities...</p>
+              <div class="region-table-wrap">
+                <table class="region-table">
+                  <thead>
+                    <tr>
+                      <th>NOAA Region</th>
+                      <th>Location</th>
+                      <th>Mag Class</th>
+                      <th>Spot Class</th>
+                      <th>Area</th>
+                      <th>C / M / X Flare %</th>
+                      <th>Trend</th>
+                    </tr>
+                  </thead>
+                  <tbody id="active-region-body">
+                    <tr><td colspan="7">Loading active regions...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <p class="feed-source-line">Sources: NOAA/SWPC GOES X-ray and particle flux, planetary Kp, real-time solar wind, active regions, and flare probability products.</p>
+        </section>
+
+        <!-- ===== Section - KP Index ===== -->
         <section>
           <h2 style="text-align:center">Space Weather Overview</h2>
           <hr>
-            <button type="button" class="collapsible">Show Feeds</button>
-            <div class="content">
-			<hr>
-			<h3 style="text-align:center">X-ray Flux - Solar Proton Flux - Geomagnetic Activity (KP)</h3>
-			<center><img id="swx" class="bordered-image" src="https://services.swpc.noaa.gov/images/swx-overview-large.gif" alt="Space Weather Overview"><center><br>
-        <button type="button" class="collapsible">About Space Weather Overview</button>
-			<div class="content">
-        <p>Solar X-ray Flux: This graph shows the intensity of X-rays emitted by the Sun over time, measured in watts per square meter. Solar flares are classified by their X-ray flux into classes A, B, C, M, and X, with X-class being the most powerful. This data helps predict radio blackouts (R-scales R0-R5).<br><br> Solar Proton Flux: This plot indicates the concentration of solar protons, which are high-energy particles released during large solar flares or coronal mass ejections (CMEs). These events can cause solar radiation storms (S-scales S0-S5), which pose risks to satellites and astronauts.<br><br> Geomagnetic Activity: This section uses the Kp index (ranging from 0 to 9) to measure disturbances in the Earth's magnetic field caused by the solar wind. High Kp values indicate geomagnetic storms (G-scales G0-G5), which can affect power grids, satellite operations, and create auroras. </p>
-			</div><br>
-			<hr>
-			<h3 style="text-align:center">Station K & A Indices</h3><hr>
-        <div class="container"><div class="left-side">
-            <center><img id="kindex" class="bordered-image" src="https://services.swpc.noaa.gov/images/station-k-index.png" alt="Station K Index"></center>
-            </div><div class="right-side">
-            <center><img id="aindex" class="bordered-image" src="https://services.swpc.noaa.gov/images/station-a-index.png" alt="Station A Index"></center>
-            </div></div><br>
-            <button type="button" class="collapsible">About Station Indices</button>
-			<div class="content">
-        <p>Scientists use several related numbers to describe how disturbed Earth’s magnetic field is.<br><br>K-index: A number given every 3 hours that shows how much Earth’s magnetic field changed compared to a calm day. Bigger changes mean a higher K value. Different locations use different scales because magnetic activity varies by latitude.<br><br>ak index: This is the same information as the K-index, but converted into a straightforward, linear number that better represents the size of the disturbance. It can be translated into actual magnetic strength units (nanoteslas).<br><br>A-index: A daily average for one location. It combines the eight ak values from the day into a single number that shows how active the day was overall.<br><br>Kp-index: A global version of the K-index. It averages data from many observatories around the world to show how disturbed Earth’s magnetic field is on a planetary scale. It is used for space weather monitoring and alerts.
-      <br><br>Ap index: A daily global average, based on Kp, that summarizes how active the entire day was worldwide.<br><br>Main idea: K and Kp show short-term magnetic activity, while A and Ap give daily averages. Because K values aren’t linear, they are first converted into “a” values before averaging.</p><br>
-      <h3>For a more complete description of Indices visit <a href="https://www.swpc.noaa.gov/products/station-k-and-indices">https://www.swpc.noaa.gov/products/station-k-and-indices</a></h3><br>			
-    </div>
-      <hr>
-      <h3 style="text-align:center">NOAA Ace MAG & SWEPAM (3 Day)</h3>
-            <center><img id="ACE3day" class="bordered-image" src="https://services.swpc.noaa.gov/images/ace-mag-swepam-3-day.gif" alt="ACE Solar Wind"></center><br>    
-			<button type="button" class="collapsible">About ACE MAG & SWEPAM</button>
-			<div class="content">
-        <p>The graph displays real-time solar wind and magnetic field data from the Advanced Composition Explorer (ACE) satellite, which provides up to an hour's advance warning of potential geomagnetic storms. Each panel represents a different function critical for monitoring space weather: <br><br>Bt & Bz (gam): This panel shows the strength of the total magnetic field (Bt) and the north-south component (Bz) in gamma (nT). The Bz component is particularly important; when it points southward (negative values), it can connect with Earth's magnetic field, allowing solar wind energy to enter the atmosphere and causing geomagnetic storms.<br><br>Phi (gsm): This represents the orientation or angle of the interplanetary magnetic field. Changes in this angle are associated with sector boundary crossings in the solar wind.<br><br>Density (/cm³): This measures the density of solar wind protons in particles per cubic centimeter. Increased density can indicate the arrival of a coronal mass ejection (CME) or a co-rotating interaction region (CIR).
-        <br><br>Speed (km/s): This panel shows the velocity of the solar wind. High-speed streams from coronal holes or the increased speed associated with a CME arrival can lead to enhanced auroral activity and geomagnetic disturbances.<br><br>Temp (K): This indicates the temperature of the solar wind plasma in Kelvin. Temperature changes often correlate with changes in density and speed, providing a more complete picture of the solar wind conditions.</p><br>
-      </div>
-      </div>
-			<br><h3 style="text-align:center">Sourced from NOAA - Updated every 3 hours</h3>
+          <p class="compact-feed-note">Click any panel to zoom the source image. These NOAA/SWPC products summarize current solar radiation, geomagnetic activity, and solar wind conditions without hiding the feeds inside a collapsible block.</p>
+          <div class="feed-collage">
+            <article class="feed-card">
+              <h3>SWPC Overview</h3>
+              <button type="button" class="zoom-trigger" data-zoom-title="NOAA SWPC Space Weather Overview" data-zoom-src="https://services.swpc.noaa.gov/images/swx-overview-large.gif" data-zoom-description="Combines X-ray flux, solar proton flux, and geomagnetic activity. Look for sudden M/X flare jumps, proton increases after eruptive events, and Kp rises during geomagnetic storms.">
+                <img id="swx" class="bordered-image" src="https://services.swpc.noaa.gov/images/swx-overview-large.gif" alt="NOAA SWPC space weather overview">
+              </button>
+              <p><strong>How to read it:</strong> X-ray flux tracks flare class, proton flux shows radiation storm risk, and Kp summarizes global geomagnetic disturbance. A sharp X-ray rise followed by proton or Kp response can signal a more consequential solar event.</p>
+            </article>
+            <article class="feed-card">
+              <h3>Station K Index</h3>
+              <button type="button" class="zoom-trigger" data-zoom-title="Station K Index" data-zoom-src="https://services.swpc.noaa.gov/images/station-k-index.png" data-zoom-description="Local three-hour magnetic disturbance values. Higher K values mean stronger short-term magnetic variation at that observing station.">
+                <img id="kindex" class="bordered-image" src="https://services.swpc.noaa.gov/images/station-k-index.png" alt="Station K index chart">
+              </button>
+              <p><strong>How to read it:</strong> K values are local, three-hour disturbance levels. They are useful for seeing whether geomagnetic activity is regional, rising quickly, or sustained across multiple observation windows.</p>
+            </article>
+            <article class="feed-card">
+              <h3>Station A Index</h3>
+              <button type="button" class="zoom-trigger" data-zoom-title="Station A Index" data-zoom-src="https://services.swpc.noaa.gov/images/station-a-index.png" data-zoom-description="Daily magnetic activity values converted from K measurements. A-index products are better for comparing overall disturbed days than single three-hour intervals.">
+                <img id="aindex" class="bordered-image" src="https://services.swpc.noaa.gov/images/station-a-index.png" alt="Station A index chart">
+              </button>
+              <p><strong>How to read it:</strong> A values compress the day into a more linear activity estimate. Use it as the daily context behind shorter K-index changes and longer geomagnetic storm periods.</p>
+            </article>
+            <article class="feed-card">
+              <h3>ACE MAG &amp; SWEPAM</h3>
+              <button type="button" class="zoom-trigger" data-zoom-title="ACE MAG and SWEPAM 3 Day Solar Wind" data-zoom-src="https://services.swpc.noaa.gov/images/ace-mag-swepam-3-day.gif" data-zoom-description="Three-day solar wind and interplanetary magnetic field data. Southward Bz, elevated speed, and higher density are key signals for geomagnetic storm potential.">
+                <img id="ACE3day" class="bordered-image" src="https://services.swpc.noaa.gov/images/ace-mag-swepam-3-day.gif" alt="ACE MAG and SWEPAM three day solar wind chart">
+              </button>
+              <p><strong>How to read it:</strong> Watch Bz most closely. A sustained negative Bz lets solar wind couple into Earths magnetic field; high speed and density can strengthen the geomagnetic response.</p>
+            </article>
+          </div>
+          <p class="feed-source-line">Sourced from NOAA Space Weather Prediction Center - source products update on their published cadence.</p>
         </section>
-		<br><br>
-		<!-- ===== Section - SDO Live Feeds ===== -->
+        <br><br><!-- ===== Section - SDO Live Feeds ===== -->
         <section>
-            <h2 style="text-align:center">Live SDO Video Feeds</h2>
-			<hr>
-      <button type="button" class="collapsible">Show SDO Feeds</button>
-      <div class="content">
-			<h3 style="text-align:center">SDO 171 Angstroms - Extreme Ultraviolet - 17.1 nanometers</h3>
-            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
-<video id="sdo-171" width="600" height="600" loop muted autoplay>
-    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0171.mp4" type="video/mp4">
-</video>
-<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
-  <button id="sdo-171-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
-  <button id="sdo-171-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
-  <button id="sdo-171-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
-  <button id="sdo-171-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
-  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
-    Speed:
-    <select id="sdo-171-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x</option>
-      <option value="2">2x</option>
-    </select>
-  </label>
-</div>
-<div style="margin-top:12px;">
-  <input id="sdo-171-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
-  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
-    Time: <span id="sdo-171-time">0:00</span> / <span id="sdo-171-duration">0:00</span>
-  </div>
-</div>
-</div></center>
-  <button type="button" class="collapsible">171 Magnetic Field Lines</button>
-  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_0171pfss.jpg" alt="171 Magnetic Field Lines"></center></div>
-  <br><br>
-	<button type="button" class="collapsible">About 171 (EUV)</button>
-			<div class="content">
-			<p>The Solar Dynamics Observatory (SDO) 171 angstrom feed provides images of the Sun's quiet corona and upper transition region, highlighting magnetic structures such as coronal loops. The images appear in the extreme ultraviolet (EUV) range and are typically colorized in gold or yellow.
-			<br><br>Temperature: The material captured in this wavelength is extremely hot, with a characteristic temperature of around 600,000 Kelvin (about 1 million degrees Fahrenheit).
-			<br><br>Plasma/Ions: The light is emitted by iron atoms that have lost eight electrons, known as Fe IX ions.
-			<br><br>Coronal loops appear as giant, arching structures of superheated plasma that trace the magnetic field lines extending from the Sun's surface.
-			<br><br>Bright spots indicate areas where magnetic fields near the surface are particularly strong.
-			<br><br>The overall structure often has a soft, feathery or brush-stroke appearance due to the plasma flowing along the magnetic field lines.</p>
-      </div>
-			<br><hr><br>
-      <div class="container">
-        <div class="left-side">
-			<h3 style="text-align:center">SDO 193 Angstroms - Extreme Ultraviolet - 19.3 nanometers</h3>
-            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
-<video id="sdo-193" width="600" height="600" loop muted autoplay>
-    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0193.mp4" type="video/mp4">
-</video>
-<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
-  <button id="sdo-193-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
-  <button id="sdo-193-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
-  <button id="sdo-193-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
-  <button id="sdo-193-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
-  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
-    Speed:
-    <select id="sdo-193-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x</option>
-      <option value="2">2x</option>
-    </select>
-  </label>
-</div>
-<div style="margin-top:12px;">
-  <input id="sdo-193-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
-  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
-    Time: <span id="sdo-193-time">0:00</span> / <span id="sdo-193-duration">0:00</span>
-  </div>
-</div>
-</div></center>
-  <button type="button" class="collapsible">193 Magnetic Field Lines</button>
-  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/f_094_335_193pfss.jpg" alt="193 Magnetic Field Lines"></center></div>
-  <br>
-	<button type="button" class="collapsible">About 193 (EUV)</button>
-			<div class="content">
-			<p>The Solar Dynamics Observatory (SDO) 193 angstrom feed is an extreme ultraviolet (EUV) image that primarily shows the Sun's outer atmosphere, the corona, and very hot flare plasma. This wavelength is particularly useful for identifying key solar features that influence space weather.
-			<br><br>Primary Ions Observed: It highlights emissions from iron atoms that have lost 11 electrons (Fe XII), which corresponds to material at about 1.25 million Kelvin (2.25 million degrees Fahrenheit).
-			<br><br>Hotter Flare Material: It also captures emissions from iron atoms that have lost 23 electrons (Fe XXIV) at much hotter temperatures, around 20 million Kelvin (about 36 million degrees Fahrenheit), which is present during solar flares.
-			<br><br>Bright Areas: Hot, active regions, solar flares, and coronal mass ejections (CMEs) appear bright because the plasma there is denser and hotter, emitting more radiation in this wavelength.
-			<br><br>Dark Areas: Regions known as coronal holes appear as large, dark patches. These are areas where very little radiation is emitted because the Sun's magnetic field lines are open, allowing material to stream out into space as a high-speed solar wind.</p>
-			</div>
-        </div>
-        <div class="right-side">
-			<h3 style="text-align:center">SDO 211 Angstroms - Extreme Ultraviolet - 21.1 nanometers</h3>
-            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
-<video id="sdo-211" width="600" height="600" loop muted>
-    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0211.mp4" type="video/mp4">
-</video>
-<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
-  <button id="sdo-211-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
-  <button id="sdo-211-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
-  <button id="sdo-211-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
-  <button id="sdo-211-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
-  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
-    Speed:
-    <select id="sdo-211-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x</option>
-      <option value="2">2x</option>
-    </select>
-  </label>
-</div>
-<div style="margin-top:12px;">
-  <input id="sdo-211-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
-  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
-    Time: <span id="sdo-211-time">0:00</span> / <span id="sdo-211-duration">0:00</span>
-  </div>
-</div>
-</div></center>
-  <button type="button" class="collapsible">211 Magnetic Field Lines</button>
-  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0211pfss.jpg"></center></div>
-  <br>
-	<button type="button" class="collapsible">About 211 (EUV)</button>
-			<div class="content">
-			<p>The Solar Dynamics Observatory (SDO) 211 angstrom feed provides images of the sun's hot, magnetically active regions in the corona. Especially good for viewing coronal holes.<br><br>Plasma Temperature: The 211 Ångstrom (21.1 nanometer) wavelength images material that has a characteristic temperature of about 2 million Kelvin (about 3.6 million degrees Fahrenheit).<br><br>Solar Feature: This light is emitted from iron atoms that have lost thirteen electrons (Fe XIV). It is used to observe the active regions of the Sun's outer atmosphere, the corona.<br><br>Bright areas indicate hot, dense, magnetically active regions (often associated with sunspots) where hot plasma is trapped in closed magnetic field loops. Solar flares and coronal mass ejections (CMEs) also appear as bright, intense bursts.<br><br>Dark areas are called coronal holes. These are regions where very little radiation is emitted because the magnetic field lines are open, allowing plasma to escape into space and form the main source of the solar wind.</p>
-			</div></div></div>
-			<br><hr><br>
-      <div class="container">
-        <div class="left-side">
-			<h3 style="text-align:center">SDO 335 Angstroms - Extreme Ultraviolet - 33.5 nanometers</h3>
-            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
-<video id="sdo-335" width="600" height="600" loop muted>
-    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0335.mp4" type="video/mp4">
-</video>
-<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
-  <button id="sdo-335-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
-  <button id="sdo-335-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
-  <button id="sdo-335-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
-  <button id="sdo-335-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
-  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
-    Speed:
-    <select id="sdo-335-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x</option>
-      <option value="2">2x</option>
-    </select>
-  </label>
-</div>
-<div style="margin-top:12px;">
-  <input id="sdo-335-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
-  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
-    Time: <span id="sdo-335-time">0:00</span> / <span id="sdo-335-duration">0:00</span>
-  </div>
-</div>
-</div></center>
-  <button type="button" class="collapsible">335 Magnetic Field Lines</button>
-  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0335pfss.jpg" alt="335 Magnetic Field Lines"></center></div>
-  <br>
-	<button type="button" class="collapsible">About 335 (EUV)</button>
-			<div class="content">
-			<p>The Solar Dynamics Observatory (SDO) 335 angstrom (Å) feed is an extreme ultraviolet (EUV) image that primarily shows hot, magnetically active regions in the Sun's atmosphere, the corona, at a characteristic temperature of approximately 2.5 million Kelvin.<br><br>The 335 Å wavelength is part of the extreme ultraviolet spectrum and is not visible to the human eye. The light at this specific wavelength is emitted by 15-times ionized iron (Fe XVI).<br><br>The overall appearance is that of the outer solar atmosphere (corona).<br><br>The most striking features are the bright, concentrated patches, which correspond to the active regions around sunspots.<br><br>Dark, relatively empty regions (coronal holes) may be visible as large, dark areas, contrasting sharply with the bright active regions.</p>
-			</div></div>
-        <div class="right-side">
-			<h3 style="text-align:center">SDO 94 Angstroms - Extreme Ultraviolet - 9.4 nanometers</h3>
-            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
-<video id="sdo-94" width="600" height="600" loop muted>
-    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0094.mp4" type="video/mp4">
-</video>
-<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
-  <button id="sdo-94-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
-  <button id="sdo-94-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
-  <button id="sdo-94-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
-  <button id="sdo-94-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
-  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
-    Speed:
-    <select id="sdo-94-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x</option>
-      <option value="2">2x</option>
-    </select>
-  </label>
-</div>
-<div style="margin-top:12px;">
-  <input id="sdo-94-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
-  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
-    Time: <span id="sdo-94-time">0:00</span> / <span id="sdo-94-duration">0:00</span>
-  </div>
-</div>
-</div></center>
-  <button type="button" class="collapsible">94 Magnetic Field Lines</button>
-  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0094pfss.jpg"></center></div>
-  <br>
-	<button type="button" class="collapsible">About 94 (EUV)</button>
-			<div class="content">
-			<p>The 94 angstrom (9.4 nm) feed from the Solar Dynamics Observatory (SDO) represents extremely hot, flaring regions of the Sun's corona and typically appears as a green-colored image in false-color visualizations. This extreme ultraviolet (EUV) light is invisible to the human eye and is only observable from space.<br><br>Temperature: The light in this wavelength is emitted by material at a characteristic temperature of about 6 million Kelvin (approximately 11 million degrees Fahrenheit).<br><br>Emitting Ion: This specific spectral line is produced by iron atoms that have lost 17 electrons, known as iron-18 or Fe XVIII ions.<br><br>Purpose: By observing the Sun in this and other wavelengths, scientists can track how energy and material move through the solar atmosphere, which helps in understanding solar explosions and improving space weather forecasting.</p>
-			</div></div></div>
-			<br><hr><br>
-      <div class="container">
-        <div class="left-side">
-			<h3 style="text-align:center">SDO 131 Angstroms - Extreme Ultraviolet - 13.1 nanometers</h3>
-            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
-<video id="sdo-131" width="600" height="600" loop muted>
-    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0131.mp4" type="video/mp4">
-</video>
-<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
-  <button id="sdo-131-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
-  <button id="sdo-131-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
-  <button id="sdo-131-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
-  <button id="sdo-131-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
-  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
-    Speed:
-    <select id="sdo-131-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x</option>
-      <option value="2">2x</option>
-    </select>
-  </label>
-</div>
-<div style="margin-top:12px;">
-  <input id="sdo-131-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
-  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
-    Time: <span id="sdo-131-time">0:00</span> / <span id="sdo-131-duration">0:00</span>
-  </div>
-</div>
-</div></center>
-  <button type="button" class="collapsible">131 Magnetic Field Lines</button>
-  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0131pfss.jpg"></center></div>
-  <br>
-	<button type="button" class="collapsible">About 131 (EUV)</button>
-			<div class="content">
-			<p>The Solar Dynamics Observatory (SDO) 131 angstrom feed highlights the hottest material in a solar flare, specifically plasma heated to temperatures around 10 million Kelvin (18 million degrees Fahrenheit). This extreme ultraviolet (EUV) light is typically colorized in teal in SDO images.<br><br>Magnetic Activity: It shows active regions on the sun where magnetic field lines are strong and complex. The bright spots in the image correspond to these areas of intense magnetic energy release.</p>
-			</div></div>
-        <div class="right-side">
-			<h3 style="text-align:center">SDO 304 Angstroms - Extreme Ultraviolet - 30.4 nanometers</h3>
-            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
-<video id="sdo-304" width="600" height="600" loop muted>
-    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304.mp4" type="video/mp4">
-</video>
-<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
-  <button id="sdo-304-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
-  <button id="sdo-304-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
-  <button id="sdo-304-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
-  <button id="sdo-304-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
-  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
-    Speed:
-    <select id="sdo-304-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x</option>
-      <option value="2">2x</option>
-    </select>
-  </label>
-</div>
-<div style="margin-top:12px;">
-  <input id="sdo-304-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
-  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
-    Time: <span id="sdo-304-time">0:00</span> / <span id="sdo-304-duration">0:00</span>
-  </div>
-</div>
-</div></center>
-  <button type="button" class="collapsible">304 Magnetic Field Lines</button>
-  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304pfss.jpg"></center></div>
-  <br>
-	<button type="button" class="collapsible">About 304 (EUV)</button>
-			<div class="content">
-			<p>The Solar Dynamics Observatory (SDO) feed for 304 angstroms captures extreme ultraviolet (EUV) light emitted by singly ionized helium (He II), primarily showing features in the Sun's chromosphere and transition region.<br><br>Temperature: This wavelength highlights solar material (plasma) with a characteristic temperature of around 50,000 Kelvin (90,000 Fahrenheit).<br><br>Solar Layers: The light originates from the Sun's upper chromosphere and lower transition region, atmospheric layers just above the visible surface.<br><br>Key Features: It is especially useful for observing cooler, denser plumes of plasma that appear as:<br><br>Filaments: Dark, streak-like features when seen against the bright solar disk.<br><br>Prominences: Bright, loop-shaped or erupting jets of material extending out from the Sun's edge (solar limb).<br><br>Coronal Rain: Cooler plasma that condenses along magnetic field lines and falls back to the solar surface.</p>
-			</div></div></div>
-			<br><hr><br>
-      <div class="container">
-        <div class="left-side">
-			<h3 style="text-align:center">SDO 1600 Angstroms - Ultraviolet - 160.0 nanometers</h3>
-            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
-<video id="sdo-1600" width="600" height="600" loop muted>
-    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1600.mp4" type="video/mp4">
-</video>
-<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
-  <button id="sdo-1600-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
-  <button id="sdo-1600-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
-  <button id="sdo-1600-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
-  <button id="sdo-1600-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
-  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
-    Speed:
-    <select id="sdo-1600-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x</option>
-      <option value="2">2x</option>
-    </select>
-  </label>
-</div>
-<div style="margin-top:12px;">
-  <input id="sdo-1600-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
-  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
-    Time: <span id="sdo-1600-time">0:00</span> / <span id="sdo-1600-duration">0:00</span>
-  </div>
-</div>
-</div></center>
-  <button type="button" class="collapsible">1600 Magnetic Field Lines</button>
-  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1600pfss.jpg"></center></div>
-  <br>
-	<button type="button" class="collapsible">About 1600 (UV)</button>
-			<div class="content">
-			<p>The Solar Dynamics Observatory (SDO) 1600 angstrom (Å) feed primarily shows the transition region and upper photosphere of the Sun, highlighting areas where the Sun's temperature rapidly rises. The images are typically colorized in a dark, grainy yellow.<br><br>Solar Layer: This ultraviolet (UV) wavelength provides a view of a mixture of the Sun's upper photosphere (the visible surface) and the transition region (the layer between the chromosphere and the corona).<br><br>Temperature: It highlights plasma at a temperature of approximately 10,000 Kelvin (around 17,500 degrees Fahrenheit), which is emitted by a spectral line of quadruply ionized carbon (C IV).<br><br>Sunspots and Active Regions: In contrast, small areas with a high concentration of magnetic field lines, typically found near sunspots and active regions, will appear as black spots. Solar flares appear as bright flashes in this feed, and flare ribbons are clearly visible.</p>
-			</div></div>
-        <div class="right-side">
-			<h3 style="text-align:center">SDO 1700 Angstroms - Ultraviolet - 170.0 nanometers</h3>
-            <center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
-<video id="sdo-1700" width="600" height="600" loop muted>
-    <source src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1700.mp4" type="video/mp4">
-</video>
-<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
-  <button id="sdo-1700-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
-  <button id="sdo-1700-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
-  <button id="sdo-1700-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
-  <button id="sdo-1700-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
-  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
-    Speed:
-    <select id="sdo-1700-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x</option>
-      <option value="2">2x</option>
-    </select>
-  </label>
-</div>
-<div style="margin-top:12px;">
-  <input id="sdo-1700-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
-  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
-    Time: <span id="sdo-1700-time">0:00</span> / <span id="sdo-1700-duration">0:00</span>
-  </div>
-</div>
-</div></center>
-  <button type="button" class="collapsible">1700 Magnetic Field Lines</button>
-  <div class="content"><center><img height="800" width="800" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1700pfss.jpg"></center></div>
-  <br>
-	<button type="button" class="collapsible">About 1700 (UV)</button>
-			<div class="content">
-			<p>The Solar Dynamics Observatory (SDO) 1700 angstrom (Å) feed is in the ultraviolet band and shows the Sun's photosphere and chromosphere. It primarily captures the continuum emission from the solar surface and the lower atmosphere, providing a view of material at a characteristic temperature of around 6,000 Kelvin (approximately 10,340 degrees Fahrenheit).<br><br>Ultraviolet Continuum: Unlike other extreme ultraviolet channels that show specific ions in the hot corona, the 1700 Å channel observes the ultraviolet continuum, essentially the background light from these lower atmospheric layers.<br><br>Magnetic Activity: Images in this channel can highlight areas where magnetic field lines are concentrated, appearing as bright patches, which often correlate with active regions and sunspots seen in visible light.</p>
-			</div></div></div></div><br>
-      <p style="text-align:center">Sourced from NASA Solar Dynamics Observatory (SDO) - Updated every 10 minutes</p><br>
+            <h2 style="text-align:center">SDO Solar Wavelength Explorer</h2>
+            <hr>
+            <p style="text-align:center">Flip through SDO wavelengths in one viewer. Each channel highlights a different solar layer, temperature range, or activity type. Magnetic field-line images are included for the selected wavelength where SDO provides a PFSS overlay.</p>
+            <div class="sdo-tool">
+                <div id="sdo-selector" class="sdo-selector" aria-label="Select SDO wavelength"></div>
+                <div class="sdo-viewer-grid">
+                    <div class="sdo-media-panel video-panel" id="sdo-tool-container">
+                        <h3 id="sdo-title" style="text-align:center;margin-top:0">SDO 171 Angstrom</h3>
+                        <video id="sdo-tool-video" loop muted autoplay playsinline>
+                            <source id="sdo-tool-source" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0171.mp4" type="video/mp4">
+                        </video>
+                        <div class="sdo-controls">
+                            <button id="sdo-tool-prev" type="button">Prev Frame</button>
+                            <button id="sdo-tool-play" type="button">Play</button>
+                            <button id="sdo-tool-pause" type="button">Pause</button>
+                            <button id="sdo-tool-next" type="button">Next Frame</button>
+                            <button id="sdo-tool-fullscreen" type="button">Fullscreen</button>
+                            <label style="display:flex;align-items:center;gap:6px;color:#fcf2dc">Speed
+                                <select id="sdo-tool-speed">
+                                    <option value="0.5">0.5x</option>
+                                    <option value="1" selected>1x</option>
+                                    <option value="2">2x</option>
+                                </select>
+                            </label>
+                        </div>
+                        <input id="sdo-tool-slider" class="sdo-scrubber" type="range" min="0" max="100" value="0">
+                        <div style="text-align:center;color:#fcf2dc;font-size:12px">Time: <span id="sdo-tool-time">0:00</span> / <span id="sdo-tool-duration">0:00</span></div>
+                    </div>
+                    <div class="sdo-info-panel">
+                        <h3 id="sdo-summary-title" style="margin-top:0;color:#00ffff">Channel Guide</h3>
+                        <p id="sdo-description"></p>
+                        <div id="sdo-characteristics" class="sdo-characteristics"></div>
+                        <p style="margin-top:12px"><a id="sdo-video-source-link" class="button" href="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0171.mp4" target="_blank">Open video source</a></p>
+                    </div>
+                </div>
+                <div class="sdo-info-panel">
+                    <h3 id="sdo-field-title" style="text-align:center;margin-top:0">Magnetic Field-Line Overlay</h3>
+                    <p id="sdo-field-description" style="text-align:center;color:#ccc">PFSS field-line overlays show modeled magnetic connectivity above the visible solar disk. They help connect loops, active regions, and coronal-hole structure with the selected wavelength.</p>
+                    <center><img id="sdo-field-image" class="bordered-image sdo-field-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_0171pfss.jpg" alt="SDO magnetic field line overlay"></center>
+                    <p style="text-align:center"><a id="sdo-field-source-link" class="button" href="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_0171pfss.jpg" target="_blank">Open magnetic field image</a></p>
+                </div>
+            </div>
+            <p style="text-align:center">Sourced from NASA Solar Dynamics Observatory (SDO) - Updated frequently by source feed</p>
         </section>
-		<br><br>
+        <br><br>
     <!-- ===== Section - Coronagraph ===== -->
         <section>
-            <h2 style="text-align:center">GOES-19 Live Coronagraph Feed</h2><hr>
-            <button type="button" class="collapsible">Show Coronagraph Feed</button>
-            <div class="content"><center><div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
-<video id="goes-coronagraph" controls loop muted width="600" height="600">
-    <source src="https://services.swpc.noaa.gov/products/ccor1/mp4s/ccor1_last_24hrs.mp4" type="video/mp4"></video>
-<div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
-  <button id="goes-coronagraph-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev Frame</button>
-  <button id="goes-coronagraph-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
-  <button id="goes-coronagraph-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
-  <button id="goes-coronagraph-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next Frame ▶</button>
-  <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
-    Speed:
-    <select id="goes-coronagraph-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x</option>
-      <option value="2">2x</option>
-    </select>
-  </label>
-</div>
-<div style="margin-top:12px;">
-  <input id="goes-coronagraph-slider" type="range" min="0" max="100" value="0" style="width:100%; cursor:pointer; accent-color:#00ffff;" />
-  <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
-    Time: <span id="goes-coronagraph-time">0:00</span> / <span id="goes-coronagraph-duration">0:00</span>
-  </div>
-</div>
-</div></center><br>
-    <button type="button" class="collapsible">About Coronagraph Feed</button>
-      <div class="content">
-        <p>The GOES-19 feed from the NOAA Space Weather Prediction Center provides real-time video of the Sun's corona, the outermost layer of the solar atmosphere. The coronagraph uses an occulting disk to block out the bright light from the Sun's surface, allowing us to see the faint corona and any solar activity occurring there.<br><br>Key Features: The feed can show coronal mass ejections (CMEs), which are large expulsions of plasma and magnetic field from the Sun's corona. These appear as bright, expanding clouds moving outward from the Sun. The video also captures the dynamic structure of the corona, including streamers and loops formed by magnetic field lines.<br><br>Space Weather Monitoring: By observing this feed, scientists can track CMEs and predict their potential impact on Earth, such as geomagnetic storms that can affect satellites, power grids, and communication systems.</p>
-      </div></div><br>
-      <p style="text-align:center">Sourced from NOAA GOES-19 - Updated every 10 minutes</p><br>
+            <h2 style="text-align:center">Coronagraph Explorer</h2><hr>
+            <p style="text-align:center">Coronagraphs block the bright solar disk so the faint outer corona and outward-moving CMEs can be seen. Use this viewer to compare GOES-19 CCOR-1, LASCO C2, and LASCO C3 in one place.</p>
+            <div class="coronagraph-tool">
+              <div id="coronagraph-selector" class="sdo-selector" aria-label="Select coronagraph feed"></div>
+              <div class="coronagraph-viewer">
+                <div class="coronagraph-media video-panel" id="coronagraph-container">
+                  <h3 id="coronagraph-title" style="text-align:center;margin-top:0">GOES-19 CCOR-1</h3>
+                  <video id="coronagraph-video" loop muted playsinline crossorigin="anonymous">
+                    <source id="coronagraph-source" src="https://services.swpc.noaa.gov/products/ccor1/mp4s/ccor1_last_24hrs.mp4" type="video/mp4">
+                  </video>
+                  <canvas id="coronagraph-canvas" width="1024" height="1024" style="display:none"></canvas>
+                  <div id="coronagraph-status" style="text-align:center;color:#00ffff;font-size:12px;margin-top:8px">Loading coronagraph feed...</div>
+                  <div class="coronagraph-controls">
+                    <button id="coronagraph-prev" type="button">Prev Frame</button>
+                    <button id="coronagraph-play" type="button">Play</button>
+                    <button id="coronagraph-pause" type="button">Pause</button>
+                    <button id="coronagraph-next" type="button">Next Frame</button>
+                    <button id="coronagraph-fullscreen" type="button">Fullscreen</button>
+                    <label style="display:flex;align-items:center;gap:6px;color:#fcf2dc">Speed
+                      <select id="coronagraph-speed">
+                        <option value="900">Slow</option>
+                        <option value="500" selected>Normal</option>
+                        <option value="250">Fast</option>
+                      </select>
+                    </label>
+                  </div>
+                  <input id="coronagraph-slider" class="coronagraph-scrubber" type="range" min="0" max="100" value="0">
+                  <div style="text-align:center;color:#fcf2dc;font-size:12px">Frame/Time: <span id="coronagraph-time">0:00</span> / <span id="coronagraph-duration">0:00</span></div>
+                </div>
+                <div class="coronagraph-info">
+                  <h3 id="coronagraph-guide-title" style="margin-top:0;color:#00ffff">Coronagraph Guide</h3>
+                  <p id="coronagraph-description"></p>
+                  <div id="coronagraph-characteristics" class="sdo-characteristics"></div>
+                  <p style="margin-top:12px"><a id="coronagraph-source-link" class="button" href="https://services.swpc.noaa.gov/products/ccor1/mp4s/ccor1_last_24hrs.mp4" target="_blank">Open source feed</a></p>
+                </div>
+              </div>
+            </div>
+            <p style="text-align:center">Sources: NOAA/SWPC CCOR-1 and SWPC-hosted SOHO/LASCO imagery. Coronagraph products update as source data is available.</p><br>
         </section>
-    <br><br>
-		<!-- ===== Section - Sunspot Watch ===== -->
-        <section>
+        <br><br>
+<!-- ===== Section - Sunspot Watch ===== -->
+        <section id="sunspot-watch">
             <h2 style="text-align:center">Live Sunspot Watch</h2>
-			<hr>
-      <button type="button" class="collapsible">Show Feeds</button>
-      <div class="content"><div class="container">
-        <div class="left-side">
-			  <h3 style="text-align:center">SDO Magnetogram</h3>
-			<br><center><a href="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_HMIBC.jpg" class="button" target="_blank">Source (Full Resolution)</a></center><br>
-            <center><img Height="800" Width="800" id="M" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_HMIBC.jpg" alt="Magnetogram"></center><br>
-        <br><p style="text-align:center">Credit: Solar Dynamics Observatory (SDO) Helioseismic and Magnetic Imager (HMI)</p><br>
-	<button type="button" class="collapsible">About Magnetogram</button>
-			<div class="content">
-			<p>The magnetogram is not a direct visual image of the sun but a data visualization produced by the Helioseismic and Magnetic Imager (HMI) instrument, which measures the splitting of iron spectral lines due to the Zeeman effect. This data is crucial for: <br><br>Identifying Active Regions: Strong magnetic fields appear as sunspots and active regions, which are the sources of solar flares and coronal mass ejections (CMEs).<br><br>Space Weather Forecasting: By tracking the movement and complexity of these magnetic fields, scientists can better predict space weather events that might impact Earth.<br><br>Studying Solar Dynamics: It provides a uniform, continuous view of how the sun's magnetic field evolves over time. 
-			<br><hr><br>(Color Schemes)<br><br>Grey areas indicate a near-zero magnetic field intensity.<br><br><span class="circle green"></span><span class="circle blue"></span>Positive (North) magnetic polarity (magnetic field lines coming toward the observer/outward from the sun) is represented by greens and blues, with increasing brightness/color intensity indicating stronger fields.<br><br><span class="circle red"></span><span class="circle orange"></span>Negative (South) magnetic polarity (magnetic field lines pointing away from the observer/inward into the sun) is represented by yellows and reds/oranges, with increasing brightness/color intensity indicating stronger fields.<br><br>Strong field regions (sunspots) appear as bright blue (positive) or red (negative) patches with dark central umbrae.</p><br>
-			</div></div><div class="right-side">
-        <h3 style="text-align:center">Far Side Sunspots</h3><br><p style="text-align:center">Stanford Seismic Monitor of the Sun's Far Hemisphere for the Solar Dynamics Observatory</p><br><center><a href="http://jsoc.stanford.edu/data/farside/" class="button" target="_blank">http://jsoc.stanford.edu/data/farside/</a></center><br>
-          <button type="button" class="collapsible">About Far Side Sunspots</button>
-          <div class="content">
-            <p>Far Side Sunspots are detected using helioseismology, which analyzes sound waves generated by solar activity. These waves travel through the Sun's interior and can be observed on the near side.<br><br>Magnetic Field (B(Gauss)): The grayscale bar on the right indicates the magnetic field strength in Gauss. Darker areas usually correspond to strong magnetic fields, which are characteristic of sunspots.<br><br>Travel Time (\(\tau \)(sec)): The color bar on the left indicates acoustic travel-time perturbations in seconds. Large active regions on the far side can be detected by horizontally extended acoustic travel-time reductions.</p><br></div>
-          <br><p style="text-align:center">Alternate sunspot resource:<br><a href="https://jsoc1.stanford.edu/hmi_latest" class="button" target="_blank">Stanford Magnetograms & Sunspot Imagery</a></p></div>
-      </div><br>
+            <hr>
+            <p class="compact-feed-note">A modular view of visible-disk magnetic structure, NOAA-numbered active regions, and farside sunspot monitoring resources. Region numbers in the Active Region Watch table link to the NOAA region locator model below.</p>
+            <div class="sunspot-module-grid">
+                <article class="sunspot-module">
+                    <h3 style="text-align:center">SDO HMI Magnetogram</h3>
+                    <center><a href="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_HMIBC.jpg" class="button" target="_blank">Source Full Resolution</a></center><br>
+                    <img id="M" class="bordered-image" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_HMIBC.jpg" alt="SDO HMI magnetogram" loading="lazy" decoding="async">
+                    <p><strong>How to read it:</strong> HMI maps line-of-sight magnetic polarity. Bright contrasting patches mark active regions where complex magnetic fields can store flare-producing energy.</p>
+                </article>
+                <article class="sunspot-module" id="active-region-model-panel">
+                    <h3 style="text-align:center">NOAA Active Region Locator</h3>
+                    <canvas id="activeRegionCanvas" width="720" height="720" aria-label="NOAA numbered active region locator model"></canvas>
+                    <p id="activeRegionModelStatus">Loading NOAA active-region locator...</p>
+                    <p><strong>Model source:</strong> NOAA/SWPC solar_regions.json. This lightweight disk model plots current NOAA region numbers from the same feed used in the Active Region Watch table.</p>
+                </article>
+                <article class="sunspot-module">
+                    <h3 style="text-align:center">Far Side Sunspots</h3>
+                    <center><a href="https://jsoc.stanford.edu/data/farside/" class="button" target="_blank">Stanford Farside Monitor</a></center><br>
+                    <p>Far-side active regions are inferred using helioseismology: acoustic travel-time shifts reveal large magnetic regions before they rotate onto the Earth-facing disk. Use this as early context alongside NOAA numbered regions.</p>
+                    <p>Alternate sunspot resource:<br><a href="https://jsoc1.stanford.edu/hmi_latest" class="button" target="_blank">Stanford Magnetograms & Sunspot Imagery</a></p>
+                </article>
+            </div>
+        </section>
+        <br><br>      <!-- ===== Section- Orbital Hazards ===== -->
+      <section>
+        <h2 style="text-align:center">Satellite Charging Hazard</h2>
+        <hr>
+        <p class="compact-feed-note">These SEAESRT products show the near-Earth radiation environment and spacecraft charging risk. Click any panel to zoom in for operational reading.</p>
+        <div class="feed-collage">
+          <article class="feed-card">
+            <h3>Orbit Environment</h3>
+            <button type="button" class="zoom-trigger" data-zoom-title="SEAESRT Real Time Orbit Environment" data-zoom-src="https://services.swpc.noaa.gov/images/seaesrt-space-environment.png" data-zoom-description="Shows the current space environment context for satellite orbits. Use it to orient charging risk around active radiation belt and particle conditions.">
+              <img id="Orbit" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-space-environment.png" alt="SEAESRT real time orbit environment display">
+            </button>
+            <p><strong>How to read it:</strong> Use this as the map/context layer. It helps relate spacecraft altitude and location to radiation belt structure and changing near-Earth particle conditions.</p>
+          </article>
+          <article class="feed-card">
+            <h3>Charging Hazard</h3>
+            <button type="button" class="zoom-trigger" data-zoom-title="Spacecraft Charging Hazard" data-zoom-src="https://services.swpc.noaa.gov/images/seaesrt-charging-hazards.png" data-zoom-description="Highlights regions where energetic particles may raise spacecraft surface or internal charging risk.">
+              <img id="Spacecraft" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-charging-hazards.png" alt="Spacecraft charging hazard display">
+            </button>
+            <p><strong>How to read it:</strong> Stronger hazard colors indicate a greater charging environment. Risk can rise during geomagnetic disturbances when energetic electrons are enhanced.</p>
+          </article>
+          <article class="feed-card">
+            <h3>Hazard Quotient 0E</h3>
+            <button type="button" class="zoom-trigger" data-zoom-title="Hazard Quotient 0 Degrees East" data-zoom-src="https://services.swpc.noaa.gov/images/seaesrt-time-series-0.png" data-zoom-description="Time series for the hazard quotient at the 0 degree east longitude sector.">
+              <img id="Quotient0" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-time-series-0.png" alt="Hazard quotient time series 0 degrees east">
+            </button>
+            <p><strong>How to read it:</strong> Rising values mean the modeled charging hazard is increasing for that longitude sector. Compare sectors to see whether risk is localized or broad.</p>
+          </article>
+          <article class="feed-card">
+            <h3>Hazard Quotient 90E</h3>
+            <button type="button" class="zoom-trigger" data-zoom-title="Hazard Quotient 90 Degrees East" data-zoom-src="https://services.swpc.noaa.gov/images/seaesrt-time-series-90.png" data-zoom-description="Time series for the hazard quotient at the 90 degree east longitude sector.">
+              <img id="Quotient90" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-time-series-90.png" alt="Hazard quotient time series 90 degrees east">
+            </button>
+            <p><strong>How to read it:</strong> This longitude slice helps identify whether hazardous charging conditions are rotating into or out of a particular orbital sector.</p>
+          </article>
+          <article class="feed-card">
+            <h3>Hazard Quotient 180E</h3>
+            <button type="button" class="zoom-trigger" data-zoom-title="Hazard Quotient 180 Degrees East" data-zoom-src="https://services.swpc.noaa.gov/images/seaesrt-time-series-180.png" data-zoom-description="Time series for the hazard quotient at the 180 degree east longitude sector.">
+              <img id="Quotient180" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-time-series-180.png" alt="Hazard quotient time series 180 degrees east">
+            </button>
+            <p><strong>How to read it:</strong> Compare this panel with the other longitudes to spot delayed or sector-specific hazard increases after geomagnetic activity.</p>
+          </article>
+          <article class="feed-card">
+            <h3>Hazard Quotient 270E</h3>
+            <button type="button" class="zoom-trigger" data-zoom-title="Hazard Quotient 270 Degrees East" data-zoom-src="https://services.swpc.noaa.gov/images/seaesrt-time-series-270.png" data-zoom-description="Time series for the hazard quotient at the 270 degree east longitude sector.">
+              <img id="Quotient270" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-time-series-270.png" alt="Hazard quotient time series 270 degrees east">
+            </button>
+            <p><strong>How to read it:</strong> Use alongside the other sectors to determine whether spacecraft charging risk is persistent, drifting, or tied to a specific longitude region.</p>
+          </article>
+        </div>
+        <p class="feed-source-line">Sourced from NOAA Space Weather Prediction Center SEAESRT products.</p>
       </section>
       <br><br>
-      <!-- ===== Section- Orbital Hazards ===== -->
+      <!-- ===== NOAA ENLIL Spiral Forecast ===== -->
       <section>
-        <h2 style="text-align:center">Satellite Charging hazards</h2>
+        <h2 style="text-align:center">NOAA ENLIL Spiral Forecast</h2>
         <hr>
-        <button type="button" class="collapsible">Show Orbital Hazards</button>
-        <div class="content">
-      <h3 style="text-align:center">Real Time Orbit Display</h3>
-      <center><img id="Orbit" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-space-environment.png"></center>
-      <br><hr><br>
-      <h3 style="text-align:center">Spacecraft Charging Hazard</h3>
-      <center><img id="Spacecraft" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-charging-hazards.png" alt="Spacecraft Charging Hazards"></center>
-      <br><hr><br>
-      <h3 style="text-align:center">Hazard Quotients</h3>
-      <center><img id="Quotient0" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-time-series-0.png" alt="SEAESRT 0E" ><img id="Quotient90" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-time-series-90.png" alt="SEAESRT 90E" ></center>
-      <br><center><img id="Quotient270" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-time-series-270.png" alt="SEAESRT 270E" ><img id="Quotient180" class="bordered-image" src="https://services.swpc.noaa.gov/images/seaesrt-time-series-180.png" alt="SEAESRT 180E" ></center>
-      <br>
-      <button type="button" class="collapsible">About SEAESRT Displays</button>
-      <div class="content">
-        <p>The charts displayed are the Spacecraft Environmental Anomalies Expert System – Real Time (SEAESRT) Orbit Displays, a product from the NOAA/NWS Space Weather Prediction Center (SWPC). This system provides real-time guidance on space weather conditions and their potential effects on geosynchronous satellites.
-          <br><br>Hazard Types: The system monitors and provides hazard levels for four common types of satellite problems:<br>- Surface charging<br>- Internal charging<br>- Single event effects (upsets)<br>- Total dose effects<br><hr><br>Hazard Quotient: For each hazard, the system provides a "hazard quotient," which represents the probability of an anomaly relative to the long-term average likelihood. A quotient of 1 indicates an average likelihood.
-          <br><hr><br>Visual Representation:<br><span class="circle green"></span> Green: This color indicates no risk or normal conditions.<br><span class="circle yellow"></span> Yellow/Orange: This indicates potential hazards or an increased probability of an anomaly occurring.<br><span class="circle red"></span> Red: This represents a high hazard or a significant probability of a satellite anomaly.
-        </p><br></div></div><br><p style="text-align:center">Sourced from NOAA Space Weather Prediction Center - Updated every 30 minutes</p><br>
-          <!-- ===== NOAA ENLIL Spiral Forecast ===== -->
-      </section>
-        <br><br>
-        <section>
-      <h2 style="text-align:center">NOAA ENLIL Spiral Forecast</h2>
-      <hr>
-      <button type="button" class="collapsible">Show ENLIL Forecast</button>
-      <div class="content">
-        <div style="background:#08202c; border:2px solid #00ffff; padding:16px; border-radius:5px; box-shadow: inset 0 0 20px rgba(0,255,255,0.1);">
-          <div style="text-align:center; color:#00ffff; font-weight:bold; margin-bottom:12px; font-size:14px;">
-            <span id="enlil-status">Loading ENLIL animation…</span>
+        <p class="compact-feed-note">ENLIL models solar wind and CME propagation through the inner heliosphere. It is now displayed directly on the page so it behaves like the other live viewers instead of opening from a hidden container.</p>
+        <div class="enlil-free-panel">
+          <div style="text-align:center; color:#00ffff; font-weight:bold; font-size:14px;">
+            <span id="enlil-status">Loading ENLIL animation...</span>
           </div>
-          <canvas id="enlil-canvas" width="600" height="600" 
-                  style="display:block; margin:0 auto; background:#000; border:2px solid #ff00ff; max-width:100%; height:auto; image-rendering:pixelated;"></canvas>
-          
-          <div style="margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; align-items:center;">
-            <button id="enlil-prev" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">◀ Prev</button>
-            <button id="enlil-play" style="padding:6px 12px; background:#00ff00; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">▶ Play</button>
-            <button id="enlil-pause" style="padding:6px 12px; background:#ff6600; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">⏸ Pause</button>
-            <button id="enlil-next" style="padding:6px 12px; background:#00ffff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius:3px;">Next ▶</button>
-            <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">
-              Speed:
-              <select id="enlil-speed" style="padding:4px 6px; background:#1a4d5c; color:#00ffff; border:1px solid #00ffff; cursor:pointer;">
-                <option value="600">0.6s</option>
-                <option value="400">0.4s</option>
-                <option value="250" selected>0.25s</option>
-                <option value="150">0.15s</option>
+          <canvas id="enlil-canvas" width="600" height="600" style="display:block; margin:0 auto; background:#000; border:2px solid #ff00ff; max-width:100%; height:auto; image-rendering:pixelated;"></canvas>
+          <div class="enlil-free-controls">
+            <button id="enlil-prev" type="button">Prev Frame</button>
+            <button id="enlil-play" type="button">Play</button>
+            <button id="enlil-pause" type="button">Pause</button>
+            <button id="enlil-next" type="button">Next Frame</button>
+            <button id="enlil-fullscreen" type="button">Fullscreen</button>
+            <label style="display:flex; align-items:center; gap:6px; color:#fcf2dc; font-size:12px;">Speed
+              <select id="enlil-speed">
+                <option value="600">Slow</option>
+                <option value="400">Normal</option>
+                <option value="250" selected>Fast</option>
+                <option value="150">Very Fast</option>
               </select>
             </label>
           </div>
-          
-          <div style="margin-top:12px;">
-            <input id="enlil-slider" type="range" min="0" max="0" value="0"
-                   style="width:100%; cursor:pointer; accent-color:#00ffff;" />
-            <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">
-              Frame <span id="enlil-frame-num">0</span> / <span id="enlil-frame-total">0</span>
-            </div>
+          <div style="width:min(760px, 100%);">
+            <input id="enlil-slider" class="enlil-scrubber" type="range" min="0" max="0" value="0" />
+            <div style="text-align:center; color:#fcf2dc; font-size:11px; margin-top:4px;">Frame <span id="enlil-frame-num">0</span> / <span id="enlil-frame-total">0</span></div>
           </div>
         </div>
-        
-        <button type="button" class="collapsible" style="margin-top:12px;">About ENLIL Forecast</button>
-        <div class="content">
-          <p>The ENLIL (Enlarge and Invert the Low-frequency Interplanetary model) model from NOAA provides a real-time 3D visualization of solar wind propagation through the heliosphere. This spiral forecast shows how coronal mass ejections (CMEs) and solar wind interact as they travel from the Sun toward Earth's orbit and beyond.<br><br><strong>Spiral Structure:</strong> The frame rotates to show the Sun-Earth line at the top, displaying how solar features spiral outward due to the Sun's rotation. Brighter or darker regions indicate variations in solar wind density, temperature, or magnetic field strength.<br><br><strong>Forecasting Value:</strong> By observing the ENLIL model, space weather forecasters can estimate arrival times of CMEs at Earth and predict the intensity of resulting geomagnetic storms. This helps with satellite operations, power grid management, and communication system planning.</p>
+        <div class="enlil-guide">
+          <p><strong>How to read it:</strong> The Sun is at the center and spiral structures show solar wind streams shaped by solar rotation. Disturbances moving outward toward Earths orbit can indicate possible CME or high-speed stream arrival timing. Treat it as model guidance, then confirm with ACE/DSCOVR solar wind data and geomagnetic indices.</p>
         </div>
-        <p style="text-align:center; color:#00ffff; font-size:12px; margin-top:12px;">Sourced from NOAA Space Weather Prediction Center - Updated every 3 hours</p>
-      </div>
-    </section>
-    <br><br>
-        <!-- ===== Section- Aurora Forecast ===== -->
+        <p class="feed-source-line">Sourced from NOAA Space Weather Prediction Center - updated as source model frames are available.</p>
+      </section>
+      <br><br><!-- ===== Section- Aurora Forecast ===== -->
 		<section>
 		<h2 style="text-align:center">NOAA Aurora Forecast Models</h2>
 		<hr><div class="container">
@@ -600,6 +911,18 @@
 
     </main>
 
+    <div id="feed-zoom-overlay" class="zoom-overlay" role="dialog" aria-modal="true" aria-labelledby="feed-zoom-title">
+      <div class="zoom-panel">
+        <div class="zoom-header">
+          <h2 id="feed-zoom-title" style="margin:0">Feed Detail</h2>
+          <button id="feed-zoom-close" class="zoom-close" type="button">Close</button>
+        </div>
+        <img id="feed-zoom-image" src="" alt="">
+        <p id="feed-zoom-description" style="color:#fcf2dc"></p>
+        <p style="text-align:center"><a id="feed-zoom-source" class="button" href="#" target="_blank">Open source image</a></p>
+      </div>
+    </div>
+
     <!-- ===== Footer ===== -->
     <footer>
         <p>&copy; 2026 Frontier Signals. All rights reserved.</p>
@@ -609,6 +932,361 @@
         </p>
     </footer>
 
+    <script>
+      function toggleMediaFullscreen(element) {
+        if (!element) return;
+        if (document.fullscreenElement) {
+          if (document.exitFullscreen) document.exitFullscreen();
+          return;
+        }
+        if (element.requestFullscreen) element.requestFullscreen();
+        else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
+      }
+    </script>
+    <script>
+      (function() {
+        const endpoints = {
+          xray: 'https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json',
+          protons: 'https://services.swpc.noaa.gov/json/goes/primary/integral-protons-6-hour.json',
+          electrons: 'https://services.swpc.noaa.gov/json/goes/primary/integral-electrons-6-hour.json',
+          kp: 'https://services.swpc.noaa.gov/json/planetary_k_index_1m.json',
+          mag: 'https://services.swpc.noaa.gov/products/solar-wind/mag-2-hour.json',
+          plasma: 'https://services.swpc.noaa.gov/products/solar-wind/plasma-2-hour.json',
+          regions: 'https://services.swpc.noaa.gov/json/solar_regions.json',
+          probabilities: 'https://services.swpc.noaa.gov/json/solar_probabilities.json'
+        };
+
+        function setText(id, text) {
+          const el = document.getElementById(id);
+          if (el) el.textContent = text;
+        }
+        function latest(list, predicate = () => true) {
+          return Array.isArray(list) ? [...list].reverse().find(predicate) : null;
+        }
+        function firstAtLeastMinutesBack(list, latestItem, minutes, timeKey = 'time_tag') {
+          if (!latestItem || !Array.isArray(list)) return null;
+          const latestTime = new Date(latestItem[timeKey] || latestItem[0]).getTime();
+          const target = latestTime - minutes * 60 * 1000;
+          return [...list].reverse().find(item => new Date(item[timeKey] || item[0]).getTime() <= target) || list[0] || null;
+        }
+        function tableRowsToObjects(rows) {
+          if (!Array.isArray(rows) || rows.length < 2 || !Array.isArray(rows[0])) return [];
+          const headers = rows[0];
+          return rows.slice(1).map(row => Object.fromEntries(headers.map((key, index) => [key, row[index]])));
+        }
+        function fluxToClass(flux) {
+          const value = Number(flux);
+          if (!Number.isFinite(value) || value <= 0) return '--';
+          const bands = [
+            ['X', 1e-4],
+            ['M', 1e-5],
+            ['C', 1e-6],
+            ['B', 1e-7],
+            ['A', 1e-8]
+          ];
+          const band = bands.find(([, base]) => value >= base) || ['A', 1e-8];
+          return `${band[0]}${(value / band[1]).toFixed(value / band[1] >= 10 ? 0 : 1)}`;
+        }
+        function xrayRank(flux) {
+          const value = Number(flux);
+          if (!Number.isFinite(value)) return ['--', 'X-ray feed unavailable', 'unknown'];
+          if (value >= 2e-3) return ['R5', 'Extreme radio blackout', 'storm'];
+          if (value >= 1e-3) return ['R4', 'Severe radio blackout', 'storm'];
+          if (value >= 1e-4) return ['R3', 'Strong radio blackout', 'storm'];
+          if (value >= 5e-5) return ['R2', 'Moderate radio blackout', 'elevated'];
+          if (value >= 1e-5) return ['R1', 'Minor radio blackout', 'watch'];
+          return ['R0', 'No M/X-class radio blackout threshold', 'quiet'];
+        }
+        function protonRank(pfu) {
+          const value = Number(pfu);
+          if (!Number.isFinite(value)) return ['--', 'Proton feed unavailable', 'unknown'];
+          if (value >= 100000) return ['S5', 'Extreme radiation storm', 'storm'];
+          if (value >= 10000) return ['S4', 'Severe radiation storm', 'storm'];
+          if (value >= 1000) return ['S3', 'Strong radiation storm', 'storm'];
+          if (value >= 100) return ['S2', 'Moderate radiation storm', 'elevated'];
+          if (value >= 10) return ['S1', 'Minor radiation storm', 'watch'];
+          return ['S0', 'Below radiation storm threshold', 'quiet'];
+        }
+        function kpRank(kp) {
+          const value = Number(kp);
+          if (!Number.isFinite(value)) return ['--', 'Kp feed unavailable', 'unknown'];
+          if (value >= 9) return ['G5', 'Extreme geomagnetic storm', 'storm'];
+          if (value >= 8) return ['G4', 'Severe geomagnetic storm', 'storm'];
+          if (value >= 7) return ['G3', 'Strong geomagnetic storm', 'storm'];
+          if (value >= 6) return ['G2', 'Moderate geomagnetic storm', 'elevated'];
+          if (value >= 5) return ['G1', 'Minor geomagnetic storm', 'watch'];
+          return ['G0', 'Below geomagnetic storm threshold', 'quiet'];
+        }
+        function chargingRank(electronFlux) {
+          const value = Number(electronFlux);
+          if (!Number.isFinite(value)) return ['--', 'Electron charging proxy unavailable', 'unknown'];
+          if (value >= 10000) return ['High', 'Elevated >=2 MeV electron environment', 'storm'];
+          if (value >= 1000) return ['Watch', 'Enhanced satellite charging environment', 'elevated'];
+          if (value >= 100) return ['Low+', 'Mild charging proxy elevation', 'watch'];
+          return ['Low', 'Quiet charging proxy', 'quiet'];
+        }
+        function auroraRank(kp, bz) {
+          const k = Number(kp);
+          const b = Number(bz);
+          if (!Number.isFinite(k) && !Number.isFinite(b)) return ['--', 'Aurora inputs unavailable', 'unknown'];
+          if (k >= 7 || (k >= 6 && b <= -8)) return ['High', 'Aurora possible farther equatorward', 'storm'];
+          if (k >= 5 || (k >= 4 && b <= -6)) return ['Watch', 'Aurora favored at high latitudes', 'watch'];
+          return ['Quiet', 'Aurora mostly polar/high latitude', 'quiet'];
+        }
+        function badge(title, rank, note) {
+          const [label, description, tone] = rank;
+          return `<div class="alert-badge alert-${tone}"><strong>${title}: ${label}</strong>${description}<br><span style="color:#bbb">${note || ''}</span></div>`;
+        }
+        function deltaItem(label, now, previous, unit, precision = 1) {
+          const n = Number(now);
+          const p = Number(previous);
+          if (!Number.isFinite(n) || !Number.isFinite(p)) {
+            return `<div class="delta-item"><strong>${label}</strong>Unavailable</div>`;
+          }
+          const delta = n - p;
+          const sign = delta > 0 ? '+' : '';
+          return `<div class="delta-item"><strong>${label}</strong>${n.toFixed(precision)} ${unit} <span style="color:#00ffff">(${sign}${delta.toFixed(precision)} in 1h)</span></div>`;
+        }
+        async function getJson(url) {
+          const response = await fetch(url, { cache: 'no-store' });
+          if (!response.ok) throw new Error(`${response.status} ${url}`);
+          return response.json();
+        }
+
+        async function loadRiskConsole() {
+          const results = await Promise.allSettled(Object.entries(endpoints).map(async ([key, url]) => [key, await getJson(url)]));
+          const data = Object.fromEntries(results.filter(result => result.status === 'fulfilled').map(result => result.value));
+
+          const xrayLatest = latest(data.xray, item => item.energy === '0.1-0.8nm');
+          const xrayPrev = firstAtLeastMinutesBack((data.xray || []).filter(item => item.energy === '0.1-0.8nm'), xrayLatest, 60);
+          const protonLatest = latest(data.protons, item => item.energy === '>=10 MeV');
+          const protonPrev = firstAtLeastMinutesBack((data.protons || []).filter(item => item.energy === '>=10 MeV'), protonLatest, 60);
+          const electronLatest = latest(data.electrons, item => item.energy === '>=2 MeV');
+          const kpLatest = latest(data.kp);
+          const kpPrev = firstAtLeastMinutesBack(data.kp, kpLatest, 60);
+          const magRows = tableRowsToObjects(data.mag);
+          const plasmaRows = tableRowsToObjects(data.plasma);
+          const magLatest = latest(magRows);
+          const magPrev = firstAtLeastMinutesBack(magRows, magLatest, 60);
+          const plasmaLatest = latest(plasmaRows);
+          const plasmaPrev = firstAtLeastMinutesBack(plasmaRows, plasmaLatest, 60);
+
+          const xrayClass = fluxToClass(xrayLatest?.flux);
+          setText('risk-xray', xrayClass);
+          setText('risk-xray-note', xrayLatest ? `${Number(xrayLatest.flux).toExponential(2)} W/m2` : 'Unavailable');
+          setText('risk-proton', protonLatest ? Number(protonLatest.flux).toFixed(2) : '--');
+          setText('risk-proton-note', protonLatest ? '>=10 MeV pfu' : 'Unavailable');
+          setText('risk-kp', kpLatest ? Number(kpLatest.estimated_kp ?? kpLatest.kp_index).toFixed(1) : '--');
+          setText('risk-kp-note', kpLatest?.time_tag || 'Unavailable');
+          setText('risk-bz', magLatest ? `${Number(magLatest.bz_gsm).toFixed(1)} nT` : '--');
+          setText('risk-bz-note', magLatest ? `Bt ${Number(magLatest.bt).toFixed(1)} nT` : 'Unavailable');
+          setText('risk-speed', plasmaLatest ? Number(plasmaLatest.speed).toFixed(0) : '--');
+          setText('risk-speed-note', plasmaLatest ? `Density ${Number(plasmaLatest.density).toFixed(1)}/cm3` : 'Unavailable');
+
+          const kpValue = Number(kpLatest?.estimated_kp ?? kpLatest?.kp_index);
+          const bzValue = Number(magLatest?.bz_gsm);
+          const badges = [
+            badge('Radio Blackout', xrayRank(xrayLatest?.flux), xrayClass),
+            badge('Radiation Storm', protonRank(protonLatest?.flux), protonLatest ? `${Number(protonLatest.flux).toFixed(2)} pfu` : ''),
+            badge('Geomagnetic Storm', kpRank(kpValue), Number.isFinite(kpValue) ? `Kp ${kpValue.toFixed(1)}` : ''),
+            badge('Satellite Charging', chargingRank(electronLatest?.flux), electronLatest ? `>=2 MeV ${Number(electronLatest.flux).toFixed(0)}` : ''),
+            badge('Aurora', auroraRank(kpValue, bzValue), Number.isFinite(bzValue) ? `Bz ${bzValue.toFixed(1)} nT` : '')
+          ];
+          const badgeGrid = document.getElementById('space-alert-badges');
+          if (badgeGrid) badgeGrid.innerHTML = badges.join('');
+
+          const deltas = [
+            deltaItem('X-ray flux', xrayLatest?.flux, xrayPrev?.flux, 'W/m2', 8),
+            deltaItem('>=10 MeV protons', protonLatest?.flux, protonPrev?.flux, 'pfu', 2),
+            deltaItem('Kp estimate', kpLatest?.estimated_kp ?? kpLatest?.kp_index, kpPrev?.estimated_kp ?? kpPrev?.kp_index, '', 1),
+            deltaItem('Bz', magLatest?.bz_gsm, magPrev?.bz_gsm, 'nT', 1),
+            deltaItem('Solar wind speed', plasmaLatest?.speed, plasmaPrev?.speed, 'km/s', 0)
+          ];
+          const deltaGrid = document.getElementById('space-delta-grid');
+          if (deltaGrid) deltaGrid.innerHTML = deltas.join('');
+
+          renderActiveRegions(data.regions || [], data.probabilities || []);
+        }
+
+        function renderActiveRegions(regions, probabilities) {
+          const body = document.getElementById('active-region-body');
+          if (!body) return;
+          const currentDate = regions.reduce((max, item) => item.observed_date > max ? item.observed_date : max, '');
+          const current = regions
+            .filter(item => item.observed_date === currentDate)
+            .sort((a, b) => (b.x_flare_probability + b.m_flare_probability + b.area) - (a.x_flare_probability + a.m_flare_probability + a.area))
+            .slice(0, 12);
+          if (!current.length) {
+            body.innerHTML = '<tr><td colspan="7">No active-region rows available from SWPC.</td></tr>';
+          } else {
+            body.innerHTML = current.map(region => {
+              const trend = region.x_xray_events > 0 ? 'Recent X flare' :
+                region.m_xray_events > 0 ? 'Recent M flare' :
+                /G|D|BETA-GAMMA|DELTA/i.test(region.mag_class || region.mag_string || '') ? 'Complex field watch' :
+                region.area >= 300 ? 'Large region watch' :
+                'Monitor';
+              return `<tr>
+                <td><button class="region-link" type="button" data-region="${region.region || ''}">${region.region || '--'}</button></td>
+                <td>${region.location || '--'}</td>
+                <td>${region.mag_class || region.mag_string || '--'}</td>
+                <td>${region.spot_class || '--'}</td>
+                <td>${region.area ?? '--'}</td>
+                <td>${region.c_flare_probability ?? 0} / ${region.m_flare_probability ?? 0} / ${region.x_flare_probability ?? 0}</td>
+                <td>${trend}</td>
+              </tr>`;
+            }).join('');
+          }
+          const latestProb = Array.isArray(probabilities) ? probabilities[0] : null;
+          setText('region-probability-note', latestProb ?
+            `Global SWPC probabilities: C ${latestProb.c_class_1_day}% / M ${latestProb.m_class_1_day}% / X ${latestProb.x_class_1_day}% / >=10 MeV protons ${latestProb['10mev_protons_1_day']}%.` :
+            'Active regions loaded. Global probability feed unavailable.');
+          drawActiveRegionModel(current);
+          body.querySelectorAll('.region-link').forEach(button => {
+            button.addEventListener('click', () => {
+              document.getElementById('active-region-model-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              drawActiveRegionModel(current, Number(button.dataset.region));
+            });
+          });
+        }
+
+        function drawActiveRegionModel(regions, highlightRegion = null) {
+          const canvas = document.getElementById('activeRegionCanvas');
+          const status = document.getElementById('activeRegionModelStatus');
+          if (!canvas) return;
+          const ctx = canvas.getContext('2d');
+          const w = canvas.width;
+          const h = canvas.height;
+          const cx = w / 2;
+          const cy = h / 2;
+          const radius = Math.min(w, h) * 0.42;
+          ctx.clearRect(0, 0, w, h);
+          const gradient = ctx.createRadialGradient(cx - radius * 0.3, cy - radius * 0.35, radius * 0.1, cx, cy, radius);
+          gradient.addColorStop(0, '#fff6a5');
+          gradient.addColorStop(0.55, '#ff9d00');
+          gradient.addColorStop(1, '#5b1800');
+          ctx.fillStyle = '#000';
+          ctx.fillRect(0, 0, w, h);
+          ctx.beginPath();
+          ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+          ctx.fillStyle = gradient;
+          ctx.fill();
+          ctx.strokeStyle = '#00ffff';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+          ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+          ctx.lineWidth = 1;
+          for (let i = -60; i <= 60; i += 30) {
+            const y = cy - (i / 90) * radius;
+            ctx.beginPath();
+            ctx.ellipse(cx, y, radius * Math.cos(Math.abs(i) * Math.PI / 180), radius * 0.09, 0, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+          ctx.fillStyle = '#fcf2dc';
+          ctx.font = '16px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText('E limb', cx - radius - 45, cy);
+          ctx.fillText('W limb', cx + radius + 45, cy);
+          (regions || []).forEach(region => {
+            const lon = Number(region.longitude);
+            const lat = Number(region.latitude);
+            if (!Number.isFinite(lon) || !Number.isFinite(lat) || Math.abs(lon) > 90 || Math.abs(lat) > 90) return;
+            const x = cx + (lon / 90) * radius;
+            const y = cy - (lat / 90) * radius;
+            const isHighlight = Number(region.region) === highlightRegion;
+            ctx.beginPath();
+            ctx.arc(x, y, isHighlight ? 15 : 10, 0, Math.PI * 2);
+            ctx.fillStyle = isHighlight ? '#ff00ff' : '#00ffff';
+            ctx.fill();
+            ctx.strokeStyle = '#00131a';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.fillStyle = '#00131a';
+            ctx.font = isHighlight ? 'bold 16px Arial' : 'bold 12px Arial';
+            ctx.fillText(String(region.region), x, y - 16);
+          });
+          if (status) status.textContent = regions?.length ? `Plotted ${regions.length} current NOAA active regions.` : 'No current active-region rows available from NOAA.';
+        }
+
+        function clickControl(selector) {
+          const el = document.querySelector(selector);
+          if (el) el.click();
+          return Boolean(el);
+        }
+        function wireComparisonMode() {
+          const apply = document.getElementById('compare-apply');
+          const play = document.getElementById('compare-play');
+          const pause = document.getElementById('compare-pause');
+          const status = document.getElementById('compare-status');
+          if (!apply || !play || !pause) return;
+          apply.addEventListener('click', () => {
+            const sdo = document.getElementById('compare-sdo')?.value || '193';
+            const coronagraph = document.getElementById('compare-coronagraph')?.value || 'lasco-c2';
+            clickControl(`#sdo-selector button[data-channel="${sdo}"]`);
+            clickControl(`#coronagraph-selector button[data-feed="${coronagraph}"]`);
+            clickControl('#enlil-pause');
+            document.getElementById('sdo-tool-container')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (status) status.textContent = `Loaded CME comparison: SDO ${sdo} A, ${coronagraph.toUpperCase()}, ENLIL ready.`;
+          });
+          play.addEventListener('click', () => {
+            clickControl('#sdo-tool-play');
+            clickControl('#coronagraph-play');
+            clickControl('#enlil-play');
+            if (status) status.textContent = 'Playing SDO, coronagraph, and ENLIL viewers.';
+          });
+          pause.addEventListener('click', () => {
+            clickControl('#sdo-tool-pause');
+            clickControl('#coronagraph-pause');
+            clickControl('#enlil-pause');
+            if (status) status.textContent = 'Paused comparison viewers.';
+          });
+        }
+
+        loadRiskConsole().catch(error => {
+          console.error('Space weather risk console failed:', error);
+          setText('risk-xray', '--');
+          const badgeGrid = document.getElementById('space-alert-badges');
+          if (badgeGrid) badgeGrid.innerHTML = '<div class="alert-badge alert-unknown"><strong>Unavailable</strong>Live risk feeds could not be loaded from SWPC.</div>';
+        });
+        wireComparisonMode();
+      })();
+    </script>
+    <script>
+      (function() {
+        const overlay = document.getElementById('feed-zoom-overlay');
+        const title = document.getElementById('feed-zoom-title');
+        const image = document.getElementById('feed-zoom-image');
+        const description = document.getElementById('feed-zoom-description');
+        const source = document.getElementById('feed-zoom-source');
+        const close = document.getElementById('feed-zoom-close');
+
+        function closeZoom() {
+          overlay.classList.remove('open');
+          image.src = '';
+        }
+
+        document.addEventListener('click', event => {
+          const trigger = event.target.closest('.zoom-trigger');
+          if (!trigger || !overlay) return;
+          const src = trigger.dataset.zoomSrc;
+          title.textContent = trigger.dataset.zoomTitle || 'Feed Detail';
+          description.textContent = trigger.dataset.zoomDescription || '';
+          image.src = src;
+          image.alt = trigger.dataset.zoomTitle || 'Zoomed space weather feed';
+          source.href = src;
+          overlay.classList.add('open');
+        });
+
+        if (close) close.addEventListener('click', closeZoom);
+        if (overlay) {
+          overlay.addEventListener('click', event => {
+            if (event.target === overlay) closeZoom();
+          });
+        }
+        document.addEventListener('keydown', event => {
+          if (event.key === 'Escape' && overlay && overlay.classList.contains('open')) closeZoom();
+        });
+      })();
+    </script>
     <script>
        (function() {
         // ENLIL Player State
@@ -624,6 +1302,7 @@
         const pauseBtn = document.getElementById("enlil-pause");
         const prevBtn = document.getElementById("enlil-prev");
         const nextBtn = document.getElementById("enlil-next");
+        const fullscreenBtn = document.getElementById("enlil-fullscreen");
         const speedSelect = document.getElementById("enlil-speed");
         const slider = document.getElementById("enlil-slider");
         
@@ -633,8 +1312,10 @@
         let isPlaying = false;
         let playTimer = null;
         let playSpeed = Number(speedSelect.value);
+        let drawRaf = null;
+        let pendingFrameIndex = 0;
         
-        function drawFrame(index) {
+        function drawFrameNow(index) {
           if (frames.length === 0) return;
           
           currentIndex = Math.max(0, Math.min(index, frames.length - 1));
@@ -662,6 +1343,14 @@
             img.src = frameUrl;
           }
         }
+        function drawFrame(index) {
+          pendingFrameIndex = index;
+          if (drawRaf) return;
+          drawRaf = requestAnimationFrame(() => {
+            drawFrameNow(pendingFrameIndex);
+            drawRaf = null;
+          });
+        }
         
         function updateUI() {
           frameNum.textContent = currentIndex + 1;
@@ -672,7 +1361,7 @@
         function playAnimation() {
           if (isPlaying) return;
           isPlaying = true;
-          status.textContent = `▶ Playing (${frames.length} frames)`;
+          status.textContent = `Playing (${frames.length} frames)`;
           
           playTimer = setInterval(() => {
             currentIndex = (currentIndex + 1) % frames.length;
@@ -683,7 +1372,7 @@
         function pauseAnimation() {
           clearInterval(playTimer);
           isPlaying = false;
-          status.textContent = `⏸ Paused at frame ${currentIndex + 1}`;
+          status.textContent = `Paused at frame ${currentIndex + 1}`;
         }
         
         function updateSpeed() {
@@ -698,6 +1387,7 @@
         pauseBtn.addEventListener("click", pauseAnimation);
         prevBtn.addEventListener("click", () => drawFrame(currentIndex - 1));
         nextBtn.addEventListener("click", () => drawFrame(currentIndex + 1));
+        fullscreenBtn.addEventListener("click", () => toggleMediaFullscreen(canvas));
         speedSelect.addEventListener("change", updateSpeed);
         slider.addEventListener("input", () => drawFrame(Number(slider.value)));
         
@@ -710,17 +1400,17 @@
               .filter(Boolean);
             
             if (frames.length === 0) {
-              status.textContent = "❌ No frames available";
+              status.textContent = "No frames available";
               return;
             }
             
             slider.max = frames.length - 1;
             frameTotal.textContent = frames.length;
             drawFrame(0);
-            status.textContent = `✓ ENLIL loaded (${frames.length} frames)`;
+            status.textContent = `ENLIL loaded (${frames.length} frames)`;
           })
           .catch(err => {
-            status.textContent = "❌ Failed to load ENLIL";
+            status.textContent = "Failed to load ENLIL";
             console.error("ENLIL Error:", err);
             ctx.fillStyle = "#000";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -733,86 +1423,452 @@
       })(); 
     </script>
     <script>
-      // SDO Video Players
       (function() {
-        const videoIds = ['sdo-171', 'sdo-193', 'sdo-211', 'sdo-335', 'sdo-94', 'sdo-131', 'sdo-304', 'sdo-1600', 'sdo-1700', 'goes-coronagraph'];
-        const autoplayIds = ['sdo-171', 'sdo-193'];
-        
+        const channels = [
+          { id:'171', label:'171 A', title:'SDO 171 Angstrom - Quiet Corona and Coronal Loops', temp:'~0.6 million K', ion:'Fe IX', sees:'Fine coronal loops and quiet upper-atmosphere structure.', best:'Best for tracing graceful magnetic loop systems around active regions.', video:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0171.mp4', field:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_4096_0171pfss.jpg' },
+          { id:'193', label:'193 A', title:'SDO 193 Angstrom - Corona, Coronal Holes, Hot Flares', temp:'~1.25 million K; much hotter flare component', ion:'Fe XII and flare Fe XXIV', sees:'Corona, bright active regions, CMEs, and dark coronal holes.', best:'Best all-around channel for coronal holes and Earth-facing high-speed solar wind sources.', video:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0193.mp4', field:'https://sdo.gsfc.nasa.gov/assets/img/latest/f_094_335_193pfss.jpg' },
+          { id:'211', label:'211 A', title:'SDO 211 Angstrom - Hot Active Corona', temp:'~2 million K', ion:'Fe XIV', sees:'Hotter coronal loops, active regions, and coronal holes.', best:'Best for strong contrast between hot active structures and open-field coronal holes.', video:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0211.mp4', field:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0211pfss.jpg' },
+          { id:'335', label:'335 A', title:'SDO 335 Angstrom - Very Hot Active Regions', temp:'~2.5 million K', ion:'Fe XVI', sees:'Very hot active-region plasma in the corona.', best:'Best for mature, hot active regions after heating events.', video:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0335.mp4', field:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0335pfss.jpg' },
+          { id:'94', label:'94 A', title:'SDO 94 Angstrom - Flaring Corona', temp:'~6 million K', ion:'Fe XVIII', sees:'Extremely hot flare loops and compact energy-release regions.', best:'Best for identifying flare-heated plasma that may be faint in cooler channels.', video:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0094.mp4', field:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0094pfss.jpg' },
+          { id:'131', label:'131 A', title:'SDO 131 Angstrom - Hottest Flare Plasma', temp:'~10 million K flare plasma; cooler transition component also present', ion:'Fe VIII / Fe XXI', sees:'Very hot flare cores, flare loops, and rapid energy release.', best:'Best for intense flares and the hottest post-flare loop systems.', video:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0131.mp4', field:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0131pfss.jpg' },
+          { id:'304', label:'304 A', title:'SDO 304 Angstrom - Prominences and Filaments', temp:'~50,000 K', ion:'He II', sees:'Cooler dense plasma in the chromosphere and transition region.', best:'Best for prominences, filaments, surges, jets, and material leaving or falling back to the Sun.', video:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304.mp4', field:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304pfss.jpg' },
+          { id:'1600', label:'1600 A', title:'SDO 1600 Angstrom - Upper Photosphere and Flare Ribbons', temp:'~10,000 K plus transition-region C IV', ion:'UV continuum + C IV', sees:'Upper photosphere, transition-region brightenings, sunspots, and flare ribbons.', best:'Best for flare ribbons and active-region footpoints close to the solar surface.', video:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1600.mp4', field:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1600pfss.jpg' },
+          { id:'1700', label:'1700 A', title:'SDO 1700 Angstrom - Lower Atmosphere and Surface Network', temp:'~6,000 K', ion:'UV continuum', sees:'Photosphere/lower chromosphere texture, bright magnetic network, and sunspot surroundings.', best:'Best for comparing surface magnetic structure with hotter coronal channels.', video:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1700.mp4', field:'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1700pfss.jpg' }
+        ];
+
         function formatTime(seconds) {
           const mins = Math.floor(seconds / 60);
           const secs = Math.floor(seconds % 60);
           return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
-        
-        function initVideoPlayer(videoId) {
-          const video = document.getElementById(videoId);
-          const playBtn = document.getElementById(videoId + '-play');
-          const pauseBtn = document.getElementById(videoId + '-pause');
-          const prevBtn = document.getElementById(videoId + '-prev');
-          const nextBtn = document.getElementById(videoId + '-next');
-          const speedSelect = document.getElementById(videoId + '-speed');
-          const slider = document.getElementById(videoId + '-slider');
-          const timeSpan = document.getElementById(videoId + '-time');
-          const durationSpan = document.getElementById(videoId + '-duration');
-          
-          let isPlaying = false;
-          
+
+        function initVideoControls(config) {
+          const video = document.getElementById(config.videoId);
+          if (!video) return;
+          const playBtn = document.getElementById(config.prefix + '-play');
+          const pauseBtn = document.getElementById(config.prefix + '-pause');
+          const prevBtn = document.getElementById(config.prefix + '-prev');
+          const nextBtn = document.getElementById(config.prefix + '-next');
+          const fullscreenBtn = document.getElementById(config.prefix + '-fullscreen');
+          const speedSelect = document.getElementById(config.prefix + '-speed');
+          const slider = document.getElementById(config.prefix + '-slider');
+          const timeSpan = document.getElementById(config.prefix + '-time');
+          const durationSpan = document.getElementById(config.prefix + '-duration');
+          const wrapper = document.getElementById(config.containerId);
+          let isScrubbing = false;
+          let pendingSeek = null;
+          let seekRaf = null;
+
           function updateUI() {
-            timeSpan.textContent = formatTime(video.currentTime);
-            durationSpan.textContent = formatTime(video.duration || 0);
-            slider.value = video.duration ? (video.currentTime / video.duration) * 100 : 0;
+            if (timeSpan) timeSpan.textContent = formatTime(video.currentTime || 0);
+            if (durationSpan) durationSpan.textContent = formatTime(video.duration || 0);
+            if (slider && !isScrubbing) slider.value = video.duration ? (video.currentTime / video.duration) * 100 : 0;
           }
-          
-          function playVideo() {
-            video.play();
-            isPlaying = true;
+          function commitSeek(value) {
+            if (!video.duration) return;
+            pendingSeek = (Number(value) / 100) * video.duration;
+            if (seekRaf) return;
+            seekRaf = requestAnimationFrame(() => {
+              video.currentTime = Math.max(0, Math.min(pendingSeek, video.duration || 0));
+              seekRaf = null;
+            });
           }
-          
-          function pauseVideo() {
-            video.pause();
-            isPlaying = false;
-          }
-          
           function stepFrame(direction) {
-            // Assume 24 fps for frame stepping
             const frameDuration = 1 / 24;
-            const newTime = video.currentTime + (direction * frameDuration);
-            video.currentTime = Math.max(0, Math.min(newTime, video.duration || 0));
+            video.currentTime = Math.max(0, Math.min(video.currentTime + direction * frameDuration, video.duration || 0));
           }
-          
-          function updateSpeed() {
-            video.playbackRate = parseFloat(speedSelect.value);
+          if (playBtn) playBtn.addEventListener('click', () => video.play());
+          if (pauseBtn) pauseBtn.addEventListener('click', () => video.pause());
+          if (prevBtn) prevBtn.addEventListener('click', () => stepFrame(-1));
+          if (nextBtn) nextBtn.addEventListener('click', () => stepFrame(1));
+          if (speedSelect) speedSelect.addEventListener('change', () => { video.playbackRate = parseFloat(speedSelect.value); });
+          if (slider) {
+            slider.addEventListener('pointerdown', () => { isScrubbing = true; });
+            slider.addEventListener('pointerup', () => { isScrubbing = false; commitSeek(slider.value); updateUI(); });
+            slider.addEventListener('change', () => { isScrubbing = false; commitSeek(slider.value); updateUI(); });
+            slider.addEventListener('input', () => {
+              if (timeSpan && video.duration) timeSpan.textContent = formatTime((Number(slider.value) / 100) * video.duration);
+              commitSeek(slider.value);
+            });
           }
-          
-          function seekToPosition() {
-            const seekTime = (slider.value / 100) * (video.duration || 0);
-            video.currentTime = seekTime;
+          if (fullscreenBtn && wrapper) {
+            fullscreenBtn.addEventListener('click', () => {
+              toggleMediaFullscreen(video);
+            });
           }
-          
-          // Event listeners
-          playBtn.addEventListener('click', playVideo);
-          pauseBtn.addEventListener('click', pauseVideo);
-          prevBtn.addEventListener('click', () => stepFrame(-1));
-          nextBtn.addEventListener('click', () => stepFrame(1));
-          speedSelect.addEventListener('change', updateSpeed);
-          slider.addEventListener('input', seekToPosition);
-          
-          // Video events
-          video.addEventListener('loadedmetadata', () => {
-            updateUI();
-            if (autoplayIds.includes(videoId)) {
-              playVideo();
-            }
-          });
-          
+          video.addEventListener('loadedmetadata', updateUI);
           video.addEventListener('timeupdate', updateUI);
-          video.addEventListener('ended', () => {
-            isPlaying = false;
+          updateUI();
+        }
+
+        const selector = document.getElementById('sdo-selector');
+        const video = document.getElementById('sdo-tool-video');
+        const source = document.getElementById('sdo-tool-source');
+        const title = document.getElementById('sdo-title');
+        const summaryTitle = document.getElementById('sdo-summary-title');
+        const description = document.getElementById('sdo-description');
+        const characteristics = document.getElementById('sdo-characteristics');
+        const fieldTitle = document.getElementById('sdo-field-title');
+        const fieldImage = document.getElementById('sdo-field-image');
+        const videoLink = document.getElementById('sdo-video-source-link');
+        const fieldLink = document.getElementById('sdo-field-source-link');
+
+        function selectChannel(channelId) {
+          const channel = channels.find(item => item.id === channelId) || channels[0];
+          title.textContent = channel.title;
+          summaryTitle.textContent = channel.label + ' Channel Guide';
+          description.textContent = channel.sees;
+          characteristics.innerHTML = [
+            `<div class="sdo-chip"><strong>Temperature:</strong> ${channel.temp}</div>`,
+            `<div class="sdo-chip"><strong>Main emission:</strong> ${channel.ion}</div>`,
+            `<div class="sdo-chip"><strong>Distinguishing use:</strong> ${channel.best}</div>`
+          ].join('');
+          source.src = channel.video;
+          videoLink.href = channel.video;
+          video.load();
+          video.play().catch(() => {});
+          fieldTitle.textContent = channel.label + ' Magnetic Field-Line Overlay';
+          fieldImage.src = channel.field;
+          fieldImage.alt = channel.label + ' magnetic field-line overlay';
+          fieldLink.href = channel.field;
+          selector.querySelectorAll('button').forEach(button => {
+            button.classList.toggle('active', button.dataset.channel === channel.id);
           });
         }
-        
-        // Initialize all video players
-        videoIds.forEach(initVideoPlayer);
+
+        if (selector && video) {
+          selector.innerHTML = channels.map(channel => `<button type="button" data-channel="${channel.id}">${channel.label}</button>`).join('');
+          selector.addEventListener('click', event => {
+            const button = event.target.closest('button[data-channel]');
+            if (button) selectChannel(button.dataset.channel);
+          });
+          initVideoControls({ videoId:'sdo-tool-video', prefix:'sdo-tool', containerId:'sdo-tool-container' });
+          selectChannel('171');
+        }
+      })();
+    </script>
+    <script>
+      (function() {
+        const feeds = [
+          {
+            id:'ccor1',
+            label:'GOES-19 CCOR-1',
+            type:'video',
+            title:'GOES-19 CCOR-1 Coronagraph',
+            source:'https://services.swpc.noaa.gov/products/ccor1/mp4s/ccor1_last_24hrs.mp4',
+            description:'CCOR-1 watches the low-to-middle corona from the GOES-19 platform. It is useful for near-real-time CME detection close to the Sun.',
+            traits:['Best for: current operational CME monitoring.', 'Field of view: inner/near corona compared with LASCO C3.', 'Look for: expanding bright fronts, streamer deflections, and halo-like ejecta.']
+          },
+          {
+            id:'lasco-c2',
+            label:'LASCO C2',
+            type:'frames',
+            title:'SOHO LASCO C2',
+            source:'https://services.swpc.noaa.gov/products/animations/lasco-c2.json',
+            description:'LASCO C2 images the inner and middle corona farther from the solar disk than EUV imagers. It is a classic CME tracking view.',
+            traits:['Best for: CME emergence and early outward expansion.', 'Field of view: closer corona than C3.', 'Look for: expanding arcs, jets, streamer blowouts, and partial halos.']
+          },
+          {
+            id:'lasco-c3',
+            label:'LASCO C3',
+            type:'frames',
+            title:'SOHO LASCO C3',
+            source:'https://services.swpc.noaa.gov/products/animations/lasco-c3.json',
+            description:'LASCO C3 has a wider field of view than C2, making it useful for following CMEs farther into the heliosphere.',
+            traits:['Best for: tracking CME propagation after it leaves the C2 field.', 'Field of view: wider outer corona.', 'Look for: large halo CMEs, solar wind structures, and bright planets/stars crossing the view.']
+          }
+        ];
+
+        const selector = document.getElementById('coronagraph-selector');
+        const video = document.getElementById('coronagraph-video');
+        const source = document.getElementById('coronagraph-source');
+        const canvas = document.getElementById('coronagraph-canvas');
+        const ctx = canvas ? canvas.getContext('2d') : null;
+        const title = document.getElementById('coronagraph-title');
+        const guideTitle = document.getElementById('coronagraph-guide-title');
+        const description = document.getElementById('coronagraph-description');
+        const characteristics = document.getElementById('coronagraph-characteristics');
+        const sourceLink = document.getElementById('coronagraph-source-link');
+        const status = document.getElementById('coronagraph-status');
+        const prevBtn = document.getElementById('coronagraph-prev');
+        const playBtn = document.getElementById('coronagraph-play');
+        const pauseBtn = document.getElementById('coronagraph-pause');
+        const nextBtn = document.getElementById('coronagraph-next');
+        const fullscreenBtn = document.getElementById('coronagraph-fullscreen');
+        const speedSelect = document.getElementById('coronagraph-speed');
+        const slider = document.getElementById('coronagraph-slider');
+        const timeSpan = document.getElementById('coronagraph-time');
+        const durationSpan = document.getElementById('coronagraph-duration');
+        const wrapper = document.getElementById('coronagraph-container');
+        let mode = 'video';
+        let frames = [];
+        let cache = {};
+        let index = 0;
+        let timer = null;
+        let imageLoadToken = 0;
+        let videoSeekRaf = null;
+        let videoPendingSeek = null;
+        let videoScrubbing = false;
+        let frameDrawRaf = null;
+        let framePendingIndex = 0;
+        let diffRaf = null;
+        let previousDiffFrame = null;
+
+        function formatTime(seconds) {
+          const mins = Math.floor(seconds / 60);
+          const secs = Math.floor(seconds % 60);
+          return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        function setStatus(text) {
+          if (status) status.textContent = text;
+        }
+        function updateGuide(feed) {
+          title.textContent = feed.title;
+          guideTitle.textContent = feed.label + ' Guide';
+          description.textContent = feed.description;
+          characteristics.innerHTML = feed.traits.map(item => `<div class="sdo-chip">${item}</div>`).join('');
+          sourceLink.href = feed.source;
+          selector.querySelectorAll('button').forEach(button => button.classList.toggle('active', button.dataset.feed === feed.id));
+        }
+        function stopDiffRenderer() {
+          if (diffRaf) cancelAnimationFrame(diffRaf);
+          diffRaf = null;
+          previousDiffFrame = null;
+        }
+        function startDiffRenderer() {
+          stopDiffRenderer();
+          canvas.width = 720;
+          canvas.height = 720;
+          const draw = () => {
+            if (mode !== 'video-diff') return;
+            try {
+              if (video.readyState >= 2) {
+                const w = canvas.width;
+                const h = canvas.height;
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.filter = 'contrast(1.3) brightness(1.15)';
+                ctx.drawImage(video, 0, 0, w, h);
+                const current = ctx.getImageData(0, 0, w, h);
+                if (previousDiffFrame) {
+                  const diff = ctx.createImageData(w, h);
+                  for (let i = 0; i < current.data.length; i += 4) {
+                    diff.data[i] = Math.abs(current.data[i] - previousDiffFrame.data[i]) * 2.4;
+                    diff.data[i + 1] = Math.abs(current.data[i + 1] - previousDiffFrame.data[i + 1]) * 2.4;
+                    diff.data[i + 2] = Math.abs(current.data[i + 2] - previousDiffFrame.data[i + 2]) * 2.4;
+                    diff.data[i + 3] = 255;
+                  }
+                  ctx.filter = 'none';
+                  ctx.putImageData(diff, 0, 0);
+                }
+                previousDiffFrame = current;
+              }
+              diffRaf = requestAnimationFrame(draw);
+            } catch (error) {
+              stopDiffRenderer();
+              setStatus('Generated DIFF view is blocked by video canvas permissions; showing standard CCOR-1 video instead.');
+              mode = 'video';
+              canvas.style.display = 'none';
+              video.style.display = 'block';
+            }
+          };
+          diffRaf = requestAnimationFrame(draw);
+        }
+        function showVideo(feed, useDifference = false) {
+          mode = useDifference ? 'video-diff' : 'video';
+          clearInterval(timer);
+          stopDiffRenderer();
+          imageLoadToken += 1;
+          frames = [];
+          cache = {};
+          canvas.style.display = useDifference ? 'block' : 'none';
+          video.style.display = useDifference ? 'none' : 'block';
+          video.crossOrigin = 'anonymous';
+          source.src = feed.source;
+          video.load();
+          video.play().catch(() => {});
+          slider.min = 0;
+          slider.max = 100;
+          slider.value = 0;
+          setStatus(useDifference ? 'Generated running-difference view selected.' : 'Video feed selected.');
+          if (useDifference) {
+            video.addEventListener('loadeddata', startDiffRenderer, { once: true });
+            if (video.readyState >= 2) startDiffRenderer();
+          }
+        }
+        function commitVideoSeek(value) {
+          if (!video.duration) return;
+          videoPendingSeek = (Number(value) / 100) * video.duration;
+          if (videoSeekRaf) return;
+          videoSeekRaf = requestAnimationFrame(() => {
+            video.currentTime = Math.max(0, Math.min(videoPendingSeek, video.duration || 0));
+            videoSeekRaf = null;
+          });
+        }
+        function drawImageFrame(nextIndex, useDifference) {
+          if (!frames.length || !ctx) return;
+          index = Math.max(0, Math.min(nextIndex, frames.length - 1));
+          const url = frames[index];
+          const token = imageLoadToken;
+          const draw = (img, prevImg) => {
+            if (token !== imageLoadToken) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (useDifference && prevImg) {
+              ctx.filter = 'contrast(1.45) brightness(1.15)';
+              ctx.globalAlpha = 1;
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              ctx.globalCompositeOperation = 'difference';
+              ctx.drawImage(prevImg, 0, 0, canvas.width, canvas.height);
+              ctx.globalCompositeOperation = 'source-over';
+              ctx.filter = 'none';
+            } else {
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            }
+            slider.value = index;
+            timeSpan.textContent = String(index + 1);
+            durationSpan.textContent = String(frames.length);
+          };
+          const prevUrl = frames[Math.max(0, index - 1)];
+          if (cache[url] && (!useDifference || cache[prevUrl])) {
+            draw(cache[url], useDifference ? cache[prevUrl] : null);
+            return;
+          }
+          Promise.all([url, useDifference ? prevUrl : null].filter(Boolean).map(loadFrameImage))
+            .then(images => draw(images[0], useDifference ? images[1] : null))
+            .catch(() => setStatus('Frame failed to load from source.'));
+        }
+        function drawFrame(nextIndex) {
+          framePendingIndex = nextIndex;
+          if (frameDrawRaf) return;
+          frameDrawRaf = requestAnimationFrame(() => {
+            drawImageFrame(framePendingIndex, mode === 'diff-frames');
+            frameDrawRaf = null;
+          });
+        }
+        function loadFrameImage(url) {
+          if (cache[url]) return Promise.resolve(cache[url]);
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => { cache[url] = img; resolve(img); };
+            img.onerror = reject;
+            img.src = url;
+          });
+        }
+        function showFrames(feed, useDifference = false) {
+          mode = useDifference ? 'diff-frames' : 'frames';
+          clearInterval(timer);
+          stopDiffRenderer();
+          imageLoadToken += 1;
+          video.pause();
+          video.style.display = 'none';
+          canvas.style.display = 'block';
+          setStatus(useDifference ? 'Loading frames for generated running-difference view...' : 'Loading frame sequence...');
+          fetch(feed.source)
+            .then(response => response.json())
+            .then(data => {
+              frames = data.map(item => item.url ? 'https://services.swpc.noaa.gov' + item.url : null).filter(Boolean);
+              cache = {};
+              index = 0;
+              slider.min = 0;
+              slider.max = Math.max(0, frames.length - 1);
+              if (!frames.length) {
+                setStatus('No frames available from source.');
+                if (feed.fallbackVideo) showVideo({ ...feed, source: feed.fallbackVideo });
+                return;
+              }
+              drawFrame(0);
+              preloadNearbyFrames(0);
+              setStatus(useDifference ? `Generated DIFF mode loaded (${frames.length} source frames).` : `Loaded ${frames.length} frames.`);
+            })
+            .catch(error => {
+              console.error('Coronagraph frame feed failed:', error);
+              if (feed.fallbackVideo) {
+                setStatus('DIFF frame source failed; falling back to standard CCOR-1 video.');
+                showVideo({ ...feed, source: feed.fallbackVideo });
+              } else {
+                setStatus('Failed to load frame feed.');
+              }
+            });
+        }
+        function preloadNearbyFrames(center) {
+          for (let offset = 1; offset <= 4; offset += 1) {
+            const next = frames[center + offset];
+            const prev = frames[center - offset];
+            if (next) loadFrameImage(next).catch(() => {});
+            if (prev) loadFrameImage(prev).catch(() => {});
+          }
+        }
+        function selectFeed(feedId) {
+          const feed = feeds.find(item => item.id === feedId) || feeds[0];
+          updateGuide(feed);
+          if (feed.type === 'video' || feed.type === 'video-diff') showVideo(feed, feed.type === 'video-diff');
+          else showFrames(feed, feed.type === 'diff-frames');
+        }
+        function play() {
+          if (mode === 'video' || mode === 'video-diff') {
+            video.play();
+            if (mode === 'video-diff' && !diffRaf) startDiffRenderer();
+            return;
+          }
+          clearInterval(timer);
+          timer = setInterval(() => {
+            const next = (index + 1) % frames.length;
+            drawFrame(next);
+            preloadNearbyFrames(next);
+          }, Number(speedSelect.value));
+        }
+        function pause() {
+          if (mode === 'video' || mode === 'video-diff') video.pause();
+          clearInterval(timer);
+        }
+        function step(direction) {
+          if (mode === 'video' || mode === 'video-diff') {
+            video.currentTime = Math.max(0, Math.min(video.currentTime + direction / 24, video.duration || 0));
+            previousDiffFrame = null;
+          } else {
+            drawFrame(index + direction);
+            preloadNearbyFrames(index + direction);
+          }
+        }
+        function updateVideoUI() {
+          if (mode !== 'video' && mode !== 'video-diff') return;
+          timeSpan.textContent = formatTime(video.currentTime || 0);
+          durationSpan.textContent = formatTime(video.duration || 0);
+          if (!videoScrubbing) slider.value = video.duration ? (video.currentTime / video.duration) * 100 : 0;
+        }
+
+        if (!selector || !video || !canvas) return;
+        selector.innerHTML = feeds.map(feed => `<button type="button" data-feed="${feed.id}">${feed.label}</button>`).join('');
+        selector.addEventListener('click', event => {
+          const button = event.target.closest('button[data-feed]');
+          if (button) selectFeed(button.dataset.feed);
+        });
+        playBtn.addEventListener('click', play);
+        pauseBtn.addEventListener('click', pause);
+        prevBtn.addEventListener('click', () => step(-1));
+        nextBtn.addEventListener('click', () => step(1));
+        slider.addEventListener('input', () => {
+          if (mode === 'video' || mode === 'video-diff') {
+            videoScrubbing = true;
+            if (video.duration) timeSpan.textContent = formatTime((Number(slider.value) / 100) * video.duration);
+            commitVideoSeek(slider.value);
+            previousDiffFrame = null;
+          } else {
+            drawFrame(Number(slider.value));
+            preloadNearbyFrames(Number(slider.value));
+          }
+        });
+        slider.addEventListener('pointerup', () => { videoScrubbing = false; if (mode === 'video' || mode === 'video-diff') commitVideoSeek(slider.value); });
+        slider.addEventListener('change', () => { videoScrubbing = false; if (mode === 'video' || mode === 'video-diff') commitVideoSeek(slider.value); });
+        speedSelect.addEventListener('change', () => { if (timer) play(); });
+        fullscreenBtn.addEventListener('click', () => {
+          const activeMedia = (mode === 'video' || mode === 'video-diff') ? video : canvas;
+          toggleMediaFullscreen(activeMedia);
+        });
+        video.addEventListener('loadedmetadata', updateVideoUI);
+        video.addEventListener('timeupdate', updateVideoUI);
+        video.addEventListener('error', () => setStatus('Video feed failed to load. Try another coronagraph tab or open the source feed.'));
+        selectFeed('ccor1');
       })();
     </script>
     <script src="script.js"></script>

@@ -639,12 +639,46 @@
                 return match ? match.name : 'Other / ungrouped';
             }
 
-            function parseUpdateAgeDays(updated) {
-                const text = String(updated || '');
-                if (!text) return 999;
-                const parsed = Date.parse(text.replace(/\b(\d{1,2})\s+([A-Za-z]{3,})\s+(\d{4})\b/, '$1 $2 $3'));
-                if (Number.isNaN(parsed)) return 90;
-                return Math.max(0, Math.round((Date.now() - parsed) / 86400000));
+            function parseVolcanoDateText(value) {
+                const text = String(value || '').replace(/\s+/g, ' ').trim();
+                if (!text) return 0;
+
+                const isoMatch = text.match(/\b(20\d{2})-(\d{1,2})-(\d{1,2})\b/);
+                if (isoMatch) {
+                    const parsed = Date.UTC(Number(isoMatch[1]), Number(isoMatch[2]) - 1, Number(isoMatch[3]));
+                    if (Number.isFinite(parsed)) return parsed;
+                }
+
+                const dayMonthYear = text.match(/\b(\d{1,2})\s+([A-Za-z]{3,9})\.?\s+(20\d{2})(?:\s+(\d{1,2}):(\d{2}))?\b/);
+                if (dayMonthYear) {
+                    const parsed = Date.parse(`${dayMonthYear[1]} ${dayMonthYear[2]} ${dayMonthYear[3]} ${dayMonthYear[4] || '12'}:${dayMonthYear[5] || '00'} UTC`);
+                    if (!Number.isNaN(parsed)) return parsed;
+                }
+
+                const monthDayYear = text.match(/\b([A-Za-z]{3,9})\.?\s+(\d{1,2}),\s*(20\d{2})(?:\s+(\d{1,2}):(\d{2}))?\b/);
+                if (monthDayYear) {
+                    const parsed = Date.parse(`${monthDayYear[1]} ${monthDayYear[2]} ${monthDayYear[3]} ${monthDayYear[4] || '12'}:${monthDayYear[5] || '00'} UTC`);
+                    if (!Number.isNaN(parsed)) return parsed;
+                }
+
+                const dayMonthOnly = text.match(/\b(\d{1,2})\s+([A-Za-z]{3,9})\.?\b/);
+                if (dayMonthOnly) {
+                    const now = new Date();
+                    let parsed = Date.parse(`${dayMonthOnly[1]} ${dayMonthOnly[2]} ${now.getUTCFullYear()} 12:00 UTC`);
+                    if (!Number.isNaN(parsed) && parsed - Date.now() > 7 * 86400000) {
+                        parsed = Date.parse(`${dayMonthOnly[1]} ${dayMonthOnly[2]} ${now.getUTCFullYear() - 1} 12:00 UTC`);
+                    }
+                    if (!Number.isNaN(parsed)) return parsed;
+                }
+
+                const fallback = Date.parse(text);
+                return Number.isNaN(fallback) ? 0 : fallback;
+            }
+
+            function parseUpdateAgeDays(volcano) {
+                const parsed = updateTimestamp(volcano);
+                if (!parsed) return 999;
+                return Math.max(0, Math.floor((Date.now() - parsed) / 86400000));
             }
 
             function calculateWatchPriority(volcano) {
@@ -655,7 +689,7 @@
                 if (volcano.tags.includes('deformation')) score += 8;
                 if (volcano.tags.includes('secondary hazard')) score += 6;
                 score += Math.min(15, volcano.reactivationScore * 3);
-                const age = parseUpdateAgeDays(volcano.updated);
+                const age = parseUpdateAgeDays(volcano);
                 if (age <= 3) score += 10;
                 else if (age <= 14) score += 6;
                 else if (age <= 45) score += 3;
@@ -663,9 +697,7 @@
             }
 
             function updateTimestamp(volcano) {
-                const text = String(volcano.updated || '');
-                const parsed = Date.parse(text.replace(/\b(\d{1,2})\s+([A-Za-z]{3,})\s+(\d{4})\b/, '$1 $2 $3'));
-                return Number.isNaN(parsed) ? 0 : parsed;
+                return volcano.updateTime || parseVolcanoDateText([volcano.updated, volcano.description, volcano.status].join(' '));
             }
 
             function priorityClass(score) {
@@ -811,13 +843,19 @@
 
             function renderDashboard() {
                 const all = Object.values(volcanoCards);
+                const newestSort = (a, b) => updateTimestamp(b) - updateTimestamp(a) || b.priority - a.priority || b.level - a.level || a.name.localeCompare(b.name);
                 const urgentSort = (a, b) => b.priority - a.priority || updateTimestamp(b) - updateTimestamp(a) || b.level - a.level || a.name.localeCompare(b.name);
                 const active = all.filter(v => v.level >= 2 || v.ash || v.reactivationScore > 0 || v.priority >= 35);
-                const daily = active.filter(v => parseUpdateAgeDays(v.updated) <= 2).sort(urgentSort).slice(0, 7);
-                const weekly = active.filter(v => parseUpdateAgeDays(v.updated) <= 7).sort(urgentSort).slice(0, 9);
-                const monthly = active.filter(v => parseUpdateAgeDays(v.updated) <= 31).sort(urgentSort).slice(0, 10);
+                const datedActive = active.filter(v => updateTimestamp(v));
+                const daily = active.filter(v => parseUpdateAgeDays(v) <= 2).sort(newestSort).slice(0, 7);
+                const weekly = active.filter(v => parseUpdateAgeDays(v) <= 7).sort(newestSort).slice(0, 9);
+                const monthly = active.filter(v => parseUpdateAgeDays(v) <= 31).sort(newestSort).slice(0, 10);
+                const latestFallback = datedActive.sort(newestSort);
+                const dailyItems = daily.length ? daily : latestFallback.slice(0, 7);
+                const weeklyItems = weekly.length ? weekly : latestFallback.slice(0, 9);
+                const monthlyItems = monthly.length ? monthly : latestFallback.slice(0, 10);
                 const regions = {};
-                monthly.forEach(v => {
+                monthlyItems.forEach(v => {
                     const region = v.hazardGroup || 'Other / ungrouped';
                     regions[region] = (regions[region] || 0) + 1;
                 });
@@ -827,9 +865,9 @@
                 const dailyEl = document.getElementById('daily-volcano-list');
                 const weeklyEl = document.getElementById('weekly-volcano-list');
                 const monthlyEl = document.getElementById('monthly-volcano-list');
-                if (dailyEl) dailyEl.innerHTML = daily.length ? renderItems(daily) : '<li>No 48-hour priority reports parsed from the loaded feed.</li>';
-                if (weeklyEl) weeklyEl.innerHTML = weekly.length ? renderItems(weekly) : '<li>No 7-day unrest or eruption reports parsed from the loaded feed.</li>';
-                if (monthlyEl) monthlyEl.innerHTML = (monthly.length ? renderItems(monthly.slice(0, 6)) : '<li>No 31-day activity reports parsed from the loaded feed.</li>') + (regional.length ? `<li><strong>Regional concentration:</strong> ${regional.map(([region, count]) => `${escapeHtml(region)} ${count}`).join('; ')}</li>` : '');
+                if (dailyEl) dailyEl.innerHTML = dailyItems.length ? renderItems(dailyItems) : '<li>No dated priority reports were parsed from the loaded feed.</li>';
+                if (weeklyEl) weeklyEl.innerHTML = weeklyItems.length ? renderItems(weeklyItems) : '<li>No dated unrest or eruption reports were parsed from the loaded feed.</li>';
+                if (monthlyEl) monthlyEl.innerHTML = (monthlyItems.length ? renderItems(monthlyItems.slice(0, 6)) : '<li>No dated activity reports were parsed from the loaded feed.</li>') + (regional.length ? `<li><strong>Regional concentration:</strong> ${regional.map(([region, count]) => `${escapeHtml(region)} ${count}`).join('; ')}</li>` : '');
             }
 
             function renderVolcanoList() {
@@ -879,15 +917,20 @@
                     info.status = statusSpan.textContent.trim();
                 }
 
-                const text = (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
-                const updateMatch = text.match(/Last update:\s*([^\n\r]+)/i);
+                const rawText = doc.body.textContent || '';
+                const text = rawText.replace(/\s+/g, ' ').trim();
+                const updateMatch = text.match(/Last update:\s*([^()]*?\b(?:20\d{2}|\d{1,2}\s+[A-Za-z]{3,9}|[A-Za-z]{3,9}\s+\d{1,2}(?:,\s*20\d{2})?)[^A-Za-z0-9]*)/i);
                 if (updateMatch) {
                     info.updated = updateMatch[1].replace(/More details.*$/i, '').trim();
+                }
+                if (!info.updated) {
+                    const dateMatch = text.match(/\b(?:20\d{2}-\d{1,2}-\d{1,2}|\d{1,2}\s+[A-Za-z]{3,9}\s+20\d{2}|[A-Za-z]{3,9}\s+\d{1,2},\s*20\d{2}|\d{1,2}\s+[A-Za-z]{3,9})\b/);
+                    if (dateMatch) info.updated = dateMatch[0];
                 }
                 info.ash = /ash/i.test(text);
                 info.description = text
                     .replace(info.status, '')
-                    .replace(/Last update:\s*[^.]+/i, '')
+                    .replace(/Last update:\s*/i, '')
                     .replace(/More details.*$/i, '')
                     .replace(/\s+/g, ' ')
                     .trim();
@@ -912,6 +955,7 @@
                 const details = parseVolcanoHtml(html || '');
                 volcano.status = details.status;
                 volcano.updated = details.updated;
+                volcano.updateTime = parseVolcanoDateText([details.updated, details.description, html].join(' '));
                 volcano.ash = details.ash;
                 volcano.moreUrl = details.moreUrl;
                 volcano.description = details.description;

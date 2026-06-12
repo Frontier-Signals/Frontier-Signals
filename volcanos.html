@@ -403,20 +403,34 @@
 		</section>
         <br><br>
         <section>
-            <h2 style="text-align:center">Live Volcano Status</h2><hr>
+            <h2 style="text-align:center">Volcano Update Windows</h2><hr>
             <div class="volcano-dashboard">
                 <div class="volcano-dashboard-grid">
                     <div class="volcano-panel">
-                        <h3>Notable Activity</h3>
-                        <ul id="notable-volcano-list"><li>Loading current activity...</li></ul>
+                        <h3>Daily Priority</h3>
+                        <ul id="daily-volcano-list"><li>Loading current activity...</li></ul>
                     </div>
                     <div class="volcano-panel">
-                        <h3>Reactivation Watch</h3>
-                        <ul id="reactivation-volcano-list"><li>Scanning source descriptions...</li></ul>
+                        <h3>Weekly Watch</h3>
+                        <ul id="weekly-volcano-list"><li>Scanning recent reports...</li></ul>
                     </div>
                     <div class="volcano-panel">
-                        <h3>Regional Concentration</h3>
-                        <ul id="regional-volcano-list"><li>Loading regional summary...</li></ul>
+                        <h3>Monthly Pattern</h3>
+                        <ul id="monthly-volcano-list"><li>Loading regional summary...</li></ul>
+                    </div>
+                </div>
+                <div class="volcano-panel" style="margin-top:1rem;">
+                    <h3>Additional Monitoring Sources</h3>
+                    <p style="margin:0 0 0.65rem;color:#ddd;">VolcanoDiscovery is useful for quick status aggregation, but confirmation should be cross-checked against observatories and ash-advisory centers when possible.</p>
+                    <div class="volcano-actions">
+                        <a class="volcano-link" href="https://www.usgs.gov/programs/VHP/volcano-updates" target="_blank" rel="noopener">USGS VHP updates</a>
+                        <a class="volcano-link" href="https://volcano.si.edu/reports_weekly.cfm" target="_blank" rel="noopener">Smithsonian weekly report</a>
+                        <a class="volcano-link" href="https://www.weather.gov/vaac/" target="_blank" rel="noopener">Global VAAC directory</a>
+                        <a class="volcano-link" href="https://www.pvmbg.esdm.go.id/" target="_blank" rel="noopener">Indonesia PVMBG</a>
+                        <a class="volcano-link" href="https://www.phivolcs.dost.gov.ph/" target="_blank" rel="noopener">PHIVOLCS</a>
+                        <a class="volcano-link" href="https://www.geonet.org.nz/volcano" target="_blank" rel="noopener">GeoNet Volcano</a>
+                        <a class="volcano-link" href="https://en.vedur.is/volcanoes/" target="_blank" rel="noopener">Iceland Met Office</a>
+                        <a class="volcano-link" href="https://www.data.jma.go.jp/vois/data/tokyo/STOCK/volinfo/volinfo.php" target="_blank" rel="noopener">JMA volcano warnings</a>
                     </div>
                 </div>
             </div>
@@ -648,6 +662,12 @@
                 return Math.max(0, Math.min(100, Math.round(score)));
             }
 
+            function updateTimestamp(volcano) {
+                const text = String(volcano.updated || '');
+                const parsed = Date.parse(text.replace(/\b(\d{1,2})\s+([A-Za-z]{3,})\s+(\d{4})\b/, '$1 $2 $3'));
+                return Number.isNaN(parsed) ? 0 : parsed;
+            }
+
             function priorityClass(score) {
                 if (score >= 70) return 'priority-high';
                 if (score >= 40) return 'priority-medium';
@@ -791,25 +811,25 @@
 
             function renderDashboard() {
                 const all = Object.values(volcanoCards);
-                const notable = all.filter(v => v.level >= 3 || v.ash || v.tags.includes('lava/thermal')).sort((a, b) => {
-                    if (b.level !== a.level) return b.level - a.level;
-                    if (Number(b.ash) !== Number(a.ash)) return Number(b.ash) - Number(a.ash);
-                    return a.name.localeCompare(b.name);
-                }).slice(0, 6);
-                const watch = all.filter(v => v.reactivationScore > 0).sort((a, b) => b.reactivationScore - a.reactivationScore || b.level - a.level).slice(0, 6);
+                const urgentSort = (a, b) => b.priority - a.priority || updateTimestamp(b) - updateTimestamp(a) || b.level - a.level || a.name.localeCompare(b.name);
+                const active = all.filter(v => v.level >= 2 || v.ash || v.reactivationScore > 0 || v.priority >= 35);
+                const daily = active.filter(v => parseUpdateAgeDays(v.updated) <= 2).sort(urgentSort).slice(0, 7);
+                const weekly = active.filter(v => parseUpdateAgeDays(v.updated) <= 7).sort(urgentSort).slice(0, 9);
+                const monthly = active.filter(v => parseUpdateAgeDays(v.updated) <= 31).sort(urgentSort).slice(0, 10);
                 const regions = {};
-                all.filter(v => v.level >= 2).forEach(v => {
+                monthly.forEach(v => {
                     const region = v.hazardGroup || 'Other / ungrouped';
                     regions[region] = (regions[region] || 0) + 1;
                 });
                 const regional = Object.entries(regions).sort((a, b) => b[1] - a[1]).slice(0, 6);
 
-                const notableEl = document.getElementById('notable-volcano-list');
-                const watchEl = document.getElementById('reactivation-volcano-list');
-                const regionalEl = document.getElementById('regional-volcano-list');
-                if (notableEl) notableEl.innerHTML = notable.length ? notable.map(v => `<li><button type="button" class="volcano-link" data-volcano-detail="${escapeHtml(v.key)}"><strong>${escapeHtml(v.name)}</strong></button> - ${escapeHtml(levelLabel(v.level))}; priority ${v.priority}/100${v.ash ? '; ash noted' : ''}</li>`).join('') : '<li>No notable eruptive indicators found in the loaded feed.</li>';
-                if (watchEl) watchEl.innerHTML = watch.length ? watch.map(v => `<li><button type="button" class="volcano-link" data-volcano-detail="${escapeHtml(v.key)}"><strong>${escapeHtml(v.name)}</strong></button> - ${escapeHtml(v.region || 'Global')}<br><span class="status-note">${escapeHtml(v.tags.join(', '))}</span></li>`).join('') : '<li>No renewed-activity wording detected in the loaded feed.</li>';
-                if (regionalEl) regionalEl.innerHTML = regional.length ? regional.map(([region, count]) => `<li><strong>${escapeHtml(region)}</strong> - ${count} unrest/eruption entr${count === 1 ? 'y' : 'ies'}</li>`).join('') : '<li>No unrest or eruption regions loaded yet.</li>';
+                const renderItems = items => items.map(v => `<li><button type="button" class="volcano-link" data-volcano-detail="${escapeHtml(v.key)}"><strong>${escapeHtml(v.name)}</strong></button> - ${escapeHtml(levelLabel(v.level))}; priority ${v.priority}/100<br><span class="status-note">${escapeHtml(v.updated || 'date not parsed')} | ${escapeHtml(v.tags.slice(0, 4).join(', ') || v.hazardGroup)}</span></li>`).join('');
+                const dailyEl = document.getElementById('daily-volcano-list');
+                const weeklyEl = document.getElementById('weekly-volcano-list');
+                const monthlyEl = document.getElementById('monthly-volcano-list');
+                if (dailyEl) dailyEl.innerHTML = daily.length ? renderItems(daily) : '<li>No 48-hour priority reports parsed from the loaded feed.</li>';
+                if (weeklyEl) weeklyEl.innerHTML = weekly.length ? renderItems(weekly) : '<li>No 7-day unrest or eruption reports parsed from the loaded feed.</li>';
+                if (monthlyEl) monthlyEl.innerHTML = (monthly.length ? renderItems(monthly.slice(0, 6)) : '<li>No 31-day activity reports parsed from the loaded feed.</li>') + (regional.length ? `<li><strong>Regional concentration:</strong> ${regional.map(([region, count]) => `${escapeHtml(region)} ${count}`).join('; ')}</li>` : '');
             }
 
             function renderVolcanoList() {
@@ -822,10 +842,7 @@
                     return;
                 }
 
-                const sorted = filtered.slice().sort((a, b) => {
-                    if (b.level !== a.level) return b.level - a.level;
-                    return a.name.localeCompare(b.name);
-                });
+                const sorted = filtered.slice().sort((a, b) => updateTimestamp(b) - updateTimestamp(a) || b.priority - a.priority || b.level - a.level || a.name.localeCompare(b.name));
 
                 listContainer.innerHTML = '<div class="live-volcano-grid">' + sorted.map(v => {
                     return '<article class="volcano-card' + (v.level >= 3 || v.ash ? ' notable' : '') + (v.reactivationScore > 0 ? ' reactivation' : '') + '" tabindex="0" role="button" data-volcano-detail="' + escapeHtml(v.key) + '">'
@@ -838,6 +855,7 @@
                         + '<p><strong>Status:</strong> ' + escapeHtml(v.status || 'Unknown') + '</p>'
                         + '<p><strong>Last update:</strong> ' + escapeHtml(v.updated || 'unknown') + '</p>'
                         + '<p><strong>Hazard group:</strong> ' + escapeHtml(v.hazardGroup) + '</p>'
+                        + '<p><strong>Specifics:</strong> ' + escapeHtml(v.activitySummary) + '</p>'
                         + '<div class="volcano-tags">' + (v.tags.length ? v.tags.map(tag => '<span class="volcano-tag">' + escapeHtml(tag) + '</span>').join('') : '<span class="volcano-tag">no extracted keywords</span>') + '</div>'
                         + '<p class="status-note">' + (v.reactivationScore > 0 ? 'Renewed-activity wording detected. Open details for context.' : 'Open details for activity readout, GVP context, and VAAC links.') + '</p>'
                         + '<div class="volcano-actions">'

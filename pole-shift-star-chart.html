@@ -114,13 +114,25 @@
                     <label for="pssc-habitat-preset">Habitat</label>
                     <select id="pssc-habitat-preset">
                         <option value="custom">Custom</option>
-                        <option value="40,-100" selected>North America</option>
+                        <option value="56,-106">Canada</option>
+                        <option value="39,-98" selected>United States</option>
+                        <option value="20,-102">Mexico / Central America</option>
                         <option value="50,10">Europe</option>
+                        <option value="51,-2">Western Europe</option>
+                        <option value="49,25">Eastern Europe</option>
+                        <option value="61,90">Russia</option>
                         <option value="25,20">North Africa</option>
+                        <option value="-22,24">Southern Africa</option>
+                        <option value="29,45">Middle East</option>
+                        <option value="44,70">Central Asia</option>
                         <option value="22,78">India</option>
-                        <option value="35,105">East Asia</option>
-                        <option value="-25,135">Australia</option>
-                        <option value="-15,-60">South America</option>
+                        <option value="34,105">East Asia</option>
+                        <option value="13,105">Southeast Asia</option>
+                        <option value="-25,122">West Australia</option>
+                        <option value="-26,145">East Australia</option>
+                        <option value="-41,174">New Zealand</option>
+                        <option value="3,-60">Northern South America</option>
+                        <option value="-24,-64">Southern South America</option>
                     </select>
                 </div>
                 <div class="pssc-small-info"><strong>Shifted habitat:</strong> <span id="pssc-habitat-label">40&deg; N, 100&deg; W</span></div>
@@ -129,6 +141,11 @@
                     <input id="pssc-observe-date" type="date" />
                     <label for="pssc-observe-time">Time</label>
                     <input id="pssc-observe-time" type="time" step="900" />
+                </div>
+                <div class="pssc-control-row">
+                    <label for="pssc-time-slider">Time of day</label>
+                    <input id="pssc-time-slider" type="range" min="0" max="1439" step="15" value="1320" />
+                    <span id="pssc-time-slider-label" class="pssc-small-info">22:00</span>
                 </div>
                 <div class="pssc-small-info"><strong>Sidereal:</strong> <span id="pssc-lst-label">--</span></div>
                 <div class="pssc-small-info"><strong>Moon phase:</strong> <span id="pssc-moon-age-label">--</span></div>
@@ -213,6 +230,7 @@
                 <ul>
                     <li>Bright Star Catalog field with traditional constellation figure overlays.</li>
                     <li>Approximate planet positions use low-precision orbital elements for chart context.</li>
+                    <li>Dashed amber path marks the ecliptic and approximate Moon travel band.</li>
                     <li>Hypothetical pole presets are speculative; catalog coordinates are astronomical.</li>
                 </ul>
                 <a class="button pssc-full-button" href="pole-shift-star-chart-tutorial.html">Open Star Chart Tutorial</a>

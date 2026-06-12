@@ -19,6 +19,8 @@
         habitatPreset: document.getElementById('pssc-habitat-preset'),
         observeDate: document.getElementById('pssc-observe-date'),
         observeTime: document.getElementById('pssc-observe-time'),
+        timeSlider: document.getElementById('pssc-time-slider'),
+        timeSliderLabel: document.getElementById('pssc-time-slider-label'),
         showConstellations: document.getElementById('pssc-show-constellations'),
         showConstellationLabels: document.getElementById('pssc-show-constellation-labels'),
         theme: document.getElementById('pssc-theme'),
@@ -119,7 +121,7 @@
             planetText: '#ffffff',
         },
         inkprint: {
-            background: '#f7f4ea',
+            background: '#ffffff',
             grid: 'rgba(24, 33, 35, 0.24)',
             gridBold: 'rgba(24, 33, 35, 0.52)',
             star: '#111719',
@@ -128,6 +130,7 @@
             label: '#111719',
             accent: '#9a3f20',
             planetText: '#111719',
+            moonShadow: '#111719',
         },
         observatory: {
             background: '#050813',
@@ -374,6 +377,32 @@
         return String(value).padStart(2, '0');
     }
 
+    function minutesToTime(totalMinutes) {
+        const minutes = Math.max(0, Math.min(1439, Number(totalMinutes) || 0));
+        const hour = Math.floor(minutes / 60);
+        const minute = minutes % 60;
+        return `${pad2(hour)}:${pad2(minute)}`;
+    }
+
+    function timeToMinutes(timeString) {
+        const [hour = 0, minute = 0] = String(timeString || '22:00').split(':').map(Number);
+        return Math.max(0, Math.min(1439, (hour * 60) + minute));
+    }
+
+    function syncTimeSliderFromInput() {
+        if (!controls.timeSlider || !controls.observeTime) return;
+        controls.timeSlider.value = String(timeToMinutes(controls.observeTime.value || '22:00'));
+        if (controls.timeSliderLabel) controls.timeSliderLabel.textContent = controls.observeTime.value || '22:00';
+    }
+
+    function setTimeFromSlider() {
+        if (!controls.timeSlider || !controls.observeTime) return;
+        const time = minutesToTime(controls.timeSlider.value);
+        controls.observeTime.value = time;
+        if (controls.timeSliderLabel) controls.timeSliderLabel.textContent = time;
+        drawScene();
+    }
+
     function getObservationDate() {
         if (!controls.observeDate || !controls.observeTime || !controls.observeDate.value) return new Date();
         const time = controls.observeTime.value || '22:00';
@@ -385,6 +414,7 @@
         if (!controls.observeDate || !controls.observeTime) return;
         controls.observeDate.value = `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
         controls.observeTime.value = `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+        syncTimeSliderFromInput();
     }
 
     function estimateMoonAge(date) {
@@ -730,10 +760,18 @@
         };
     }
 
-    function drawBackground(target, w, h, theme, center, radius) {
+    function drawBackground(target, w, h, theme, center, radius, printFriendly = false) {
         target.clearRect(0, 0, w, h);
-        target.fillStyle = theme.background;
+        target.fillStyle = printFriendly ? '#ffffff' : theme.background;
         target.fillRect(0, 0, w, h);
+        if (printFriendly) {
+            target.save();
+            target.beginPath();
+            target.arc(center.x, center.y, radius, 0, pi * 2);
+            target.fillStyle = theme.background;
+            target.fill();
+            target.restore();
+        }
         target.save();
         target.strokeStyle = theme.grid;
         target.lineWidth = 1.2;
@@ -759,13 +797,13 @@
         target.restore();
     }
 
-    function drawDirections(target, theme, center, radius, scale = 1) {
+    function drawDirections(target, theme, center, radius, scale = 1, printFriendly = false) {
         const labels = [
             ['N', 0], ['NE', 45], ['E', 90], ['SE', 135],
             ['S', 180], ['SW', 225], ['W', 270], ['NW', 315],
         ];
         target.save();
-        target.fillStyle = theme.accent;
+        target.fillStyle = printFriendly ? '#9a3f20' : theme.accent;
         target.font = `700 ${24 * scale}px Lucida Console, monospace`;
         target.textAlign = 'center';
         target.textBaseline = 'middle';
@@ -839,9 +877,6 @@
         }
         target.stroke();
         target.setLineDash([]);
-        target.fillStyle = theme.accent;
-        target.font = `700 ${13 * scale}px Arial, sans-serif`;
-        target.fillText('Ecliptic / Moon path', center.x + radius * 0.34, center.y - radius * 0.28);
         target.restore();
     }
 
@@ -1059,7 +1094,7 @@
             target.beginPath();
             target.arc(moonPoint.x, moonPoint.y, 10 * scale, 0, pi * 2);
             target.fill();
-            target.fillStyle = theme.background;
+            target.fillStyle = theme.moonShadow || theme.background;
             target.beginPath();
             target.arc(moonPoint.x + 4 * scale, moonPoint.y - 2 * scale, 6 * scale, 0, pi * 2);
             target.fill();
@@ -1081,8 +1116,9 @@
         const radius = layout.radius || Math.min(w, h) * 0.43;
         const basis = makeShiftedSkyBasis(state.viewPole, state.northPole);
         const labelBoxes = [];
-        drawBackground(target, w, h, theme, center, radius);
-        drawDirections(target, theme, center, radius, exportScale);
+        const printFriendly = Boolean(layout.printFriendly);
+        drawBackground(target, w, h, theme, center, radius, printFriendly);
+        drawDirections(target, theme, center, radius, exportScale, printFriendly);
         if (!controls.showRaGrid || controls.showRaGrid.checked) drawRaDecLabels(target, theme, center, radius, exportScale);
         if (!controls.showAltGrid || controls.showAltGrid.checked) drawAltitudeGrid(target, theme, center, radius, exportScale);
         drawEcliptic(target, theme, state, basis, center, radius, exportScale);
@@ -1090,21 +1126,24 @@
         drawConstellations(target, theme, state, basis, center, radius, labelBoxes, exportScale);
         drawNamedStars(target, theme, state, basis, center, radius, labelBoxes, exportScale);
         const longitudes = drawPlanetsAndMoon(target, theme, state, basis, center, radius, labelBoxes, exportScale);
-        drawFooter(target, theme, state, longitudes, w, h, exportScale, layout.footerY);
+        drawFooter(target, theme, state, longitudes, w, h, exportScale, layout.footerY, printFriendly);
         if (controls.exportInset && controls.exportInset.checked && exportScale > 1.5) {
-            drawExportInset(target, theme, state, longitudes, w, h, exportScale, layout);
-            drawExportTips(target, theme, layout.tipsX || w - 1240 * exportScale, layout.tipsY || 42 * exportScale, 418 * exportScale, exportScale);
+            drawExportInset(target, theme, state, longitudes, w, h, exportScale, layout, printFriendly);
+            drawExportTips(target, theme, layout.tipsX || w - 1240 * exportScale, layout.tipsY || 42 * exportScale, 418 * exportScale, exportScale, printFriendly);
         }
         return longitudes;
     }
 
-    function drawFooter(target, theme, state, longitudes, w, h, scale = 1, footerY = null) {
+    function drawFooter(target, theme, state, longitudes, w, h, scale = 1, footerY = null, printFriendly = false) {
         target.save();
-        target.fillStyle = theme.faint;
+        target.fillStyle = printFriendly ? '#111719' : theme.faint;
         target.font = `${12 * scale}px Arial, sans-serif`;
         target.textAlign = 'center';
         const dateText = state.observationDate.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-        target.fillText(`${state.hemisphere} habitat sky | pole ${formatCoordinate(state.lat, state.lon)} | habitat ${formatCoordinate(state.habitatLat, state.habitatLon)} | ${dateText}`, w / 2, footerY || h - 24 * scale);
+        const constellationState = controls.showConstellations.checked ? 'constellations on' : 'constellations off';
+        const labelState = controls.showConstellationLabels.checked ? 'labels on' : 'labels off';
+        target.fillText(`${state.hemisphere} habitat sky | pole ${formatCoordinate(state.lat, state.lon)} | habitat ${formatCoordinate(state.habitatLat, state.habitatLon)} | ${dateText}`, w / 2, (footerY || h - 24 * scale) - 16 * scale);
+        target.fillText(`Conditions: ${projectionLabels[state.projection] || state.projection}; ${controls.labelMode.value} labels; ${state.skyFilter}; ${state.visibleMode}; ${constellationState}; ${labelState}; ecliptic/moon path shown`, w / 2, footerY || h - 24 * scale);
         if (!starCatalog.length) {
             target.fillStyle = theme.accent;
             target.fillText('Loading Bright Star Catalog...', w / 2, h / 2 + 32 * scale);
@@ -1112,7 +1151,7 @@
         target.restore();
     }
 
-    function drawExportInset(target, theme, state, longitudes, w, h, scale = 1, layout = {}) {
+    function drawExportInset(target, theme, state, longitudes, w, h, scale = 1, layout = {}, printFriendly = false) {
         const insetW = 382 * scale;
         const insetH = 190 * scale;
         const x = layout.insetX || 42 * scale;
@@ -1120,8 +1159,8 @@
         const globeRadius = 52 * scale;
         const best = closestNorthStar(state);
         target.save();
-        target.fillStyle = theme.background === '#efe0bc' ? 'rgba(239, 224, 188, 0.92)' : 'rgba(4, 15, 33, 0.9)';
-        target.strokeStyle = theme.gridBold;
+        target.fillStyle = printFriendly ? '#ffffff' : (theme.background === '#efe0bc' ? 'rgba(239, 224, 188, 0.92)' : 'rgba(4, 15, 33, 0.9)');
+        target.strokeStyle = printFriendly ? '#111719' : theme.gridBold;
         target.lineWidth = 1.2 * scale;
         target.beginPath();
         target.roundRect(x, y, insetW, insetH, 8 * scale);
@@ -1132,23 +1171,23 @@
         drawCalibratedEarth(target, x + 72 * scale, y + 92 * scale, globeRadius, state, scale, false);
 
         target.save();
-        target.fillStyle = theme.label;
+        target.fillStyle = printFriendly ? '#111719' : theme.label;
         target.font = `700 ${15 * scale}px Arial, sans-serif`;
         target.textAlign = 'left';
         target.fillText('Pole Shift Star Chart', x + 142 * scale, y + 30 * scale);
         target.font = `${12 * scale}px Arial, sans-serif`;
-        target.fillStyle = theme.faint;
+        target.fillStyle = printFriendly ? '#243d45' : theme.faint;
         target.fillText(`Pole: ${formatCoordinate(state.lat, state.lon)}`, x + 142 * scale, y + 51 * scale);
         target.fillText(`Habitat: ${formatCoordinate(state.habitatLat, state.habitatLon)}`, x + 142 * scale, y + 71 * scale);
         target.fillText(`Tilt: ${state.axisTilt.toFixed(1)}${DEG} @ ${state.axisAzimuth.toFixed(1)}${DEG} azimuth`, x + 142 * scale, y + 91 * scale);
         target.fillText(`Projection: ${projectionLabels[state.projection] || state.projection}`, x + 142 * scale, y + 111 * scale);
-        target.fillText(`LST: ${formatSidereal(state.siderealDeg)} | ${state.skyFilter}`, x + 142 * scale, y + 131 * scale);
+        target.fillText(`View: ${state.visibleMode} | ${state.skyFilter} | ${controls.labelMode.value} labels`, x + 142 * scale, y + 131 * scale);
         if (best) target.fillText(`Pole guide: ${best.name} (${rad2deg(best.angle).toFixed(2)}${DEG}, ${best.visible ? 'visible' : 'below horizon'})`, x + 142 * scale, y + 151 * scale);
         target.fillText(`Sun ${longitudes.sunLongitude.toFixed(1)}${DEG} | Moon ${longitudes.moonLongitude.toFixed(1)}${DEG}`, x + 142 * scale, y + 171 * scale);
         target.restore();
     }
 
-    function drawExportTips(target, theme, x, y, width, scale = 1) {
+    function drawExportTips(target, theme, x, y, width, scale = 1, printFriendly = false) {
         const tips = [
             'Star-nav tips',
             'Rim = horizon; center = overhead sky.',
@@ -1160,8 +1199,8 @@
         const lineHeight = 18 * scale;
         const height = (tips.length * lineHeight) + 30 * scale;
         target.save();
-        target.fillStyle = theme.background === '#efe0bc' || theme.background === '#f7f4ea' ? 'rgba(247, 244, 234, 0.9)' : 'rgba(4, 15, 33, 0.76)';
-        target.strokeStyle = theme.gridBold;
+        target.fillStyle = printFriendly ? '#ffffff' : (theme.background === '#efe0bc' || theme.background === '#ffffff' ? 'rgba(255, 255, 255, 0.94)' : 'rgba(4, 15, 33, 0.76)');
+        target.strokeStyle = printFriendly ? '#111719' : theme.gridBold;
         target.lineWidth = 1.1 * scale;
         target.beginPath();
         target.roundRect(x, y, width, height, 8 * scale);
@@ -1170,7 +1209,7 @@
         target.textAlign = 'left';
         target.textBaseline = 'top';
         tips.forEach((tip, index) => {
-            target.fillStyle = index === 0 ? theme.accent : theme.label;
+            target.fillStyle = printFriendly ? (index === 0 ? '#9a3f20' : '#111719') : (index === 0 ? theme.accent : theme.label);
             target.font = `${index === 0 ? '700' : '600'} ${index === 0 ? 14 * scale : 11 * scale}px Arial, sans-serif`;
             target.fillText(tip, x + 18 * scale, y + 14 * scale + index * lineHeight);
         });
@@ -1446,6 +1485,7 @@
                 insetY: 110,
                 tipsX: options.tipsX || 1880,
                 tipsY: 110,
+                printFriendly: true,
             },
         );
         return exportCanvas;
@@ -1566,7 +1606,11 @@
         if (controls.observeDate) controls.observeDate.addEventListener('change', () => {
             drawScene();
         });
-        if (controls.observeTime) controls.observeTime.addEventListener('change', drawScene);
+        if (controls.observeTime) controls.observeTime.addEventListener('change', () => {
+            syncTimeSliderFromInput();
+            drawScene();
+        });
+        if (controls.timeSlider) controls.timeSlider.addEventListener('input', setTimeFromSlider);
         if (controls.habitatPreset) {
             controls.habitatPreset.addEventListener('change', () => {
                 if (controls.habitatPreset.value === 'custom') return;

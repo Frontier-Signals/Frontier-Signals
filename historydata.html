@@ -347,6 +347,8 @@
                     <label for="quakeDepthMode">Catalog
                         <select id="quakeDepthMode">
                             <option value="all">All depths</option>
+                            <option value="deep100">Intermediate/deep events 100+ km</option>
+                            <option value="deep250">Deep events 250+ km</option>
                             <option value="deep">Deep events 400+ km</option>
                         </select>
                     </label>
@@ -637,7 +639,9 @@
         function buildEarthquakeFeeds(options) {
             const region = earthquakeRegions[options.region] || earthquakeRegions.global;
             const bbox = paramsFromRegion(region);
-            const depth = options.depthMode === 'deep' ? '&mindepth=400' : '';
+            const depthThresholds = { deep100: 100, deep250: 250, deep: 400 };
+            const minDepth = depthThresholds[options.depthMode];
+            const depth = minDepth ? `&mindepth=${minDepth}` : '';
             const start = encodeURIComponent(options.startDate);
             const end = encodeURIComponent(addDays(options.endDate, 1));
             const mag = encodeURIComponent(options.minMagnitude);
@@ -794,12 +798,16 @@
                 .filter(result => result.status === 'fulfilled')
                 .flatMap(result => result.value.source.format === 'xml' ? normalizeIscXml(result.value.data) : normalizeEarthquakeData(result.value.data, result.value.source.agency));
             const deduped = dedupeEarthquakes(normalized);
-            const deepCount = deduped.filter(event => event.depth >= 400).length;
+            const deep100Count = deduped.filter(event => event.depth >= 100).length;
+            const deep250Count = deduped.filter(event => event.depth >= 250).length;
+            const deep400Count = deduped.filter(event => event.depth >= 400).length;
             const agencySet = Array.from(new Set(deduped.flatMap(event => event.agencies))).sort();
 
             renderSummary('regionalQuakeSummary', [
-                { label: 'Events', value: formatNumber(deduped.length) },
-                { label: 'Deep 400+ km', value: formatNumber(deepCount) },
+                { label: 'Earthquakes', value: formatNumber(deduped.length) },
+                { label: '100+ km', value: formatNumber(deep100Count) },
+                { label: '250+ km', value: formatNumber(deep250Count) },
+                { label: '400+ km', value: formatNumber(deep400Count) },
                 { label: 'Agencies', value: agencySet.join(', ') || 'None' },
                 { label: 'Region', value: regionLabel }
             ]);
@@ -838,6 +846,41 @@
 
             status.textContent = `Loaded ${formatNumber(deduped.length)} deduplicated events from ${agencySet.join(', ') || 'no agencies'}. ${failures.length ? 'Unavailable feed(s): ' + failures.join('; ') : ''}`;
             refreshOpenCollapsibleHeights();
+        }
+
+        function donkiUrls(endpoint, startDate, endDate) {
+            const start = encodeURIComponent(startDate);
+            const end = encodeURIComponent(endDate);
+            return [
+                {
+                    label: `NASA DONKI ${endpoint}`,
+                    url: `https://api.nasa.gov/DONKI/${endpoint}?startDate=${start}&endDate=${end}&api_key=${nasaApiKey}`
+                },
+                {
+                    label: `CCMC DONKI ${endpoint}`,
+                    url: `https://kauai.ccmc.gsfc.nasa.gov/DONKI/WS/get/${endpoint}?startDate=${start}&endDate=${end}`
+                }
+            ];
+        }
+
+        async function fetchDonkiEndpoint(endpoint, startDate, endDate) {
+            const errors = [];
+            for (const candidate of donkiUrls(endpoint, startDate, endDate)) {
+                try {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 25000);
+                    const response = await fetch(candidate.url, { signal: controller.signal });
+                    clearTimeout(timeout);
+                    if (!response.ok) throw new Error(`${response.status}`);
+                    const data = await response.json();
+                    if (Array.isArray(data)) return { endpoint, data, source: candidate.label };
+                    if (data && data.error) throw new Error(data.error.message || data.error.code || 'API error');
+                    throw new Error('unexpected response');
+                } catch (error) {
+                    errors.push(`${candidate.label}: ${error.name === 'AbortError' ? 'timed out' : error.message}`);
+                }
+            }
+            return { endpoint, data: [], error: errors.join('; ') };
         }
 
         function normalizeDonkiFlare(event) {
@@ -900,13 +943,14 @@
             const startDate = document.getElementById('spaceStartDate').value || '2010-01-01';
             const endDate = document.getElementById('spaceEndDate').value || isoDate(new Date());
             const cadence = document.getElementById('spaceCadence').value;
-            status.textContent = 'Loading NASA DONKI space weather events...';
+            status.textContent = 'Loading NASA/CCMC DONKI space weather events...';
 
-            const flareUrl = `https://api.nasa.gov/DONKI/FLR?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&api_key=${nasaApiKey}`;
-            const hssUrl = `https://api.nasa.gov/DONKI/HSS?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&api_key=${nasaApiKey}`;
-            const settled = await Promise.allSettled([fetch(flareUrl).then(res => res.json()), fetch(hssUrl).then(res => res.json())]);
-            const flares = settled[0].status === 'fulfilled' && Array.isArray(settled[0].value) ? settled[0].value.map(normalizeDonkiFlare).filter(Boolean) : [];
-            const hssEvents = settled[1].status === 'fulfilled' && Array.isArray(settled[1].value) ? settled[1].value.map(normalizeDonkiHss).filter(event => event.date) : [];
+            const [flareResult, hssResult] = await Promise.all([
+                fetchDonkiEndpoint('FLR', startDate, endDate),
+                fetchDonkiEndpoint('HSS', startDate, endDate)
+            ]);
+            const flares = flareResult.data.map(normalizeDonkiFlare).filter(Boolean);
+            const hssEvents = hssResult.data.map(normalizeDonkiHss).filter(event => event.date);
             const events = dedupeSpaceWeather([...flares, ...hssEvents]).sort((a, b) => new Date(b.date) - new Date(a.date));
             const summary = summarizeSpaceWeather(events, cadence);
             const xCount = events.filter(event => event.type === 'X flare').length;
@@ -955,10 +999,9 @@
                 options: baseChartOptions('Space Weather Events')
             });
 
-            const unavailable = settled
-                .map((result, index) => result.status === 'rejected' ? (index === 0 ? 'FLR' : 'HSS') : null)
-                .filter(Boolean);
-            status.textContent = `Loaded ${formatNumber(events.length)} NASA DONKI events. ${unavailable.length ? 'Unavailable endpoint(s): ' + unavailable.join(', ') : ''}`;
+            const unavailable = [flareResult, hssResult].filter(result => result.error).map(result => `${result.endpoint} (${result.error})`);
+            const usedSources = Array.from(new Set([flareResult.source, hssResult.source].filter(Boolean)));
+            status.textContent = `Loaded ${formatNumber(events.length)} DONKI events${usedSources.length ? ' from ' + usedSources.join(', ') : ''}. ${unavailable.length ? 'Unavailable endpoint(s): ' + unavailable.join(' | ') : ''}`;
             refreshOpenCollapsibleHeights();
         }
 

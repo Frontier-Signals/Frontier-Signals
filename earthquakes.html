@@ -187,6 +187,52 @@ svg .leaflet-draw-guide-line {
   padding: 8px 10px;
 }
 
+.earth-monitor-panel {
+  border: 1px solid #ff6b35;
+  padding: 1rem;
+  background: rgba(0, 255, 255, 0.04);
+}
+
+.schumann-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.schumann-card {
+  margin: 0;
+  border: 1px solid rgba(0, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.28);
+  padding: 0.9rem;
+}
+
+.schumann-card img {
+  display: block;
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  background: #000;
+  border: 1px solid #ff6b35;
+}
+
+.schumann-card.feed-error::before {
+  content: "Live image unavailable from the station host.";
+  display: block;
+  min-height: 120px;
+  padding: 2rem 1rem;
+  color: #fcf2dc;
+  text-align: center;
+  border: 1px solid #ff6b35;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+@media (max-width: 800px) {
+  .schumann-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Map styling */
 #map {
   border: 2px solid orange;
@@ -309,6 +355,22 @@ svg .leaflet-draw-guide-line {
 </div>
             <!-- Map container -->
             <center><div id="map" class="leaflet-container" style="height: 400px;"></div></center>
+			<br>
+            <section class="earth-monitor-panel">
+                <h2 style="text-align:center">Live Earth Monitor: Schumann Resonance</h2><hr>
+                <p style="text-align:center;color:#ccc;font-size:0.95rem">Schumann resonance spectrograms track extremely-low-frequency electromagnetic activity in the Earth-ionosphere cavity. This feed is observational context only; local weather, instrumentation, and station noise can affect the display.</p>
+                <div class="schumann-grid">
+                    <figure class="schumann-card">
+                        <img src="https://sosrff.tsu.ru/new/shm.jpg" alt="Live Schumann resonance spectrogram from Tomsk Space Observing System" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.closest('figure').classList.add('feed-error'); this.alt='Schumann resonance feed unavailable';">
+                        <figcaption><strong>Tomsk Space Observing System Schumann spectrogram.</strong> If the image does not load, open the source directly; some live science image hosts restrict hotlinking or occasionally go offline.</figcaption>
+                    </figure>
+                    <div class="schumann-card">
+                        <h3>How to read it</h3>
+                        <p>Bright horizontal bands near the low-frequency resonance modes indicate stronger ELF signal energy. Sudden vertical flashes can be transient disturbances, lightning-driven bursts, instrument noise, or broader electromagnetic activity. Use it as a companion monitor next to seismic and geomagnetic data, not as a standalone hazard signal.</p>
+                        <a class="button" href="https://sosrff.tsu.ru/" target="_blank" rel="noopener">Open source station</a>
+                    </div>
+                </div>
+            </section>
 			<br>
 			<hr>
 			<!-- ===== Table for Legend ===== -->

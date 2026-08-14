@@ -334,6 +334,12 @@
       const animationButton = document.getElementById('toggle-history-animation');
       const historySpeed = document.getElementById('history-speed');
       const sourceStatus = document.getElementById('model-source-status');
+      const ASSET_RELEASE = '2026-08-14';
+      const publicAssetUrl = path => {
+        const url = new URL(path, document.baseURI);
+        url.searchParams.set('v', ASSET_RELEASE);
+        return url.href;
+      };
       const stats = {
         dipoleMoment: document.getElementById('dipole-moment'),
         dipoleTrend: document.getElementById('dipole-trend'),
@@ -835,7 +841,7 @@
 
       async function loadGeography() {
         try {
-          const response = await fetch('data/countries.geo.json', { cache: 'force-cache' });
+          const response = await fetch(publicAssetUrl('data/countries.geo.json'), { cache: 'no-cache' });
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const data = await response.json();
           worldGeography = (data.features || []).flatMap(feature => geometryRings(feature.geometry));
@@ -845,9 +851,9 @@
       }
 
       async function loadNoaaPoleHistory() {
-        const url = 'data/noaa-dip-poles-1590-2025.geojson';
+        const url = publicAssetUrl('data/noaa-dip-poles-1590-2025.geojson');
         try {
-          const response = await fetch(url, { cache: 'force-cache' });
+          const response = await fetch(url, { cache: 'no-cache' });
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const data = await response.json();
           const points = (data.features || []).map(feature => {
@@ -910,7 +916,7 @@
         updateStats();
         rebuildFieldGrid();
         try {
-          const response = await fetch('data/WMM2025.COF', { cache: 'force-cache' });
+          const response = await fetch(publicAssetUrl('data/WMM2025.COF'), { cache: 'no-cache' });
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           wmmModel = parseWmmCoefficients(await response.text());
           sourceStatus.textContent = `Loaded local WMM2025 degree-${wmmModel.nMax} coefficients; interactive readout uses physically scaled dipole and regional terms.`;

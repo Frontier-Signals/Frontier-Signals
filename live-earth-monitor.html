@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Live global wildfire, flood, drought, tropical-system, and Schumann resonance monitoring.">
+  <meta name="keywords" content="live earth monitor, wildfires, floods, drought, tropical cyclones, Schumann resonance">
+  <meta property="og:title" content="Live Earth Monitor - Frontier Signals">
+  <meta property="og:description" content="Live global natural-hazard overlays and Schumann resonance monitoring.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://frontier-signals.github.io/Frontier-Signals/live-earth-monitor">
+  <meta property="og:image" content="https://frontier-signals.github.io/Frontier-Signals/images/liveearthmonitorbanner.png">
+  <link rel="canonical" href="https://frontier-signals.github.io/Frontier-Signals/live-earth-monitor">
+  <link rel="stylesheet" href="stylesheet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  <title>Live Earth Monitor - Frontier Signals</title>
+  <style>
+    #earth-monitor-map { height: 500px; border: 2px solid orange; }
+    .earth-monitor-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 22px; align-items: center; padding: 16px; background: #0b2a3b; }
+    .earth-monitor-controls label { display: inline-flex; align-items: center; gap: 7px; }
+    .map-status { min-height: 1.5em; width: 100%; margin: 0; text-align: center; color: #ccc; }
+    .source-status { width: min(760px, 100%); }
+    .source-status span { padding: 7px 9px; border: 1px solid rgba(0,255,255,.35); background: rgba(0,0,0,.25); font-size: .82rem; }
+    .hazard-switcher { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; }
+    .hazard-button { position: relative; min-width: 150px; padding: 11px 15px; border: 1px solid var(--hazard-color); border-radius: 8px; color: #fff; background: color-mix(in srgb, var(--hazard-color) 22%, #06121c); box-shadow: 0 0 12px color-mix(in srgb, var(--hazard-color) 45%, transparent); cursor: pointer; font: inherit; font-weight: 700; letter-spacing: .04em; transition: transform .16s, box-shadow .16s, background .16s; }
+    .hazard-button:hover { transform: translateY(-2px); box-shadow: 0 0 20px color-mix(in srgb, var(--hazard-color) 75%, transparent); }
+    .hazard-button.active { color: #06121c; background: var(--hazard-color); box-shadow: 0 0 22px var(--hazard-color); }
+    .hazard-button[data-hazard="wildfires"] { --hazard-color: #ff5a36; }
+    .hazard-button[data-hazard="floods"] { --hazard-color: #2bbcff; }
+    .hazard-button[data-hazard="drought"] { --hazard-color: #f3c84b; }
+    .hazard-button[data-hazard="tropicalCyclones"] { --hazard-color: #b86cff; }
+    .drought-legend { max-width: 100%; margin-top: 8px; background: #fff; }
+    .leaflet-drought-pane { mix-blend-mode: multiply; filter: saturate(1.15) contrast(1.08); }
+    .opacity-control { display: inline-flex; align-items: center; gap: 8px; }
+    .opacity-control input { width: 130px; accent-color: #f3c84b; }
+    .hazard-marker { display: grid; place-items: center; width: 32px; height: 32px; border: 3px solid var(--alert-color, #00ffff); border-radius: 50%; background: rgba(3,13,23,.88); font-size: 20px; line-height: 28px; filter: drop-shadow(0 0 5px var(--alert-color, #00ffff)); }
+    .marker-cluster div { color: #031019; background: #46e5ff; font-weight: 800; }
+    .schumann-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 20px; align-items: start; }
+    .schumann-card { margin: 0; padding: 16px; border: 1px solid #ff8c00; background: rgba(5, 16, 28, .72); }
+    .schumann-card img { display: block; width: 100%; min-height: 220px; object-fit: contain; background: #050505; }
+    .schumann-toolbar { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; margin: 14px 0; }
+    .schumann-meta { color: #00ffff; }
+    .schumann-card.feed-error::before { content: 'Live image unavailable'; display: block; padding: 8px; color: #ff9f43; text-align: center; }
+    .monitor-legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0; list-style: none; }
+    .monitor-legend li { padding: 10px; border: 1px solid #ff8c00; background: rgba(5, 16, 28, .72); }
+    @media (max-width: 760px) { .schumann-grid, .monitor-legend { grid-template-columns: 1fr; } .hazard-button { min-width: 46%; } #earth-monitor-map { height: 420px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <center><img id="banner" class="bordered-image" src="images/FrontierSignalsBanner.png" alt="Frontier Signals Official Banner"></center>
+    <hr>
+    <p>Live Earth Monitor</p>
+  </header>
+  <nav>
+    <div class="hamburger"><div></div><div></div><div></div></div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="button">Home Page</a></li>
+      <li><a href="historydata.html" class="button">Historical Data &amp; Archives</a></li>
+      <li><a href="peerpapers.html" class="button">Frontier Science Articles</a></li>
+      <li><a href="ancienthistory.html" class="button">Ancient History</a></li>
+      <li><a href="extras.html" class="button">Multimedia &amp; Resource Links</a></li>
+      <li><a href="about.html" class="button">About/Contact</a></li>
+    </ul>
+    <hr>
+    <ul class="nav-links">
+      <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
+      <li><a href="live-earth-monitor.html" class="button">Live Earth Monitor</a></li>
+      <li><a href="magneticfield.html" class="button">Magnetic Field Tracker</a></li>
+      <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
+      <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
+      <li><a href="starcharts.html" class="button">Star Charts</a></li>
+      <li><a href="models.html" class="button">Models</a></li>
+    </ul>
+  </nav>
+  <main>
+    <br><br>
+    <section><center><img class="bordered-image" src="images/liveearthmonitorbanner.png" alt="Live Earth Monitor Banner" style="width:100%; height:auto;"></center></section>
+    <section>
+      <h2 style="text-align:center">Live Natural Hazard Map</h2><hr>
+      <p style="text-align:center">Explore current global hazards from NASA EONET, GDACS, and the Copernicus Global Drought Observatory.</p>
+      <div class="earth-monitor-controls">
+        <label for="earthMonitorBaseMap">Map Style</label>
+        <select id="earthMonitorBaseMap">
+          <option value="osm" selected>OpenStreetMap</option><option value="satellite">Satellite Imagery</option><option value="dark">Dark Matter</option><option value="terrain">Terrain</option>
+        </select>
+        <label for="eventWindow">Wildfire Window</label>
+        <select id="eventWindow"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option><option value="60">60 days</option></select>
+        <label class="opacity-control" for="droughtOpacity">Drought Opacity <input id="droughtOpacity" type="range" min="20" max="75" value="48" step="1"><output id="droughtOpacityValue" for="droughtOpacity">48%</output></label>
+        <div class="hazard-switcher" role="tablist" aria-label="Choose one map overlay">
+          <button type="button" class="hazard-button active" data-hazard="wildfires" role="tab" aria-selected="true">🔥 Wildfires</button>
+          <button type="button" class="hazard-button" data-hazard="floods" role="tab" aria-selected="false">💧 Floods</button>
+          <button type="button" class="hazard-button" data-hazard="drought" role="tab" aria-selected="false">☀ Drought</button>
+          <button type="button" class="hazard-button" data-hazard="tropicalCyclones" role="tab" aria-selected="false">🌀 Tropical Systems</button>
+        </div>
+        <button type="button" class="button" id="refreshHazards">Refresh Live Data</button>
+        <p id="earthMonitorStatus" class="map-status" role="status" aria-live="polite">Loading all live hazard overlays...</p>
+        <div id="sourceStatus" class="source-status" aria-label="Active hazard source status"></div>
+      </div>
+      <div id="earth-monitor-map" aria-label="Live global natural hazard map"></div>
+      <ul class="monitor-legend">
+        <li><span class="fire-icon">&#x1F525;</span> Wildfire — open NASA EONET events updated within 14 days</li>
+        <li><span class="flood-icon">&#x1F4A7;</span> Flood — GDACS event location and alert level</li>
+        <li><span class="drought-icon">&#x2600;</span> Drought — latest global Copernicus short-term SPI (3-month precipitation window)<br><img class="drought-legend" src="https://drought.emergency.copernicus.eu/api/wms?SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetLegendGraphic&amp;FORMAT=image/png&amp;LAYER=spaST" alt="Copernicus global short-term drought indicator legend" loading="lazy"></li>
+        <li><span class="tropical-icon">&#x1F300;</span> Tropical cyclone — current GDACS system location</li>
+      </ul>
+      <p>Only one hazard layer is displayed at a time for clarity. Sources are queried on page load, on demand, and automatically every 15 minutes. Event markers identify a reported event location; the drought overlay is a spatial analysis layer. Source dates and alert details appear when markers are selected.</p>
+    </section>
+    <section class="earth-monitor-panel">
+      <h2 style="text-align:center">Schumann Resonance</h2><hr>
+      <p style="text-align:center;color:#ccc;font-size:0.95rem">Schumann resonance spectrograms track extremely-low-frequency electromagnetic activity in the Earth-ionosphere cavity. This is observational context only; local weather, instrumentation, and station noise can affect the display.</p>
+      <div class="schumann-toolbar">
+        <label for="schumannSource">Schumann Source</label>
+        <select id="schumannSource"><option value="tomskMirror" selected>Schumann Today Tomsk mirror</option><option value="cumianaGeophone">Cumiana geophone / E-field</option><option value="cumianaDaily">Cumiana daily strip</option><option value="tomskDirect">Tomsk direct station</option></select>
+        <button type="button" class="button" id="refreshSchumann">Refresh Image</button>
+      </div>
+      <div class="schumann-grid">
+        <figure class="schumann-card"><img id="schumannImage" src="" alt="Live Schumann resonance spectrogram" loading="lazy" decoding="async" referrerpolicy="no-referrer"><figcaption id="schumannCaption"></figcaption></figure>
+        <div class="schumann-card"><h3>How to read it</h3><p>Bright horizontal bands near the low-frequency resonance modes indicate stronger ELF signal energy. Sudden vertical flashes can be transient disturbances, lightning-driven bursts, instrument noise, or broader electromagnetic activity. Use it as a companion monitor, not a standalone hazard signal.</p><p id="schumannUpdated" class="schumann-meta">Loading source...</p><a id="schumannSourceLink" class="button" href="https://schumannresonance.today/" target="_blank" rel="noopener">Open source page</a></div>
+      </div>
+    </section>
+  </main>
+  <footer><p>&copy; 2026 Frontier Signals. All rights reserved.</p><p style="font-size:12px;margin-top:10px"><a href="privacy-policy.html" style="color:#00ffff;text-decoration:none">Privacy Policy</a> | <a href="terms-of-service.html" style="color:#00ffff;text-decoration:none">Terms of Service</a></p></footer>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script>
+  const map = L.map('earth-monitor-map', { worldCopyJump: true }).setView([20, 0], 2);
+  map.createPane('droughtPane'); map.getPane('droughtPane').style.zIndex = 350; map.getPane('droughtPane').classList.add('leaflet-drought-pane');
+  map.createPane('referencePane'); map.getPane('referencePane').style.zIndex = 450; map.getPane('referencePane').style.pointerEvents = 'none';
+  const baseLayers = {
+    osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: 'OpenStreetMap contributors' }),
+    satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles Esri' }),
+    dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: 'OpenStreetMap contributors, CARTO' }),
+    terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: 'OpenTopoMap contributors' })
+  };
+  let currentBaseLayer = baseLayers.osm.addTo(map);
+  const droughtReferenceLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { pane: 'referencePane', maxZoom: 19, opacity: .95, attribution: 'Labels CARTO' });
+  document.getElementById('earthMonitorBaseMap').addEventListener('change', function () { map.removeLayer(currentBaseLayer); currentBaseLayer = baseLayers[this.value] || baseLayers.osm; currentBaseLayer.addTo(map); });
+  const status = document.getElementById('earthMonitorStatus');
+  const sourceStatus = document.getElementById('sourceStatus');
+  const hazardLayers = {};
+  const sourceStates = {};
+  let activeHazard = 'wildfires';
+  let refreshTimer;
+  const hazardConfig = {
+    wildfires: { symbol: '&#x1F525;', label: 'Wildfires', source: 'NASA EONET' },
+    floods: { symbol: '&#x1F4A7;', label: 'Floods', source: 'GDACS' },
+    drought: { symbol: '&#x2600;', label: 'Drought', source: 'Copernicus GDO' },
+    tropicalCyclones: { symbol: '&#x1F300;', label: 'Tropical systems', source: 'GDACS' }
+  };
+  const escapeHtml = value => String(value == null ? '' : value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+  const validLatLng = coordinates => Array.isArray(coordinates) && coordinates.length >= 2 && Number.isFinite(Number(coordinates[0])) && Number.isFinite(Number(coordinates[1])) && Math.abs(Number(coordinates[0])) <= 180 && Math.abs(Number(coordinates[1])) <= 90 ? [Number(coordinates[1]), Number(coordinates[0])] : null;
+  const isoDate = date => date.toISOString().slice(0, 10);
+  function setSourceState(key, message) { sourceStates[key] = message; if (key === activeHazard) sourceStatus.innerHTML = `<span><strong>${hazardConfig[key].label}</strong> · ${escapeHtml(message)}</span>`; }
+  function markerIcon(symbol, alert = 'blue') { const colors = { red: '#ff3d3d', orange: '#ff9f32', green: '#54df8a', blue: '#39c8ff' }; return L.divIcon({ html: `<span class="hazard-marker" style="--alert-color:${colors[String(alert).toLowerCase()] || colors.blue}">${symbol}</span>`, className: '', iconSize: [38, 38], iconAnchor: [19, 19] }); }
+  function markerLayer() { return typeof L.markerClusterGroup === 'function' ? L.markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 46, showCoverageOnHover: false }) : L.layerGroup(); }
+  async function fetchJson(url, source) { const response = await fetch(`${url}${url.includes('?') ? '&' : '?'}_=${Date.now()}`); if (!response.ok) throw new Error(`${source} returned ${response.status}`); return response.json(); }
+  async function loadWildfires() {
+    const days = Number(document.getElementById('eventWindow').value) || 14;
+    const data = await fetchJson(`https://eonet.gsfc.nasa.gov/api/v3/events?status=open&category=wildfires&days=${days}&limit=500`, 'NASA EONET');
+    const layer = markerLayer();
+    (data.events || []).forEach(event => { const geometry = (event.geometry || []).slice().reverse().find(item => item.type === 'Point'); const latlng = geometry && validLatLng(geometry.coordinates); if (!latlng) return; const source = event.sources && event.sources[0]; const link = source && source.url ? `<br><a href="${escapeHtml(source.url)}" target="_blank" rel="noopener">Source report</a>` : ''; L.marker(latlng, { icon: markerIcon(hazardConfig.wildfires.symbol) }).bindPopup(`<strong>${escapeHtml(event.title || 'Wildfire')}</strong><br>Updated: ${geometry.date ? new Date(geometry.date).toLocaleString() : 'Not supplied'}<br>Source: NASA EONET${link}`).addTo(layer); });
+    layer.eventCount = layer.getLayers().length; return layer;
+  }
+  async function loadGdacs(eventType, key, lookbackDays) {
+    const end = new Date(); const start = new Date(end.getTime() - lookbackDays * 86400000);
+    const url = `https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=${eventType}&fromdate=${isoDate(start)}&todate=${isoDate(end)}&alertlevel=red%3Borange%3Bgreen`;
+    const data = await fetchJson(url, 'GDACS'); const layer = markerLayer();
+    (data.features || []).filter(feature => String(feature.properties && feature.properties.iscurrent).toLowerCase() === 'true').forEach(feature => { const latlng = feature.geometry && feature.geometry.type === 'Point' && validLatLng(feature.geometry.coordinates); if (!latlng) return; const p = feature.properties || {}; const report = p.url && (p.url.report || p.url.details); const dateText = p.todate || p.fromdate; L.marker(latlng, { icon: markerIcon(hazardConfig[key].symbol, p.alertlevel) }).bindPopup(`<strong>${escapeHtml(p.eventname || p.name || hazardConfig[key].label)}</strong><br>Country/region: ${escapeHtml(p.country || 'Not supplied')}<br>Alert: ${escapeHtml(p.alertlevel || 'Not supplied')}<br>Updated: ${dateText ? new Date(dateText).toLocaleString() : 'Not supplied'}<br>Source: GDACS${report ? `<br><a href="${escapeHtml(report)}" target="_blank" rel="noopener">GDACS report</a>` : ''}`).addTo(layer); });
+    layer.eventCount = layer.getLayers().length; return layer;
+  }
+  function loadDrought() { const opacity = Number(document.getElementById('droughtOpacity').value) / 100; const layer = L.tileLayer.wms('https://drought.emergency.copernicus.eu/api/wms', { pane: 'droughtPane', layers: 'spaST', styles: '', format: 'image/png', transparent: true, version: '1.1.1', uppercase: true, tiled: true, selected_timescale: '03', noWrap: true, updateWhenIdle: true, keepBuffer: 3, opacity, attribution: 'Copernicus EMS Global Drought Observatory' }); layer.eventCount = null; layer.on('tileerror', () => setSourceState('drought', 'A drought tile failed; retrying as the map moves')); return Promise.resolve(layer); }
+  async function createHazardLayer(key) { if (key === 'wildfires') return loadWildfires(); if (key === 'floods') return loadGdacs('FL', key, 60); if (key === 'tropicalCyclones') return loadGdacs('TC', key, 45); return loadDrought(); }
+  async function loadHazard(key, force = false) { if (force && hazardLayers[key]) { map.removeLayer(hazardLayers[key]); delete hazardLayers[key]; } if (hazardLayers[key]) return hazardLayers[key]; setSourceState(key, `Loading from ${hazardConfig[key].source}…`); const layer = await createHazardLayer(key); hazardLayers[key] = layer; const detail = key === 'drought' ? 'latest spatial layer' : `${layer.eventCount} mapped event${layer.eventCount === 1 ? '' : 's'}`; setSourceState(key, `${detail} · ${hazardConfig[key].source}`); return layer; }
+  async function showHazard(key, force = false) {
+    activeHazard = key;
+    Object.values(hazardLayers).forEach(layer => { if (map.hasLayer(layer)) map.removeLayer(layer); });
+    if (map.hasLayer(droughtReferenceLabels)) map.removeLayer(droughtReferenceLabels);
+    document.querySelectorAll('.hazard-button').forEach(button => { const selected = button.dataset.hazard === key; button.classList.toggle('active', selected); button.setAttribute('aria-selected', String(selected)); });
+    status.textContent = `Loading ${hazardConfig[key].label.toLowerCase()}…`;
+    sourceStatus.innerHTML = `<span><strong>${hazardConfig[key].label}</strong> · Loading from ${hazardConfig[key].source}…</span>`;
+    try { const layer = await loadHazard(key, force); if (key !== activeHazard) return; layer.addTo(map); if (key === 'drought') droughtReferenceLabels.addTo(map); const detail = key === 'drought' ? 'latest global drought analysis' : `${layer.eventCount} current event${layer.eventCount === 1 ? '' : 's'}`; status.textContent = `${hazardConfig[key].label}: ${detail}. Refreshed ${new Date().toLocaleTimeString()}.`; setSourceState(key, sourceStates[key]); }
+    catch (error) { status.textContent = `Unable to load ${hazardConfig[key].label.toLowerCase()}: ${error.message}`; setSourceState(key, `Unavailable · ${error.message}`); }
+  }
+  function scheduleRefresh() { clearInterval(refreshTimer); refreshTimer = setInterval(() => showHazard(activeHazard, true), 15 * 60 * 1000); }
+  document.querySelectorAll('.hazard-button').forEach(button => button.addEventListener('click', () => showHazard(button.dataset.hazard)));
+  document.getElementById('eventWindow').addEventListener('change', () => showHazard(activeHazard, true));
+  document.getElementById('droughtOpacity').addEventListener('input', function () { document.getElementById('droughtOpacityValue').value = `${this.value}%`; if (hazardLayers.drought) hazardLayers.drought.setOpacity(Number(this.value) / 100); });
+  document.getElementById('refreshHazards').addEventListener('click', () => showHazard(activeHazard, true));
+  showHazard('wildfires'); scheduleRefresh();
+  const schumannSources = {
+    tomskMirror: { label: 'Schumann Today Tomsk mirror', image: 'https://schumannresonance.today/live/tomsk1.jpg', page: 'https://schumannresonance.today/', caption: 'Maintained mirror of the Tomsk ELF/Schumann spectrogram.' },
+    cumianaGeophone: { label: 'Cumiana geophone / E-field', image: 'https://spacemonitor.io/_data/livedata/cumiana1.jpg', page: 'https://schumannresonance.today/live/', caption: 'Cumiana, Italy live-data mirror for cross-checking the Tomsk display.' },
+    cumianaDaily: { label: 'Cumiana daily strip', image: 'https://spacemonitor.io/_data/livedata/cumiana2.jpg', page: 'https://schumannresonance.today/live/', caption: 'Alternative Cumiana daily strip from the SpaceMonitor live-data mirror.' },
+    tomskDirect: { label: 'Tomsk direct station', image: 'https://sosrff.tsu.ru/new/shm.jpg', page: 'https://sosrff.tsu.ru/', caption: 'Direct Tomsk Space Observing System image; mirror options may load more reliably.' }
+  };
+  function setSchumannSource(key, allowFallback = true) { const source = schumannSources[key] || schumannSources.tomskMirror; const image = document.getElementById('schumannImage'); const caption = document.getElementById('schumannCaption'); const updated = document.getElementById('schumannUpdated'); const link = document.getElementById('schumannSourceLink'); const select = document.getElementById('schumannSource'); const keys = Object.keys(schumannSources); const next = keys[(keys.indexOf(key) + 1) % keys.length]; const figure = image.closest('figure'); figure.classList.remove('feed-error'); image.onerror = () => { figure.classList.add('feed-error'); updated.textContent = `${source.label} did not load. ${allowFallback ? 'Trying the next source...' : 'Open the source page for the latest view.'}`; if (allowFallback && next !== key) setSchumannSource(next, false); }; image.onload = () => { figure.classList.remove('feed-error'); updated.textContent = `Displayed from ${source.label}. Refreshed ${new Date().toLocaleTimeString()}.`; }; image.src = `${source.image}${source.image.includes('?') ? '&' : '?'}t=${Date.now()}`; image.alt = `${source.label} Schumann resonance spectrogram`; caption.innerHTML = `<strong>${source.label}.</strong> ${source.caption}`; link.href = source.page; link.textContent = `Open ${source.label}`; select.value = key; }
+  const schumannSelect = document.getElementById('schumannSource'); schumannSelect.addEventListener('change', () => setSchumannSource(schumannSelect.value)); document.getElementById('refreshSchumann').addEventListener('click', () => setSchumannSource(schumannSelect.value)); setSchumannSource('tomskMirror');
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

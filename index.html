@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -34,7 +34,22 @@
 	<link rel="stylesheet" href="stylesheet.css">
 
     <style>
-
+        .release-badge { display: inline-block; margin: 0 0 14px; padding: 6px 14px; border: 1px solid #48f2ff; border-radius: 999px; color: #48f2ff; background: rgba(0, 255, 255, .08); box-shadow: 0 0 14px rgba(0, 255, 255, .25); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+        .welcome-copy { max-width: 980px; margin: 0 auto; font-size: 1.05rem; line-height: 1.75; }
+        .scope-intro { max-width: 980px; margin: 0 auto 22px; text-align: center; color: #d7e8ee; }
+        .scope-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 0; list-style: none; }
+        .scope-item { --feature-color: #48f2ff; position: relative; padding: 16px 18px 16px 48px; border: 1px solid color-mix(in srgb, var(--feature-color) 70%, transparent); border-left: 5px solid var(--feature-color); border-radius: 8px; background: linear-gradient(120deg, color-mix(in srgb, var(--feature-color) 13%, #07131d), rgba(3, 12, 20, .82)); box-shadow: inset 0 0 18px rgba(0,0,0,.2), 0 0 12px color-mix(in srgb, var(--feature-color) 18%, transparent); line-height: 1.55; }
+        .scope-item::before { content: '◆'; position: absolute; left: 18px; top: 17px; color: var(--feature-color); text-shadow: 0 0 8px var(--feature-color); }
+        .scope-item strong { display: block; margin-bottom: 3px; color: var(--feature-color); letter-spacing: .035em; }
+        .scope-space { --feature-color: #61d9ff; }
+        .scope-earth { --feature-color: #55e69a; }
+        .scope-magnetic { --feature-color: #c47cff; }
+        .scope-seismic { --feature-color: #ff9c45; }
+        .scope-history { --feature-color: #ffd75b; }
+        .scope-research { --feature-color: #ff6e9d; }
+        .scope-sky { --feature-color: #9da8ff; }
+        .scope-media { --feature-color: #40ead8; }
+        @media (max-width: 760px) { .scope-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -42,7 +57,6 @@
     <!-- ===== Header ===== -->
     <header>
         <center><img id="banner" class="bordered-image" src="images/FrontierSignalsBanner.png" alt="Frontier Signals Official Banner"></center>
-		<p style="text-align: center; color: #ff00ff; font-weight: bold; margin: 5px 0;">Beta</p>
 		<hr>
         <p>Home Page - Mission Statement - Scope - Daily Video</p>
     </header>
@@ -69,6 +83,8 @@
             <!-- Live Feeds Submenu (still uses nav-links so CSS applies) -->
             <ul class="nav-links">
                 <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
+                <li><a href="live-earth-monitor.html" class="button">Live Earth Monitor</a></li>
+                <li><a href="magneticfield.html" class="button">Magnetic Field Tracker</a></li>
                 <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
                 <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
                 <li><a href="starcharts.html" class="button">Star Charts</a></li>
@@ -87,31 +103,32 @@
         </section><br><br>
 	<!-- ===== Landing Page ===== -->
         <section>
-            <h2 style="text-align:center">Welcome To Frontier Signals - WIP</h2><hr>
-            <p>&emsp;Frontier Signals is a work-in-progress research and monitoring hub focused on space weather, seismic activity, volcanism, historical event data, long-term Earth changes, models, star charts, and related frontier science topics. The goal is to collect useful public feeds, archives, papers, and educational resources in one place so patterns and sources can be explored more easily.</p><br><br>
+            <h2 style="text-align:center">Welcome To Frontier Signals</h2><hr>
+            <div style="text-align:center"><span class="release-badge">Ongoing Release</span></div>
+            <p class="welcome-copy">Frontier Signals is an active research, monitoring, and educational platform for exploring the forces shaping Earth and its space environment. It brings live public data, historical records, scientific literature, interactive models, and original commentary together in one evolving resource. The site is now in ongoing release: its core dashboards are available for regular use, while new datasets, visualizations, and analytical tools will continue to be added and refined.</p><br><br>
             <p style="text-align:center">A message to all from a Gen Z perspective: <a href="From-Gen-Z-Distractions-to-Fateful-Encounters.html" class="button">From Gen Z Distractions to Fateful Encounters</a></p><br>
         </section>
         <br><br>
         <!-- ===== Scope ===== -->
         <section>
         <h2 style="text-align:center">Scope</h2><hr>
-        <p>&emsp;Frontier Signals covers live monitoring, historical archives, research references, and interpretive tools related to space weather, earthquakes, volcanoes, ancient history, geophysics, astronomy, and independent scientific inquiry. Some sections are complete enough for regular use, while others remain experimental or under active development.</p>
-        <ul>
-            <li>Daily Frontier Signals video updates and commentary</li>
-            <li>Live space weather feeds, solar imagery, geomagnetic data, and model references</li>
-            <li>Interactive earthquake monitoring with public agency feeds and map tools</li>
-            <li>Volcano monitoring references and historical volcanism data</li>
-            <li>Historical data tables and charts for space weather, earthquakes, deep events, and volcanic activity</li>
-            <li>Peer-reviewed papers, research notes, source links, and frontier science articles</li>
-            <li>Ancient history, catastrophism, models, star charts, and related educational resources</li>
-            <li>Photography, multimedia, and external references for deeper study</li>
+        <p class="scope-intro">From events happening now to patterns unfolding across centuries, Frontier Signals connects authoritative observations with tools that make complex Earth and space systems easier to explore.</p>
+        <ul class="scope-grid">
+            <li class="scope-item scope-space"><strong>Space Weather</strong>Live solar imagery, geomagnetic conditions, auroral activity, agency feeds, model references, and daily video analysis.</li>
+            <li class="scope-item scope-earth"><strong>Live Earth Monitor</strong>Switchable global wildfire, flood, tropical-system, and drought layers using current NASA, GDACS, and Copernicus data.</li>
+            <li class="scope-item scope-magnetic"><strong>Magnetic Field Tracker</strong>An interactive geographic globe with pole-migration history, magnetic anomalies, field visualization, and long-term intensity trends.</li>
+            <li class="scope-item scope-seismic"><strong>Earthquakes &amp; Volcanoes</strong>Interactive seismic monitoring, volcano overlays, public-agency feeds, historical events, and geographic exploration tools.</li>
+            <li class="scope-item scope-history"><strong>Historical Data &amp; Archives</strong>Tables and charts for long-term space weather, deep earthquakes, volcanism, magnetic change, and related Earth-system records.</li>
+            <li class="scope-item scope-research"><strong>Frontier Science Research</strong>Peer-reviewed papers, research notes, source links, and articles connecting established evidence with open scientific questions.</li>
+            <li class="scope-item scope-sky"><strong>Models, Star Charts &amp; Ancient History</strong>Interactive models, astronomy tools, historical inquiry, catastrophism research, and educational context across disciplines.</li>
+            <li class="scope-item scope-media"><strong>Media &amp; Learning Resources</strong>Frontier Signals videos, photography, multimedia collections, reference links, and curated paths for deeper study.</li>
         </ul>
         </section><br><br>
 		<!-- ===== Disclaimer ===== -->
         <section>
         
         <h2 style="text-align:center">Disclaimer</h2><hr>
-            <p>&emsp;Frontier Signals is provided for educational, research, and informational purposes only. It is not an official warning system, forecasting service, emergency resource, or substitute for guidance from agencies such as NOAA, NASA, USGS, the Smithsonian Global Volcanism Program, emergency management offices, or other authoritative institutions.<br><br>&emsp;Many charts, feeds, images, maps, videos, and datasets on this site come from public or third-party sources. Those sources can change, delay, revise, rate-limit, or remove data without notice. I try to cite and preserve source context where practical, but users should verify important information directly with the original source before relying on it.<br><br>&emsp;Except where explicitly indicated, third-party images, papers, datasets, and other materials remain the property of their respective rights holders. Content may include public domain material, Creative Commons material, linked resources, embedded media, or fair-use educational references. If you have a copyright, attribution, or source concern, please contact the site owner.<br><br>&emsp;This website is in beta and may contain incomplete sections, experimental tools, preliminary notes, or errors. I have no direct affiliation with the scientific institutions, agencies, publishers, or organizations referenced on this site unless explicitly stated.</p>
+            <p>&emsp;Frontier Signals is provided for educational, research, and informational purposes only. It is not an official warning system, forecasting service, emergency resource, or substitute for guidance from agencies such as NOAA, NASA, USGS, the Smithsonian Global Volcanism Program, emergency management offices, or other authoritative institutions.<br><br>&emsp;Many charts, feeds, images, maps, videos, and datasets on this site come from public or third-party sources. Those sources can change, delay, revise, rate-limit, or remove data without notice. I try to cite and preserve source context where practical, but users should verify important information directly with the original source before relying on it.<br><br>&emsp;Except where explicitly indicated, third-party images, papers, datasets, and other materials remain the property of their respective rights holders. Content may include public domain material, Creative Commons material, linked resources, embedded media, or fair-use educational references. If you have a copyright, attribution, or source concern, please contact the site owner.<br><br>&emsp;This website may contain incomplete sections, experimental tools, preliminary notes, or errors. I have no direct affiliation with the scientific institutions, agencies, publishers, or organizations referenced on this site unless explicitly stated.</p>
         </section>
         <br><br>
 		

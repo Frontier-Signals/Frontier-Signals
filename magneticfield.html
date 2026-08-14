@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Frontier Signals magnetic field dashboard with WMM2025-based field-strength weakening and north magnetic pole tracking on a 3D globe.">
+  <meta name="keywords" content="magnetic field, WMM2025, north magnetic pole, geomagnetic field, NOAA, NCEI, BGS">
+  <meta property="og:title" content="Magnetic Field Tracker - Frontier Signals">
+  <meta property="og:description" content="Track modeled geomagnetic field weakening and north magnetic pole movement using NOAA/NCEI WMM2025 data.">
+  <meta property="og:url" content="https://frontier-signals.com/magneticfield.html">
+  <link rel="canonical" href="https://frontier-signals.com/magneticfield.html">
+  <meta property="og:image" content="https://frontier-signals.com/images/magneticfieldbanner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Magnetic Field Tracker - Frontier Signals">
+  <meta name="twitter:description" content="3D WMM2025 magnetic field tracker for field weakening and north magnetic pole movement.">
+  <meta name="twitter:image" content="https://frontier-signals.com/images/magneticfieldbanner.png">
+  <title>Magnetic Field Tracker - Frontier Signals</title>
+  <link rel="stylesheet" href="stylesheet.css">
+  <style>
+    .mag-dashboard {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .mag-panel {
+      border: 1px solid #ff6b35;
+      background: rgba(0, 255, 255, 0.04);
+      padding: 1rem;
+      box-shadow: 0 0 16px rgba(0, 255, 255, 0.12);
+    }
+
+    .mag-globe-frame {
+      position: relative;
+      min-height: 620px;
+      border: 1px solid #00ffff;
+      background: radial-gradient(circle at 50% 45%, rgba(20, 48, 74, 0.78), rgba(0, 0, 0, 0.92));
+      overflow: hidden;
+    }
+
+    #magnetic-globe {
+      display: block;
+      width: 100%;
+      height: 620px;
+    }
+
+    .mag-legend {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      height: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      margin: 0.5rem 0 0.25rem;
+    }
+
+    .mag-legend span:nth-child(1) { background: #3522a4; }
+    .mag-legend span:nth-child(2) { background: #00a7ff; }
+    .mag-legend span:nth-child(3) { background: #f7e65c; }
+    .mag-legend span:nth-child(4) { background: #ff4b1f; }
+
+    .mag-controls {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .mag-controls label {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .mag-toggle-row {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .mag-toggle-row label {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      min-height: 38px;
+    }
+
+    .mag-playback { display: grid; grid-template-columns: auto 1fr; gap: 0.6rem; align-items: center; }
+    .mag-playback select { min-width: 0; }
+    .mag-inspector { border: 1px solid rgba(0, 255, 255, 0.65); background: rgba(0, 10, 20, 0.84); padding: 0.8rem; }
+    .mag-inspector-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.45rem; }
+    .mag-inspector-grid span { color: #ccc; font-size: 0.78rem; }
+    .mag-inspector-grid strong { display: block; color: #00ffff; font-size: 0.92rem; }
+
+    .mag-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .mag-stat {
+      border: 1px solid rgba(255, 107, 53, 0.8);
+      padding: 0.75rem;
+      background: rgba(11, 42, 59, 0.9);
+    }
+
+    .mag-stat span {
+      display: block;
+      color: #fcf2dc;
+      font-size: 0.82rem;
+    }
+
+    .mag-stat strong {
+      display: block;
+      color: #ff6b35;
+      font-size: 1.1rem;
+      margin-top: 0.25rem;
+    }
+
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .source-card {
+      border: 1px solid rgba(0, 255, 255, 0.45);
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.24);
+    }
+
+    .source-card img {
+      display: block;
+      width: 100%;
+      max-height: 260px;
+      object-fit: contain;
+      background: #000;
+      border: 1px solid #ff6b35;
+    }
+
+    .mag-chart-wrap { position: relative; min-height: 360px; border: 1px solid #00ffff; background: rgba(2, 10, 20, 0.9); padding: 0.75rem; }
+    #field-history-chart { display: block; width: 100%; height: 340px; }
+    .chart-callout { border-left: 4px solid #ff6b35; padding: 0.8rem 1rem; background: rgba(255, 107, 53, 0.08); }
+    .mag-key { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem 1.2rem; color: #ccc; font-size: 0.86rem; }
+    .mag-key span::before { content: ''; display: inline-block; width: 18px; height: 4px; margin-right: 6px; vertical-align: middle; background: var(--key-color); }
+
+    @media (max-width: 980px) {
+      .mag-dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .mag-globe-frame,
+      #magnetic-globe {
+        min-height: 460px;
+        height: 460px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .mag-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .mag-globe-frame,
+      #magnetic-globe {
+        min-height: 360px;
+        height: 360px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <center><img id="banner" class="bordered-image" src="images/FrontierSignalsBanner.png" alt="Frontier Signals Official Banner"></center>
+    <hr>
+    <p>Magnetic Field Tracker</p>
+  </header>
+
+  <nav>
+    <div class="hamburger">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="button">Home Page</a></li>
+      <li><a href="historydata.html" class="button">Historical Data &amp; Archives</a></li>
+      <li><a href="peerpapers.html" class="button">Frontier Science Articles</a></li>
+      <li><a href="ancienthistory.html" class="button">Ancient History</a></li>
+      <li><a href="extras.html" class="button">Multimedia &amp; Resource Links</a></li>
+      <li><a href="about.html" class="button">About/Contact</a></li>
+    </ul>
+    <hr>
+    <ul class="nav-links">
+                <li><a href="spaceweather.html" class="button">Space Weather Feeds</a></li>
+                <li><a href="live-earth-monitor.html" class="button">Live Earth Monitor</a></li>
+      <li><a href="magneticfield.html" class="button">Magnetic Field Tracker</a></li>
+      <li><a href="earthquakes.html" class="button">Earthquake Monitoring</a></li>
+      <li><a href="volcanos.html" class="button">Volcano Monitoring</a></li>
+      <li><a href="starcharts.html" class="button">Star Charts</a></li>
+      <li><a href="models.html" class="button">Models</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <br><br>
+    <section>
+      <center><img class="bordered-image" src="images/magneticfieldbanner.png" alt="Magnetic Field Tracker Banner" style="width:100%;height:auto"></center>
+    </section>
+    <section>
+      <h1 style="text-align:center">Earth Magnetic Field Tracker</h1><hr>
+      <p>This tool combines the current WMM2025 main field with NOAA's modeled magnetic-dip-pole history from 1590 onward. The globe shows geographic coastlines, both pole tracks, and regional intensity structure—including the weak South Atlantic Anomaly. It does not treat short-lived geomagnetic storms as permanent main-field change.</p>
+    </section>
+
+    <section>
+      <h2 style="text-align:center">3D Main-Field Model</h2><hr>
+      <div class="mag-dashboard">
+        <div class="mag-panel">
+          <div class="mag-globe-frame">
+            <canvas id="magnetic-globe"></canvas>
+          </div>
+          <div class="mag-legend" aria-label="Field intensity legend"><span></span><span></span><span></span><span></span></div>
+          <div class="mag-key"><span style="--key-color:#f5d742">Geographic coastlines</span><span style="--key-color:#ff654f">North dip-pole track</span><span style="--key-color:#62d6ff">South dip-pole track</span><span style="--key-color:#ff39c6">Weak-field/SAA</span><span style="--key-color:#ff9d40">East declination</span><span style="--key-color:#50deff">West declination</span><span style="--key-color:#fff">Agonic line (0deg)</span></div>
+          <p style="text-align:center;color:#ccc;font-size:0.9rem;margin-top:0.25rem">WMM2025 total-intensity colors run from lower (violet/blue) to higher (yellow/orange). Drag to rotate; scroll or pinch to zoom.</p>
+        </div>
+
+        <aside class="mag-panel mag-controls">
+          <h3 style="margin-top:0">Model Controls</h3>
+          <div class="mag-toggle-row">
+            <label><input id="toggle-field-layer" type="checkbox" checked> Show field-strength weakening layer</label>
+            <label><input id="toggle-geography-layer" type="checkbox" checked> Show geographic Earth map</label>
+            <label><input id="toggle-pole-layer" type="checkbox" checked> Show north and south magnetic pole paths</label>
+            <label><input id="toggle-anomaly-layer" type="checkbox" checked> Highlight Atlantic intensity structure</label>
+            <label><input id="toggle-declination-layer" type="checkbox" checked> Show declination contours</label>
+          </div>
+          <label for="model-year">Pole-history year: <span id="model-year-label">2025</span>
+            <input id="model-year" type="range" min="1590" max="2030" step="1" value="2025">
+          </label>
+          <div class="mag-playback">
+            <button id="toggle-history-animation" class="button" type="button">Play History</button>
+            <label for="history-speed">Playback speed
+              <select id="history-speed"><option value="12">12 years/sec</option><option value="30" selected>30 years/sec</option><option value="60">60 years/sec</option></select>
+            </label>
+          </div>
+          <label for="rotation-speed">Auto-rotation
+            <input id="rotation-speed" type="range" min="0" max="1" step="0.05" value="0.25">
+          </label>
+          <button id="reset-camera" class="button" type="button">Reset View</button>
+          <div class="mag-inspector">
+            <h3 style="margin:0 0 0.55rem">Location Inspector</h3>
+            <p id="inspector-location" style="margin:0 0 0.55rem;color:#ccc">Click anywhere on the visible globe.</p>
+            <div class="mag-inspector-grid">
+              <span>Total intensity F<strong id="inspect-f">--</strong></span><span>Declination D<strong id="inspect-d">--</strong></span>
+              <span>Inclination I<strong id="inspect-i">--</strong></span><span>Horizontal H<strong id="inspect-h">--</strong></span>
+              <span>North X<strong id="inspect-x">--</strong></span><span>East Y<strong id="inspect-y">--</strong></span>
+              <span>Down Z<strong id="inspect-z">--</strong></span><span>Component model<strong>WMM2025 dipole + regional</strong></span>
+            </div>
+          </div>
+          <p id="model-source-status" style="font-size:0.85rem;color:#ccc;margin:0">Loading local WMM2025 coefficient model...</p>
+          <div class="mag-stats">
+            <div class="mag-stat"><span>Centered dipole moment</span><strong id="dipole-moment">--</strong></div>
+            <div class="mag-stat"><span>Annual trend</span><strong id="dipole-trend">--</strong></div>
+            <div class="mag-stat"><span>North magnetic pole</span><strong id="north-pole-position">--</strong></div>
+            <div class="mag-stat"><span>South magnetic pole</span><strong id="south-pole-position">--</strong></div>
+            <div class="mag-stat"><span>Geomagnetic dipole pole</span><strong id="dipole-pole-position">--</strong></div>
+          </div>
+          <p style="font-size:0.86rem;color:#ccc">The interactive components use the WMM2025 centered-dipole terms with regional intensity adjustments for the Atlantic structure; they are educational approximations rather than NOAA navigation outputs. The history slider moves the NOAA gufm1/IGRF pole markers without extrapolating WMM backward.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section>
+      <h2 style="text-align:center">Main-Field Strength: Four-Century Context</h2><hr>
+      <div class="mag-chart-wrap"><canvas id="field-history-chart" aria-label="Relative global geomagnetic field strength history from 1590 to 2030"></canvas></div>
+      <p style="font-size:0.9rem;color:#ccc">The chart separates three source frames: the approximately 40% decline over 400 years cited by Kabat (2016) from Turner (2011); ESA's approximately 9% global-average decline over two centuries; and an accelerated rate-change scenario transitioning from 5% per century to 5% per decade. ESA mission material reports nearly 8% axial-dipole decline over 150 years and regional South Atlantic weakening up to 10% in 20 years, so the accelerated curve is regional/scenario context rather than a global-average measurement.</p>
+    </section>
+
+    <section>
+      <h2 style="text-align:center">Operational Magnetic Field Context</h2><hr>
+      <div class="source-grid">
+        <article class="source-card">
+          <h3>NOAA WMM2025</h3>
+          <p>The World Magnetic Model is the standard navigation model for Earth's main magnetic field. NOAA/NCEI states WMM2025 was released on December 17, 2024 and remains valid until late 2029.</p>
+          <a class="button" href="https://www.ncei.noaa.gov/products/world-magnetic-model" target="_blank" rel="noopener">NOAA/NCEI WMM</a>
+        </article>
+        <article class="source-card">
+          <h3>NOAA Historical Pole Tracks</h3>
+          <p>NOAA's modeled dip-pole service covers 1590–2025 using gufm1, a transition around 1890–1900, and IGRF thereafter. WMM2025 places the 2025 north and south dip poles at 85.762°N, 139.298°E and 63.851°S, 135.078°E.</p>
+          <a class="button" href="https://www.ncei.noaa.gov/products/wandering-geomagnetic-poles" target="_blank" rel="noopener">NOAA Pole History</a>
+        </article>
+        <article class="source-card">
+          <h3>ESA Swarm Field Context</h3>
+          <p>ESA reports an approximately 9% decline in global average field strength over the past two centuries and documents the evolving South Atlantic Anomaly.</p>
+          <a class="button" href="https://visuals.earth.esa.int/data/magnetic-field" target="_blank" rel="noopener">ESA Magnetic Field</a>
+        </article>
+        <article class="source-card">
+          <h3>Cataclysmic Pole Shift Report</h3>
+          <p>Kabat's 2016 Air Command and Staff College research report cites Turner (2011) for a 40% decline over approximately 400 years and discusses potential national-security consequences of geomagnetic weakening.</p>
+          <a class="button" href="pdfs/other/Cataclysmic%20Pole%20Shift.pdf" target="_blank" rel="noopener">Read Local Report</a>
+        </article>
+        <article class="source-card">
+          <h3>USGS Ground Magnetic Field</h3>
+          <img src="https://geomag.usgs.gov/images/observatories/Realtime_CONUS.png" alt="USGS real-time geomagnetic variation map" loading="lazy" decoding="async">
+          <p>Useful for current ground disturbance context. This is storm-time variation, separate from the slow main-field weakening visualized on the globe.</p>
+          <a class="button" href="https://www.usgs.gov/programs/geomagnetism" target="_blank" rel="noopener">USGS Geomagnetism</a>
+        </article>
+        <article class="source-card">
+          <h3>NOAA/SWPC K Index</h3>
+          <img src="https://services.swpc.noaa.gov/images/station-k-index.png" alt="NOAA SWPC station K index" loading="lazy" decoding="async">
+          <p>K-index products show short-term magnetic disturbance. High K/Kp values indicate storm-time activity, not a permanent weakening of the main field.</p>
+          <a class="button" href="https://www.swpc.noaa.gov/products/station-k-and-indices" target="_blank" rel="noopener">NOAA K/A Indices</a>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Frontier Signals. All rights reserved.</p>
+    <p style="font-size: 12px; margin-top: 10px;">
+      <a href="privacy-policy.html" style="color: #00ffff; text-decoration: none;">Privacy Policy</a> |
+      <a href="terms-of-service.html" style="color: #00ffff; text-decoration: none;">Terms of Service</a>
+    </p>
+  </footer>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById('magnetic-globe');
+      const ctx = canvas.getContext('2d', { alpha: true });
+      const yearSlider = document.getElementById('model-year');
+      const yearLabel = document.getElementById('model-year-label');
+      const rotationSlider = document.getElementById('rotation-speed');
+      const fieldToggle = document.getElementById('toggle-field-layer');
+      const geographyToggle = document.getElementById('toggle-geography-layer');
+      const poleToggle = document.getElementById('toggle-pole-layer');
+      const anomalyToggle = document.getElementById('toggle-anomaly-layer');
+      const declinationToggle = document.getElementById('toggle-declination-layer');
+      const animationButton = document.getElementById('toggle-history-animation');
+      const historySpeed = document.getElementById('history-speed');
+      const sourceStatus = document.getElementById('model-source-status');
+      const stats = {
+        dipoleMoment: document.getElementById('dipole-moment'),
+        dipoleTrend: document.getElementById('dipole-trend'),
+        northPole: document.getElementById('north-pole-position'),
+        southPole: document.getElementById('south-pole-position'),
+        dipolePole: document.getElementById('dipole-pole-position')
+      };
+
+      const WMM = {
+        epoch: 2025,
+        g10: -29351.8,
+        g11: -1410.8,
+        h11: 4545.4,
+        dg10: 12.0,
+        dg11: 9.7,
+        dh11: -21.5
+      };
+      let northPolePath = [
+        { year: 1590, lat: 73.9, lon: -111.8 }, { year: 1700, lat: 79.0, lon: -107.0 },
+        { year: 1800, lat: 78.5, lon: -96.0 }, { year: 1900, lat: 70.5, lon: -96.0 },
+        { year: 1950, lat: 73.9, lon: -100.9 }, { year: 2000, lat: 81.2, lon: -110.8 },
+        { year: 2020, lat: 86.5, lon: 164.0 }, { year: 2025, lat: 85.762, lon: 139.298 },
+        { year: 2030, lat: 84.8, lon: 113.4 }
+      ];
+      let southPolePath = [
+        { year: 1590, lat: -78.0, lon: -152.9 }, { year: 1700, lat: -75.0, lon: 145.0 },
+        { year: 1800, lat: -71.0, lon: 137.0 }, { year: 1900, lat: -66.5, lon: 148.0 },
+        { year: 1950, lat: -68.7, lon: 143.0 }, { year: 2000, lat: -64.7, lon: 138.3 },
+        { year: 2025, lat: -63.851, lon: 135.078 }, { year: 2030, lat: -63.5, lon: 134.5 }
+      ];
+      let worldGeography = [];
+
+      let wmmModel = null;
+      let rotX = -0.18;
+      let rotY = 0.45;
+      let zoom = 1;
+      let dragging = false;
+      let pointerMoved = false;
+      let lastPointer = { x: 0, y: 0 };
+      let fieldGrid = null;
+      let declinationGrid = null;
+      let animationPlaying = false;
+      let lastAnimationTime = 0;
+      let selectedLocation = null;
+
+      function degreesToRadians(value) { return value * Math.PI / 180; }
+      function radiansToDegrees(value) { return value * 180 / Math.PI; }
+      function normalizeLon(value) {
+        const lon = ((value + 540) % 360) - 180;
+        return lon === -180 ? 180 : lon;
+      }
+      function coeffAt(base, rate, year) {
+        return base + rate * (year - WMM.epoch);
+      }
+      function dipoleCoefficients(year) {
+        return {
+          g10: coeffAt(WMM.g10, WMM.dg10, year),
+          g11: coeffAt(WMM.g11, WMM.dg11, year),
+          h11: coeffAt(WMM.h11, WMM.dh11, year)
+        };
+      }
+      function dipoleMoment(year) {
+        const c = dipoleCoefficients(year);
+        return Math.hypot(c.g10, c.g11, c.h11);
+      }
+      function dipoleTrend(year) {
+        const c = dipoleCoefficients(year);
+        return (c.g10 * WMM.dg10 + c.g11 * WMM.dg11 + c.h11 * WMM.dh11) / dipoleMoment(year);
+      }
+      function geomagneticDipolePole(year) {
+        const c = dipoleCoefficients(year);
+        const lat = radiansToDegrees(Math.atan2(-c.g10, Math.hypot(c.g11, c.h11)));
+        const lon = normalizeLon(radiansToDegrees(Math.atan2(c.h11, c.g11)) + 180);
+        return { lat, lon };
+      }
+      function interpolatePole(year, points = northPolePath) {
+        if (year <= points[0].year) return points[0];
+        if (year >= points[points.length - 1].year) return points[points.length - 1];
+        const right = points.find(point => point.year >= year);
+        const left = points[points.indexOf(right) - 1];
+        const t = (year - left.year) / (right.year - left.year);
+        return {
+          year,
+          lat: left.lat + (right.lat - left.lat) * t,
+          lon: left.lon + (right.lon - left.lon) * t
+        };
+      }
+      function formatCoord(lat, lon) {
+        return `${Math.abs(lat).toFixed(1)}deg ${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lon).toFixed(1)}deg ${lon >= 0 ? 'E' : 'W'}`;
+      }
+
+      function parseWmmCoefficients(text) {
+        const lines = text.trim().split(/\r?\n/);
+        const header = lines.shift().trim().split(/\s+/);
+        const coeffs = [];
+        for (const line of lines) {
+          const parts = line.trim().split(/\s+/).map(Number);
+          if (parts.length < 6 || parts.some(Number.isNaN)) continue;
+          const [n, m, g, h, dg, dh] = parts;
+          coeffs.push({ n, m, g, h, dg, dh });
+        }
+        return { epoch: Number(header[0]) || WMM.epoch, nMax: Math.max(...coeffs.map(c => c.n)), coeffs };
+      }
+
+      function legendreTable(theta, nMax) {
+        const x = Math.cos(theta);
+        const s = Math.max(1e-6, Math.sin(theta));
+        const p = Array.from({ length: nMax + 1 }, () => Array(nMax + 1).fill(0));
+        p[0][0] = 1;
+        for (let n = 1; n <= nMax; n += 1) {
+          p[n][n] = (2 * n - 1) * s * p[n - 1][n - 1];
+          p[n][n - 1] = (2 * n - 1) * x * p[n - 1][n - 1];
+          for (let m = 0; m <= n - 2; m += 1) {
+            p[n][m] = ((2 * n - 1) * x * p[n - 1][m] - (n + m - 1) * p[n - 2][m]) / (n - m);
+          }
+        }
+        return p;
+      }
+
+      function potentialAt(lat, lon, year) {
+        if (!wmmModel) return dipoleFieldProxy(lat, lon, year);
+        const theta = degreesToRadians(90 - lat);
+        const lambda = degreesToRadians(lon);
+        const p = legendreTable(theta, wmmModel.nMax);
+        let potential = 0;
+        for (const coeff of wmmModel.coeffs) {
+          const g = coeff.g + coeff.dg * (year - wmmModel.epoch);
+          const h = coeff.h + coeff.dh * (year - wmmModel.epoch);
+          potential += (g * Math.cos(coeff.m * lambda) + h * Math.sin(coeff.m * lambda)) * p[coeff.n][coeff.m];
+        }
+        return potential;
+      }
+
+      function radialTermAt(lat, lon, year) {
+        if (!wmmModel) return 0;
+        const theta = degreesToRadians(90 - lat);
+        const lambda = degreesToRadians(lon);
+        const p = legendreTable(theta, wmmModel.nMax);
+        let radial = 0;
+        for (const coeff of wmmModel.coeffs) {
+          const g = coeff.g + coeff.dg * (year - wmmModel.epoch);
+          const h = coeff.h + coeff.dh * (year - wmmModel.epoch);
+          radial += (coeff.n + 1) * (g * Math.cos(coeff.m * lambda) + h * Math.sin(coeff.m * lambda)) * p[coeff.n][coeff.m];
+        }
+        return radial;
+      }
+
+      function fieldComponents(lat, lon, year = 2025) {
+        const modelYear = Math.max(2025, Math.min(2030, year));
+        const r = latLonVector(lat, lon);
+        const pole = geomagneticDipolePole(modelYear);
+        const axis = latLonVector(pole.lat, pole.lon);
+        const magneticMoment = { x: -axis.x, y: -axis.y, z: -axis.z };
+        const dot = magneticMoment.x * r.x + magneticMoment.y * r.y + magneticMoment.z * r.z;
+        const scale = dipoleMoment(modelYear);
+        const field = {
+          x: scale * (3 * dot * r.x - magneticMoment.x),
+          y: scale * (3 * dot * r.y - magneticMoment.y),
+          z: scale * (3 * dot * r.z - magneticMoment.z)
+        };
+        const latRad = degreesToRadians(lat);
+        const lonRad = degreesToRadians(lon);
+        const northUnit = { x: -Math.sin(latRad) * Math.sin(lonRad), y: Math.cos(latRad), z: -Math.sin(latRad) * Math.cos(lonRad) };
+        const eastUnit = { x: Math.cos(lonRad), y: 0, z: -Math.sin(lonRad) };
+        const angularDistance = (aLat, aLon) => Math.acos(Math.max(-1, Math.min(1, Math.sin(latRad) * Math.sin(degreesToRadians(aLat)) + Math.cos(latRad) * Math.cos(degreesToRadians(aLat)) * Math.cos(lonRad - degreesToRadians(aLon)))));
+        const saaReduction = 0.43 * Math.exp(-Math.pow(angularDistance(-26.1, -60) / degreesToRadians(34), 2));
+        const northAtlanticIncrease = 0.09 * Math.exp(-Math.pow(angularDistance(53, -28) / degreesToRadians(28), 2));
+        const regionalScale = 1 - saaReduction + northAtlanticIncrease;
+        const north = regionalScale * (field.x * northUnit.x + field.y * northUnit.y + field.z * northUnit.z);
+        const east = regionalScale * (field.x * eastUnit.x + field.y * eastUnit.y + field.z * eastUnit.z);
+        const down = -regionalScale * (field.x * r.x + field.y * r.y + field.z * r.z);
+        const horizontal = Math.hypot(north, east);
+        return { north, east, down, horizontal, total: Math.hypot(horizontal, down), declination: radiansToDegrees(Math.atan2(east, north)), inclination: radiansToDegrees(Math.atan2(down, horizontal)) };
+      }
+
+      function fullFieldProxy(lat, lon, year) {
+        if (!wmmModel) return dipoleFieldProxy(lat, lon, year);
+        return fieldComponents(lat, lon, year).total;
+      }
+
+      function dipoleFieldProxy(lat, lon, year) {
+        const pole = geomagneticDipolePole(year);
+        const p = latLonVector(lat, lon);
+        const a = latLonVector(pole.lat, pole.lon);
+        const cosTheta = p.x * a.x + p.y * a.y + p.z * a.z;
+        const dipole = dipoleMoment(year) / dipoleMoment(WMM.epoch);
+        return dipole * Math.sqrt(1 + 3 * cosTheta * cosTheta);
+      }
+
+      function colorRamp(value) {
+        const t = Math.max(0, Math.min(1, value));
+        const stops = [
+          [0.00, [53, 34, 164]],
+          [0.36, [0, 167, 255]],
+          [0.68, [247, 230, 92]],
+          [1.00, [255, 75, 31]]
+        ];
+        for (let i = 1; i < stops.length; i += 1) {
+          if (t <= stops[i][0]) {
+            const prev = stops[i - 1];
+            const local = (t - prev[0]) / (stops[i][0] - prev[0]);
+            const rgb = prev[1].map((channel, index) => Math.round(channel + (stops[i][1][index] - channel) * local));
+            return `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+          }
+        }
+        return 'rgb(255,75,31)';
+      }
+
+      function latLonVector(lat, lon) {
+        const latRad = degreesToRadians(lat);
+        const lonRad = degreesToRadians(lon);
+        return {
+          x: Math.cos(latRad) * Math.sin(lonRad),
+          y: Math.sin(latRad),
+          z: Math.cos(latRad) * Math.cos(lonRad)
+        };
+      }
+
+      function rotateVector(v) {
+        const cy = Math.cos(rotY);
+        const sy = Math.sin(rotY);
+        const cx = Math.cos(rotX);
+        const sx = Math.sin(rotX);
+        const x1 = v.x * cy + v.z * sy;
+        const z1 = -v.x * sy + v.z * cy;
+        return {
+          x: x1,
+          y: v.y * cx - z1 * sx,
+          z: v.y * sx + z1 * cx
+        };
+      }
+
+      function project(lat, lon, radius, centerX, centerY) {
+        const rotated = rotateVector(latLonVector(lat, lon));
+        return {
+          visible: rotated.z > -0.08,
+          x: centerX + rotated.x * radius,
+          y: centerY - rotated.y * radius,
+          z: rotated.z
+        };
+      }
+
+      function canvasPointToLatLon(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+        const radius = Math.min(width, height) * 0.43 * zoom;
+        const xr = (clientX - rect.left - width / 2) / radius;
+        const yr = (height / 2 - (clientY - rect.top)) / radius;
+        const radialSquared = xr * xr + yr * yr;
+        if (radialSquared > 1) return null;
+        const zr = Math.sqrt(Math.max(0, 1 - radialSquared));
+        const cxr = Math.cos(rotX), sxr = Math.sin(rotX), cyr = Math.cos(rotY), syr = Math.sin(rotY);
+        const originalY = yr * cxr + zr * sxr;
+        const z1 = -yr * sxr + zr * cxr;
+        const originalX = xr * cyr - z1 * syr;
+        const originalZ = xr * syr + z1 * cyr;
+        return { lat: radiansToDegrees(Math.asin(Math.max(-1, Math.min(1, originalY)))), lon: normalizeLon(radiansToDegrees(Math.atan2(originalX, originalZ))) };
+      }
+
+      function updateLocationInspector(location) {
+        if (!location) return;
+        selectedLocation = location;
+        const values = fieldComponents(location.lat, location.lon, 2025);
+        const formatNt = value => `${Math.round(value).toLocaleString()} nT`;
+        document.getElementById('inspector-location').textContent = formatCoord(location.lat, location.lon);
+        document.getElementById('inspect-f').textContent = formatNt(values.total);
+        document.getElementById('inspect-d').textContent = `${values.declination.toFixed(1)}deg`;
+        document.getElementById('inspect-i').textContent = `${values.inclination.toFixed(1)}deg`;
+        document.getElementById('inspect-h').textContent = formatNt(values.horizontal);
+        document.getElementById('inspect-x').textContent = formatNt(values.north);
+        document.getElementById('inspect-y').textContent = formatNt(values.east);
+        document.getElementById('inspect-z').textContent = formatNt(values.down);
+      }
+
+      function rebuildFieldGrid() {
+        const year = Math.max(2025, Math.min(2030, Number(yearSlider.value)));
+        const samples = [];
+        let min = Infinity;
+        let max = -Infinity;
+        for (let lat = -88; lat <= 88; lat += 4) {
+          for (let lon = -180; lon < 180; lon += 4) {
+            const components = wmmModel ? fieldComponents(lat, lon, year) : null;
+            const value = components ? components.total : fullFieldProxy(lat, lon, year);
+            min = Math.min(min, value);
+            max = Math.max(max, value);
+            samples.push({ lat, lon, value, declination: components ? components.declination : 0 });
+          }
+        }
+        const span = Math.max(1e-6, max - min);
+        fieldGrid = samples.map(sample => ({
+          lat: sample.lat,
+          lon: sample.lon,
+          intensity: (sample.value - min) / span,
+          declination: sample.declination,
+          color: colorRamp((sample.value - min) / span)
+        }));
+        declinationGrid = fieldGrid;
+      }
+
+      function updateStats() {
+        const year = Number(yearSlider.value);
+        const fieldYear = Math.max(2025, Math.min(2030, year));
+        yearLabel.textContent = year.toFixed(0);
+        const currentPole = interpolatePole(year, northPolePath);
+        const currentSouthPole = interpolatePole(year, southPolePath);
+        const dipolePole = geomagneticDipolePole(fieldYear);
+        const moment = dipoleMoment(fieldYear);
+        const trend = dipoleTrend(fieldYear);
+        stats.dipoleMoment.textContent = `${Math.round(moment).toLocaleString()} nT`;
+        stats.dipoleTrend.textContent = `${trend.toFixed(1)} nT/yr (${(trend / moment * 100).toFixed(3)}%/yr)`;
+        stats.northPole.textContent = formatCoord(currentPole.lat, currentPole.lon);
+        stats.southPole.textContent = formatCoord(currentSouthPole.lat, currentSouthPole.lon);
+        stats.dipolePole.textContent = formatCoord(dipolePole.lat, dipolePole.lon);
+      }
+
+      function drawGreatCircle(points, color, width, radius, cx, cy, dashed = false) {
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        if (dashed) ctx.setLineDash([10, 8]);
+        ctx.beginPath();
+        let drawing = false;
+        for (const point of points) {
+          const projected = project(point.lat, point.lon, radius, cx, cy);
+          if (!projected.visible) {
+            drawing = false;
+            continue;
+          }
+          if (!drawing) {
+            ctx.moveTo(projected.x, projected.y);
+            drawing = true;
+          } else {
+            ctx.lineTo(projected.x, projected.y);
+          }
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function geometryRings(geometry) {
+        if (!geometry || !geometry.coordinates) return [];
+        if (geometry.type === 'Polygon') return geometry.coordinates;
+        if (geometry.type === 'MultiPolygon') return geometry.coordinates.flat();
+        return [];
+      }
+
+      function drawGeography(radius, cx, cy) {
+        if (!geographyToggle.checked) return;
+        for (const ring of worldGeography) {
+          const points = ring.map(pair => ({ lat: Number(pair[1]), lon: Number(pair[0]) }));
+          drawGreatCircle(points, 'rgba(245,215,66,0.82)', 1.15, radius, cx, cy);
+        }
+      }
+
+      function drawAnomalyStructure(radius, cx, cy) {
+        if (!anomalyToggle.checked || !fieldGrid) return;
+        for (const sample of fieldGrid) {
+          if (sample.intensity > 0.18 && sample.intensity < 0.88) continue;
+          const p = project(sample.lat, sample.lon, radius, cx, cy);
+          if (!p.visible) continue;
+          ctx.fillStyle = sample.intensity <= 0.18 ? 'rgba(255,57,198,0.72)' : 'rgba(98,214,255,0.34)';
+          ctx.fillRect(p.x - 1.7, p.y - 1.7, 3.4, 3.4);
+        }
+        drawMarker(-26.1, -60.0, '#ff39c6', 7, 'South Atlantic Anomaly', radius, cx, cy);
+      }
+
+      function drawDeclinationContours(radius, cx, cy) {
+        if (!declinationToggle.checked || !declinationGrid) return;
+        for (const sample of declinationGrid) {
+          const nearest = Math.round(sample.declination / 20) * 20;
+          const distance = Math.abs(sample.declination - nearest);
+          if (distance > 1.8) continue;
+          const p = project(sample.lat, sample.lon, radius, cx, cy);
+          if (!p.visible) continue;
+          const zero = Math.abs(nearest) < 1;
+          ctx.fillStyle = zero ? 'rgba(255,255,255,0.95)' : (nearest > 0 ? 'rgba(255,157,64,0.78)' : 'rgba(80,222,255,0.78)');
+          const size = zero ? 3.2 : 2.2;
+          ctx.fillRect(p.x - size / 2, p.y - size / 2, size, size);
+        }
+      }
+
+      function drawMarker(lat, lon, color, size, label, radius, cx, cy) {
+        const p = project(lat, lon, radius, cx, cy);
+        if (!p.visible) return;
+        const scale = 0.62 + 0.38 * Math.max(0, p.z);
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 14;
+        ctx.arc(p.x, p.y, size * scale, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        if (label) {
+          ctx.font = `${Math.max(12, 15 * scale)}px Arial`;
+          ctx.fillStyle = '#fcf2dc';
+          ctx.fillText(label, p.x + size + 6, p.y - size - 4);
+        }
+      }
+
+      function drawScene() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const width = canvas.width / dpr;
+        const height = canvas.height / dpr;
+        const cx = width / 2;
+        const cy = height / 2;
+        const radius = Math.min(width, height) * 0.43 * zoom;
+        ctx.clearRect(0, 0, width, height);
+
+        const glow = ctx.createRadialGradient(cx - radius * 0.25, cy - radius * 0.3, radius * 0.08, cx, cy, radius);
+        glow.addColorStop(0, '#153a54');
+        glow.addColorStop(0.75, '#061b2a');
+        glow.addColorStop(1, '#01040a');
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fillStyle = glow;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0,255,255,0.8)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.clip();
+
+        if (fieldToggle.checked && fieldGrid) {
+          for (const sample of fieldGrid) {
+            const p = project(sample.lat, sample.lon, radius, cx, cy);
+            if (!p.visible) continue;
+            ctx.fillStyle = sample.color;
+            ctx.globalAlpha = 0.42 + 0.45 * Math.max(0, p.z);
+            ctx.fillRect(p.x - 2.2, p.y - 2.2, 4.4, 4.4);
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        drawAnomalyStructure(radius, cx, cy);
+        drawGeography(radius, cx, cy);
+        drawDeclinationContours(radius, cx, cy);
+
+        for (let lon = -180; lon <= 180; lon += 30) {
+          const points = [];
+          for (let lat = -88; lat <= 88; lat += 2) points.push({ lat, lon });
+          drawGreatCircle(points, 'rgba(0,255,255,0.18)', 1, radius, cx, cy);
+        }
+        for (let lat = -60; lat <= 60; lat += 30) {
+          const points = [];
+          for (let lon = -180; lon <= 180; lon += 2) points.push({ lat, lon });
+          drawGreatCircle(points, lat === 0 ? 'rgba(255,107,53,0.55)' : 'rgba(0,255,255,0.18)', lat === 0 ? 2 : 1, radius, cx, cy);
+        }
+
+        if (poleToggle.checked) {
+          drawGreatCircle(northPolePath, '#ff6b35', 3, radius, cx, cy);
+          drawGreatCircle(southPolePath, '#62d6ff', 3, radius, cx, cy);
+          for (const point of northPolePath.filter((_, index) => index % Math.max(1, Math.floor(northPolePath.length / 18)) === 0)) drawMarker(point.lat, point.lon, '#ffd479', 4, '', radius, cx, cy);
+          for (const point of southPolePath.filter((_, index) => index % Math.max(1, Math.floor(southPolePath.length / 18)) === 0)) drawMarker(point.lat, point.lon, '#bcefff', 4, '', radius, cx, cy);
+          const current = interpolatePole(Number(yearSlider.value), northPolePath);
+          const currentSouth = interpolatePole(Number(yearSlider.value), southPolePath);
+          drawMarker(current.lat, current.lon, '#ff2020', 11, 'North magnetic pole', radius, cx, cy);
+          drawMarker(currentSouth.lat, currentSouth.lon, '#31baff', 11, 'South magnetic pole', radius, cx, cy);
+          const dipolePole = geomagneticDipolePole(Math.max(2025, Math.min(2030, Number(yearSlider.value))));
+          drawMarker(dipolePole.lat, dipolePole.lon, '#00ffff', 8, 'Dipole pole', radius, cx, cy);
+        }
+
+        if (selectedLocation) drawMarker(selectedLocation.lat, selectedLocation.lon, '#ffffff', 7, 'Selected location', radius, cx, cy);
+
+        ctx.restore();
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius * 1.015, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,255,255,0.28)';
+        ctx.lineWidth = 8;
+        ctx.stroke();
+      }
+
+      function renderLoop(timestamp = 0) {
+        if (animationPlaying) {
+          const elapsed = lastAnimationTime ? (timestamp - lastAnimationTime) / 1000 : 0;
+          const nextYear = Number(yearSlider.value) + elapsed * Number(historySpeed.value);
+          yearSlider.value = nextYear > 2030 ? 1590 : nextYear;
+          updateStats();
+        }
+        lastAnimationTime = timestamp;
+        rotY += Number(rotationSlider.value) * 0.006;
+        drawScene();
+        requestAnimationFrame(renderLoop);
+      }
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.max(320, Math.floor(rect.width * dpr));
+        canvas.height = Math.max(320, Math.floor(rect.height * dpr));
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      async function loadGeography() {
+        try {
+          const response = await fetch('data/countries.geo.json', { cache: 'force-cache' });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          worldGeography = (data.features || []).flatMap(feature => geometryRings(feature.geometry));
+        } catch (error) {
+          worldGeography = [];
+        }
+      }
+
+      async function loadNoaaPoleHistory() {
+        const url = 'data/noaa-dip-poles-1590-2025.geojson';
+        try {
+          const response = await fetch(url, { cache: 'force-cache' });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          const points = (data.features || []).map(feature => {
+            const coordinates = feature.geometry && feature.geometry.coordinates;
+            const yearEntry = Object.entries(feature.properties || {}).find(([key]) => /year|date|time/i.test(key));
+            const rawYear = yearEntry && yearEntry[1];
+            const parsedYear = Number.isFinite(Number(rawYear)) && Number(rawYear) < 10000 ? Number(rawYear) : new Date(rawYear).getUTCFullYear();
+            return coordinates && Number.isFinite(parsedYear) ? { year: parsedYear, lat: Number(coordinates[1]), lon: normalizeLon(Number(coordinates[0])) } : null;
+          }).filter(point => point && Number.isFinite(point.lat) && Number.isFinite(point.lon));
+          const north = points.filter(point => point.lat >= 0).sort((a, b) => a.year - b.year);
+          const south = points.filter(point => point.lat < 0).sort((a, b) => a.year - b.year);
+          if (north.length > 20) northPolePath = north;
+          if (south.length > 20) southPolePath = south;
+          sourceStatus.textContent += ` NOAA pole history loaded (${north.length} north, ${south.length} south positions).`;
+        } catch (error) {
+          sourceStatus.textContent += ' Using embedded NOAA-history fallback pole tracks.';
+        }
+      }
+
+      function drawHistoryChart() {
+        const chart = document.getElementById('field-history-chart');
+        const chartCtx = chart.getContext('2d');
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const rect = chart.getBoundingClientRect();
+        const width = Math.max(360, rect.width);
+        const height = 340;
+        chart.width = width * dpr; chart.height = height * dpr; chartCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const pad = { left: 58, right: 24, top: 24, bottom: 48 };
+        const esaSeries = [
+          { year: 1820, value: 100 }, { year: 1850, value: 99.2 }, { year: 1900, value: 97.2 },
+          { year: 1950, value: 94.2 }, { year: 2000, value: 91.6 }, { year: 2025, value: 91.0 }, { year: 2030, value: 90.8 }
+        ];
+        const fortyPercentClaim = [{ year: 1590, value: 100 }, { year: 2025, value: 60 }];
+        const acceleratedScenario = [];
+        const transitionYear = 1980;
+        const transitionValue = 100 * Math.pow(0.95, (transitionYear - 1590) / 100);
+        for (let year = 1590; year <= 2025; year += 5) {
+          const value = year <= transitionYear
+            ? 100 * Math.pow(0.95, (year - 1590) / 100)
+            : transitionValue * Math.pow(0.95, (year - transitionYear) / 10);
+          acceleratedScenario.push({ year, value });
+        }
+        const x = year => pad.left + (year - 1590) / (2030 - 1590) * (width - pad.left - pad.right);
+        const y = value => pad.top + (105 - value) / 50 * (height - pad.top - pad.bottom);
+        chartCtx.clearRect(0, 0, width, height);
+        chartCtx.strokeStyle = 'rgba(255,255,255,0.18)'; chartCtx.fillStyle = '#c8d7df'; chartCtx.font = '12px Arial';
+        for (let value = 60; value <= 100; value += 10) { chartCtx.beginPath(); chartCtx.moveTo(pad.left, y(value)); chartCtx.lineTo(width - pad.right, y(value)); chartCtx.stroke(); chartCtx.fillText(String(value), 23, y(value) + 4); }
+        for (let year = 1600; year <= 2000; year += 100) { chartCtx.fillText(String(year), x(year) - 14, height - 20); }
+        chartCtx.fillText('2030', x(2030) - 20, height - 20); chartCtx.fillText('Relative field strength (each series starts at 100)', pad.left, 14);
+        chartCtx.save(); chartCtx.setLineDash([4, 5]); chartCtx.strokeStyle = 'rgba(255,57,198,0.5)'; chartCtx.beginPath(); chartCtx.moveTo(x(transitionYear), pad.top); chartCtx.lineTo(x(transitionYear), height - pad.bottom); chartCtx.stroke(); chartCtx.restore(); chartCtx.fillStyle = '#ff9de7'; chartCtx.fillText('rate transition', x(transitionYear) - 38, height - pad.bottom - 6);
+        chartCtx.beginPath(); esaSeries.forEach((point, index) => { index ? chartCtx.lineTo(x(point.year), y(point.value)) : chartCtx.moveTo(x(point.year), y(point.value)); }); chartCtx.strokeStyle = '#00ffff'; chartCtx.lineWidth = 3; chartCtx.setLineDash([]); chartCtx.stroke();
+        chartCtx.beginPath(); fortyPercentClaim.forEach((point, index) => { index ? chartCtx.lineTo(x(point.year), y(point.value)) : chartCtx.moveTo(x(point.year), y(point.value)); }); chartCtx.strokeStyle = '#ff6b35'; chartCtx.lineWidth = 3; chartCtx.setLineDash([9, 7]); chartCtx.stroke(); chartCtx.setLineDash([]);
+        chartCtx.beginPath(); acceleratedScenario.forEach((point, index) => { index ? chartCtx.lineTo(x(point.year), y(point.value)) : chartCtx.moveTo(x(point.year), y(point.value)); }); chartCtx.strokeStyle = '#ff39c6'; chartCtx.lineWidth = 3; chartCtx.setLineDash([]); chartCtx.stroke();
+        chartCtx.fillStyle = '#00ffff'; chartCtx.fillRect(pad.left + 8, pad.top + 9, 25, 4); chartCtx.fillStyle = '#fcf2dc'; chartCtx.fillText('ESA: ~9% over ~200 years', pad.left + 41, pad.top + 15);
+        chartCtx.save(); chartCtx.setLineDash([9, 7]); chartCtx.strokeStyle = '#ff6b35'; chartCtx.lineWidth = 3; chartCtx.beginPath(); chartCtx.moveTo(pad.left + 8, pad.top + 34); chartCtx.lineTo(pad.left + 33, pad.top + 34); chartCtx.stroke(); chartCtx.restore(); chartCtx.fillStyle = '#fcf2dc'; chartCtx.fillText('Kabat/Turner: 40% over ~400 years', pad.left + 41, pad.top + 38);
+        chartCtx.fillStyle = '#ff39c6'; chartCtx.fillRect(pad.left + 8, pad.top + 55, 25, 4); chartCtx.fillStyle = '#fcf2dc'; chartCtx.fillText('Accelerated scenario: 5%/century to 5%/decade', pad.left + 41, pad.top + 61);
+      }
+
+      async function loadModel() {
+        updateStats();
+        rebuildFieldGrid();
+        try {
+          const response = await fetch('data/WMM2025.COF', { cache: 'force-cache' });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          wmmModel = parseWmmCoefficients(await response.text());
+          sourceStatus.textContent = `Loaded local WMM2025 degree-${wmmModel.nMax} coefficients; interactive readout uses physically scaled dipole and regional terms.`;
+        } catch (error) {
+          sourceStatus.textContent = 'Using embedded centered-dipole fallback; local WMM2025 coefficient file was not available.';
+        }
+        rebuildFieldGrid();
+        updateStats();
+        await Promise.all([loadGeography(), loadNoaaPoleHistory()]);
+      }
+
+      canvas.addEventListener('pointerdown', event => {
+        dragging = true;
+        pointerMoved = false;
+        lastPointer = { x: event.clientX, y: event.clientY };
+        canvas.setPointerCapture(event.pointerId);
+      });
+      canvas.addEventListener('pointermove', event => {
+        if (!dragging) return;
+        const dx = event.clientX - lastPointer.x;
+        const dy = event.clientY - lastPointer.y;
+        if (Math.abs(dx) + Math.abs(dy) > 3) pointerMoved = true;
+        rotY += dx * 0.008;
+        rotX = Math.max(-1.15, Math.min(1.15, rotX + dy * 0.008));
+        lastPointer = { x: event.clientX, y: event.clientY };
+      });
+      canvas.addEventListener('pointerup', event => {
+        dragging = false;
+        canvas.releasePointerCapture(event.pointerId);
+        if (!pointerMoved) updateLocationInspector(canvasPointToLatLon(event.clientX, event.clientY));
+      });
+      canvas.addEventListener('wheel', event => {
+        event.preventDefault();
+        zoom = Math.max(0.72, Math.min(1.6, zoom - event.deltaY * 0.001));
+      }, { passive: false });
+
+      yearSlider.addEventListener('input', () => {
+        updateStats();
+      });
+      fieldToggle.addEventListener('change', drawScene);
+      geographyToggle.addEventListener('change', drawScene);
+      poleToggle.addEventListener('change', drawScene);
+      anomalyToggle.addEventListener('change', drawScene);
+      declinationToggle.addEventListener('change', drawScene);
+      animationButton.addEventListener('click', () => {
+        animationPlaying = !animationPlaying;
+        lastAnimationTime = 0;
+        animationButton.textContent = animationPlaying ? 'Pause History' : 'Play History';
+      });
+      document.getElementById('reset-camera').addEventListener('click', () => {
+        rotX = -0.18;
+        rotY = 0.45;
+        zoom = 1;
+      });
+      window.addEventListener('resize', () => {
+        resize();
+        drawScene();
+        drawHistoryChart();
+      });
+
+      resize();
+      drawHistoryChart();
+      loadModel();
+      renderLoop();
+    })();
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

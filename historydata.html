@@ -95,6 +95,21 @@
             order: 2;
             width: 100%;
         }
+        .archive-page-links { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; margin:24px 0; }
+        .archive-page-card { padding:22px; border:2px solid #ff6b35; border-radius:8px; background:rgba(0,0,0,.28); text-align:center; }
+        .archive-page-card h3 { margin-top:0; }
+        .archive-page-card .button { display:inline-block; margin-top:10px; }
+        .archive-back { margin:0 0 22px; text-align:center; }
+        .resource-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin:20px 0; }
+        .resource-card { padding:18px; border:1px solid #ff6b35; border-radius:6px; }
+        .explorer-controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; align-items:end; margin:18px 0; }
+        .explorer-controls label { display:flex; flex-direction:column; gap:6px; font-weight:bold; }
+        .explorer-controls input, .explorer-controls select { padding:9px; background:#111; color:#fcf2dc; border:1px solid #ff6b35; }
+        .coverage-meter { height:16px; border:1px solid #00ffff; border-radius:10px; overflow:hidden; background:#111; }
+        .coverage-meter span { display:block; height:100%; background:linear-gradient(90deg,#ff6b35,#00ffff); }
+        .explorer-note { padding:14px; border-left:4px solid #00ffff; background:rgba(0,255,255,.06); }
+        .timeline-list { list-style:none; padding:0; display:grid; gap:10px; }
+        .timeline-list li { padding:12px; border-left:3px solid #ff6b35; background:rgba(255,107,53,.06); }
         .volcano-table {
             max-width: 100%;
             overflow: auto;
@@ -168,15 +183,21 @@
     <main>
         <br><br>
         <section>
-            <center><img class="bordered-image" src="images/historydatabanner.png" alt="Historical Data Archives Banner" style="width:100%;height:auto;max-width:100%;display:block;margin:auto"></center>
+            <center><img id="historyViewBanner" class="bordered-image" src="images/historydatabanner.png" alt="Historical Data Archives Banner" style="width:100%;height:auto;max-width:100%;display:block;margin:auto"></center>
         </section>
         <section>
             <h2 style="text-align:center">Historical Data Archives</h2>
             <h3 style="text-align:center">Earthquakes - Volcanoes - Solar Activity - Charts</h3>
+            <div class="archive-page-links" aria-label="Historical data categories">
+                <article class="archive-page-card"><h3>Solar History</h3><p>Verified DONKI M- and X-class flare history, HSS context, tables, and graphs.</p><a href="solar-history.html" class="button">Open Solar History</a></article>
+                <article class="archive-page-card"><h3>Earthquake History</h3><p>Regional multi-agency catalog search with magnitude bands and deep-event tracking.</p><a href="earthquake-history.html" class="button">Open Earthquake History</a></article>
+                <article class="archive-page-card"><h3>Volcano History</h3><p>Smithsonian eruption statistics plus monitoring, ash, and weekly-report resources.</p><a href="volcano-history.html" class="button">Open Volcano History</a></article>
+            </div>
         </section>
         <br><br>
 		<!-- ===== Section 1 ===== -->
-         <section>
+         <section id="solar-history" class="history-domain">
+            <p class="archive-back"><a href="historydata.html" class="button">Back to Historical Data</a></p>
             <h2 style="text-align:center">Historical Solar Data</h2><hr>
             <h3 style="text-align:center">Last Solar Cycles Comparison</h3>
             <p>This chart compares the current solar cycle activity with the last few solar cycles.</p><br>
@@ -185,7 +206,7 @@
 
             <button type="button" class="collapsible">Space Weather Event History (experimental)</button>
             <div class="content">
-                <p>Solar flare and coronal hole propagation data is loaded from NASA DONKI as far back as the public DONKI event API supports, beginning in 2010. X flares, M flares, and high-speed streams from coronal holes are summarized by year below.</p>
+                <p>Solar flare and coronal hole propagation data is loaded from NASA DONKI as far back as the public DONKI event API supports, beginning in 2010. X flares, M flares, and high-speed streams from coronal holes are summarized by month below.</p>
                 <div class="data-tools">
                     <label for="spaceStartDate">Start Date
                         <input id="spaceStartDate" type="date">
@@ -193,11 +214,9 @@
                     <label for="spaceEndDate">End Date
                         <input id="spaceEndDate" type="date">
                     </label>
-                    <label for="spaceCadence">Graph By
-                        <select id="spaceCadence">
-                            <option value="year">Year</option>
-                            <option value="month">Month</option>
-                        </select>
+                    <label>Graph Interval
+                        <span class="status-note">Monthly</span>
+                        <input id="spaceCadence" type="hidden" value="month">
                     </label>
                     <button type="button" class="button" id="loadSpaceWeather">Load Space Weather</button>
                 </div>
@@ -208,7 +227,7 @@
                     <div class="table-section">
                         <div class="table-container">
                             <table id="spaceWeatherTable">
-                                <caption>Solar Flares and Coronal Hole Propagation</caption>
+                                <caption>Monthly Solar Flares and Coronal Hole Propagation</caption>
                                 <thead>
                                     <tr>
                                         <th>Period</th>
@@ -245,7 +264,8 @@
             </div>
         </section><br><br>
         <!-- ===== Section 2 ===== -->
-        <section>
+        <section id="earthquake-history" class="history-domain">
+            <p class="archive-back"><a href="historydata.html" class="button">Back to Historical Data</a></p>
             <h2 style="text-align:center">Historical Earthquake Data</h2><hr>
             <p>This section combines the existing USGS historical summaries with live regional catalog searches. The regional tool queries USGS, EMSC, and ISC feeds, normalizes the records, and removes likely duplicate events before table and chart rendering.</p>
 			<h3>Past Earthquakes Year By Year</h3>
@@ -256,7 +276,7 @@
 			  <div class="table-chart-container">
 			    <div class="table-section">
 			      <div class="table-container"><table>
-    <caption>Global Earthquake Summary (2015–2025) <br><br><hr> Data compiled from USGS </caption>
+    <caption>Global Earthquake Summary (2015–2025) <br><br><hr> USGS FDSN catalog counts, verified 29 Aug 2026. Earthquakes only; UTC calendar years. </caption>
     <thead>
       <tr>
         <th>Year</th>
@@ -266,17 +286,17 @@
       </tr>
     </thead>
     <tbody>
-      <tr><td>2015</td><td>26,840</td><td>93,004</td><td>119,844</td></tr>
-      <tr><td>2016</td><td>25,102</td><td>93,997</td><td>119,099</td></tr>
-      <tr><td>2017</td><td>22,666</td><td>104,673</td><td>127,339</td></tr>
-      <tr><td>2018</td><td>41,025</td><td>135,571</td><td>176,596</td></tr>
-      <tr><td>2019</td><td>26,611</td><td>149,782</td><td>176,393</td></tr>
-      <tr><td>2020</td><td>32,105</td><td>156,171</td><td>188,276</td></tr>
-      <tr><td>2021</td><td>28,662</td><td>125,509</td><td>154,171</td></tr>
-      <tr><td>2022</td><td>26,738</td><td>113,802</td><td>140,540</td></tr>
-      <tr><td>2023</td><td>27,153</td><td>112,454</td><td>139,607</td></tr>
-      <tr><td>2024</td><td>25,055</td><td>112,853</td><td>137,908</td></tr>
-      <tr><td>2025</td><td>28,304</td><td>95,854</td><td>124,158</td></tr>
+      <tr><td>2015</td><td>26,778</td><td>93,158</td><td>119,936</td></tr>
+      <tr><td>2016</td><td>25,040</td><td>93,672</td><td>118,712</td></tr>
+      <tr><td>2017</td><td>22,618</td><td>104,850</td><td>127,468</td></tr>
+      <tr><td>2018</td><td>41,154</td><td>139,333</td><td>180,487</td></tr>
+      <tr><td>2019</td><td>26,482</td><td>151,160</td><td>177,642</td></tr>
+      <tr><td>2020</td><td>32,037</td><td>157,427</td><td>189,464</td></tr>
+      <tr><td>2021</td><td>28,607</td><td>126,272</td><td>154,879</td></tr>
+      <tr><td>2022</td><td>26,670</td><td>114,483</td><td>141,153</td></tr>
+      <tr><td>2023</td><td>27,039</td><td>112,856</td><td>139,895</td></tr>
+      <tr><td>2024</td><td>24,954</td><td>113,304</td><td>138,258</td></tr>
+      <tr><td>2025</td><td>28,957</td><td>98,652</td><td>127,609</td></tr>
     </tbody>
   </table></div>
 			    </div>
@@ -290,7 +310,7 @@
                 <div class="table-chart-container">
                     <div class="table-section">
                         <div class="table-container"><table>
-    <caption>2.5+ magnitude 400+ Km Deep Earthquakes 2015-2025 <br><br><hr> Data compiled from USGS </caption>
+    <caption>M2.5+ earthquakes at 400 km depth or deeper, 2015–2025 <br><br><hr> USGS FDSN catalog counts, verified 29 Aug 2026. Earthquakes only; UTC calendar years. </caption>
     <thead>
         <tr>
             <th>Year</th>
@@ -298,17 +318,17 @@
         </tr>
     </thead>
     <tbody>
-        <tr><td>2015</td><td>1,013</td></tr>
-        <tr><td>2016</td><td>1,050</td></tr>
+        <tr><td>2015</td><td>1,008</td></tr>
+        <tr><td>2016</td><td>1,048</td></tr>
         <tr><td>2017</td><td>981</td></tr>
-        <tr><td>2018</td><td>1,410</td></tr>
+        <tr><td>2018</td><td>1,407</td></tr>
         <tr><td>2019</td><td>1,031</td></tr>
-        <tr><td>2020</td><td>1,073</td></tr>
-        <tr><td>2021</td><td>1,079</td></tr>
-        <tr><td>2022</td><td>1,098</td></tr>
-        <tr><td>2023</td><td>1,100</td></tr>
-        <tr><td>2024</td><td>1,036</td></tr>
-        <tr><td>2025</td><td>928</td></tr>
+        <tr><td>2020</td><td>1,072</td></tr>
+        <tr><td>2021</td><td>1,077</td></tr>
+        <tr><td>2022</td><td>1,095</td></tr>
+        <tr><td>2023</td><td>1,098</td></tr>
+        <tr><td>2024</td><td>1,034</td></tr>
+        <tr><td>2025</td><td>953</td></tr>
     </tbody>
                 </table></div>
                     </div>
@@ -378,16 +398,43 @@
                             </table>
                         </div>
                     </div>
-                    <div class="chart-section">
-                        <canvas id="regionalQuakeChart" width="400" height="300"></canvas>
+                    <div class="charts-column">
+                        <div class="chart-section"><canvas id="regionalQuakeMagnitudeChart" width="400" height="300"></canvas></div>
+                        <div class="chart-section"><canvas id="regionalQuakeDeepChart" width="400" height="300"></canvas></div>
                     </div>
                 </div>
             </div><br><hr><br>
         </section>
         <br><br>
 		<!-- ===== Section 3 ===== -->
-        <section>
+        <section id="volcano-history" class="history-domain">
+            <p class="archive-back"><a href="historydata.html" class="button">Back to Historical Data</a></p>
             <h2 style="text-align:center">Historical Volcano Data</h2>
+            <p>The annual Smithsonian table is a useful long-term baseline, but it should be read alongside alert-level changes, weekly activity reports, ash advisories, and monitoring observations.</p>
+            <div class="resource-grid">
+                <article class="resource-card"><h3>Weekly Activity Archive</h3><p>Search Smithsonian/USGS weekly reports by date or volcano from November 2000 onward.</p><a href="https://volcano.si.edu/reports_weekly.cfm" target="_blank" rel="noopener" class="button">Open Weekly Reports</a></article>
+                <article class="resource-card"><h3>USGS Volcano Alerts</h3><p>Current elevated U.S. volcanoes, observatory notices, alert levels, and CAP data.</p><a href="https://volcanoes.usgs.gov/hans-public/api/volcano/default" target="_blank" rel="noopener" class="button">Open USGS Volcano API</a></article>
+                <article class="resource-card"><h3>Volcanic Ash Advisories</h3><p>Plume location, altitude, forecast movement, and advisory history from the worldwide VAAC network.</p><a href="https://www.icao.int/safety/meteorology/iavwopsg/Pages/vaac.aspx" target="_blank" rel="noopener" class="button">Find a VAAC</a></article>
+                <article class="resource-card"><h3>NASA Global Volcanism</h3><p>Satellite-observed eruption and ash context through NASA Earth Observatory and related Earthdata products.</p><a href="https://earthobservatory.nasa.gov/topic/volcanoes" target="_blank" rel="noopener" class="button">Open NASA Volcanoes</a></article>
+            </div>
+            <h3>Historical Eruption Explorer</h3>
+            <p>Filter the Smithsonian annual series. Results update the table, summary, and focused chart without changing the source values.</p>
+            <div class="explorer-controls">
+                <label>From year<input id="volcanoYearFrom" type="number" min="1960" max="2025" value="1960"></label>
+                <label>Through year<input id="volcanoYearTo" type="number" min="1960" max="2025" value="2025"></label>
+                <label>Minimum VEI group<select id="volcanoVeiFilter"><option value="all">All annual records</option><option value="3">At least one VEI 3+</option><option value="4">At least one VEI 4+</option><option value="5">At least one VEI 5+</option><option value="6">At least one VEI 6</option></select></label>
+                <label>Minimum active volcanoes<input id="volcanoMinActive" type="number" min="0" value="0"></label>
+                <button id="resetVolcanoExplorer" class="button" type="button">Reset Filters</button>
+            </div>
+            <div class="summary-grid" id="volcanoExplorerSummary"></div>
+            <div class="chart-section"><canvas id="volcanoExplorerChart" width="900" height="330"></canvas></div>
+            <div class="resource-grid">
+                <article class="resource-card"><h3>Alert-level timeline</h3><ul class="timeline-list"><li><strong>Current notices:</strong> Query the USGS HANS feed for elevated U.S. volcanoes and each volcano's newest notice.</li><li><strong>Historical context:</strong> Compare notice changes with Smithsonian weekly and Bulletin reports.</li></ul><a class="button" target="_blank" rel="noopener" href="https://volcanoes.usgs.gov/hans-public/api/volcano/getElevatedVolcanoes">View Current USGS Alerts</a></article>
+                <article class="resource-card"><h3>Weekly report frequency</h3><p>The weekly archive starts in November 2000. Report frequency measures notable reporting activity—not the number of eruptions.</p><a class="button" target="_blank" rel="noopener" href="https://volcano.si.edu/reports_weekly.cfm">Search Weekly Archive</a></article>
+                <article class="resource-card"><h3>Ash-plume history</h3><p>Use VAAC advisories to compare plume altitude, direction, and duration. An ash advisory is an aviation product and is not a VEI measurement.</p><a class="button" target="_blank" rel="noopener" href="https://www.icao.int/safety/meteorology/iavwopsg/Pages/vaac.aspx">Open VAAC Network</a></article>
+                <article class="resource-card"><h3>Monitoring coverage</h3><div class="coverage-meter" aria-label="Annual table coverage from 1960 through 2025"><span style="width:100%"></span></div><p><strong>Annual-table span: 1960–2025.</strong> Detection and reporting capability varies substantially by country, era, remoteness, eruption size, and monitoring network.</p></article>
+            </div>
+            <p class="explorer-note"><strong>Interpretation warning:</strong> “No report” does not mean “no unrest.” Historical counts are affected by changing observation technology and reporting practices, especially for remote and submarine volcanoes.</p>
             <button type="button" class="collapsible">Smithsonian Global Volcanism Program (GVP) Annual Statistics.</button>
 			<div class="content">
                 <h3 style="text-align:center">Volcanic Eruptions Year By Year </h3><hr><br>
@@ -395,7 +442,7 @@
             <p>Table from that source has been recreated line for line for ease of use below.<br>Global Volcanism Program, 2025. [Database] Volcanoes of the World (v. 5.3.4; 30 Dec 2025).<br> Distributed by Smithsonian Institution, compiled by Venzke, E.<br> <a href="https://doi.org/10.5479/si.GVP.VOTW5-2025.5.3" target="_blank">https://doi.org/10.5479/si.GVP.VOTW5-2025.5.3</a></p><br>
                 <div class="table-chart-container volcano-stack">
                     <div class="table-section">
-                        <div class="table-container volcano-table"><table>
+                        <div class="table-container volcano-table"><table id="volcanoAnnualTable">
     <thead>
       <tr>
         <th>Year</th>
@@ -513,8 +560,10 @@
         const chartTextColor = '#fcf2dc';
         const chartGridColor = 'rgba(255, 107, 53, 0.2)';
         const nasaApiKey = 'DEMO_KEY';
-        let regionalQuakeChartInstance = null;
+        let regionalQuakeMagnitudeChartInstance = null;
+        let regionalQuakeDeepChartInstance = null;
         let spaceWeatherChartInstance = null;
+        let volcanoExplorerChartInstance = null;
 
         function setTableBody(tableId, rows) {
             const tbody = document.querySelector(`#${tableId} tbody`);
@@ -614,6 +663,49 @@
                     <strong>${escapeHtml(item.value)}</strong>
                 </div>
             `).join('');
+            refreshOpenCollapsibleHeights();
+        }
+
+        function volcanoAnnualRows() {
+            return Array.from(document.querySelectorAll('#volcanoAnnualTable tbody tr')).map(row => {
+                const values = Array.from(row.cells).map(cell => Number(cell.textContent.replace(/,/g, '').trim()) || 0);
+                return { row, year: values[0], started: values[1], ended: values[2], total: values[3], active: values[4], countries: values[5], vei2: values[6], vei3: values[7], vei4: values[8], vei5: values[9], vei6: values[10] };
+            });
+        }
+
+        function updateVolcanoExplorer() {
+            const from = Number(document.getElementById('volcanoYearFrom').value) || 1960;
+            const to = Number(document.getElementById('volcanoYearTo').value) || 2025;
+            const vei = document.getElementById('volcanoVeiFilter').value;
+            const minActive = Number(document.getElementById('volcanoMinActive').value) || 0;
+            const allRows = volcanoAnnualRows();
+            const filtered = allRows.filter(item => {
+                const veiMatch = vei === 'all' || (vei === '3' && item.vei3 + item.vei4 + item.vei5 + item.vei6 > 0) || (vei === '4' && item.vei4 + item.vei5 + item.vei6 > 0) || (vei === '5' && item.vei5 + item.vei6 > 0) || (vei === '6' && item.vei6 > 0);
+                return item.year >= Math.min(from, to) && item.year <= Math.max(from, to) && item.active >= minActive && veiMatch;
+            });
+            allRows.forEach(item => { item.row.hidden = !filtered.includes(item); });
+            const chronological = filtered.slice().sort((a, b) => a.year - b.year);
+            const totalEruptions = filtered.reduce((sum, item) => sum + item.total, 0);
+            const maxYear = filtered.reduce((best, item) => !best || item.total > best.total ? item : best, null);
+            renderSummary('volcanoExplorerSummary', [
+                { label: 'Years shown', value: filtered.length },
+                { label: 'Reported eruptions', value: formatNumber(totalEruptions) },
+                { label: 'Peak annual total', value: maxYear ? `${maxYear.year}: ${maxYear.total}` : 'None' },
+                { label: 'VEI 4+ records', value: formatNumber(filtered.reduce((sum, item) => sum + item.vei4 + item.vei5 + item.vei6, 0)) }
+            ]);
+            if (volcanoExplorerChartInstance) volcanoExplorerChartInstance.destroy();
+            volcanoExplorerChartInstance = new Chart(document.getElementById('volcanoExplorerChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: chronological.map(item => item.year),
+                    datasets: [
+                        { label: 'Eruptions total', data: chronological.map(item => item.total), borderColor: '#ff6b35', backgroundColor: 'rgba(255,107,53,.12)', tension: .12 },
+                        { label: 'Active volcanoes', data: chronological.map(item => item.active), borderColor: '#00ffff', backgroundColor: 'rgba(0,255,255,.12)', tension: .12 },
+                        { label: 'Eruptions started', data: chronological.map(item => item.started), borderColor: '#ff00ff', backgroundColor: 'rgba(255,0,255,.1)', tension: .12 }
+                    ]
+                },
+                options: baseChartOptions('Filtered Smithsonian Annual Volcanic Activity')
+            });
             refreshOpenCollapsibleHeights();
         }
 
@@ -775,10 +867,26 @@
             }, []);
         }
 
-        function recentEventsForChart(events) {
-            return events
-                .slice(0, 250)
-                .sort((a, b) => a.time - b.time);
+        function earthquakePeriodKey(time, spanDays) {
+            const date = new Date(time);
+            if (spanDays > 550) return String(date.getUTCFullYear());
+            if (spanDays > 62) return date.toISOString().slice(0, 7);
+            return date.toISOString().slice(0, 10);
+        }
+
+        function summarizeEarthquakes(events, startDate, endDate) {
+            const spanDays = Math.max(1, (Date.parse(endDate) - Date.parse(startDate)) / 86400000);
+            const buckets = new Map();
+            events.forEach(event => {
+                const period = earthquakePeriodKey(event.time, spanDays);
+                if (!buckets.has(period)) buckets.set(period, { period, low: 0, medium: 0, high: 0, deep100: 0 });
+                const bucket = buckets.get(period);
+                if (event.mag <= 3.9) bucket.low += 1;
+                else if (event.mag < 5.8) bucket.medium += 1;
+                else bucket.high += 1;
+                if (Number.isFinite(event.depth) && event.depth > 100) bucket.deep100 += 1;
+            });
+            return Array.from(buckets.values()).sort((a, b) => a.period.localeCompare(b.period));
         }
 
         async function loadRegionalEarthquakes() {
@@ -825,24 +933,30 @@
                 </tr>
             `).join('') || '<tr><td colspan="7">No matching events found.</td></tr>');
 
-            const chartEvents = recentEventsForChart(deduped);
-            if (regionalQuakeChartInstance) regionalQuakeChartInstance.destroy();
-            regionalQuakeChartInstance = new Chart(document.getElementById('regionalQuakeChart').getContext('2d'), {
+            const chartPeriods = summarizeEarthquakes(deduped, options.startDate, options.endDate);
+            if (regionalQuakeMagnitudeChartInstance) regionalQuakeMagnitudeChartInstance.destroy();
+            regionalQuakeMagnitudeChartInstance = new Chart(document.getElementById('regionalQuakeMagnitudeChart').getContext('2d'), {
                 type: 'line',
                 data: {
-                    labels: chartEvents.map(event => new Date(event.time).toLocaleDateString()),
-                    datasets: [{
-                        label: 'Event magnitude',
-                        data: chartEvents.map(event => event.mag),
-                        backgroundColor: chartEvents.map(event => event.depth >= 400 ? 'rgba(255, 0, 255, 0.55)' : 'rgba(0, 255, 255, 0.35)'),
-                        borderColor: '#00ffff',
-                        borderWidth: 2,
-                        pointRadius: 3,
-                        pointHoverRadius: 5,
-                        tension: 0.12
-                    }]
+                    labels: chartPeriods.map(row => row.period),
+                    datasets: [
+                        { label: 'M3.9 or less', data: chartPeriods.map(row => row.low), borderColor: '#00ffff', backgroundColor: 'rgba(0,255,255,.12)', tension: .12 },
+                        { label: 'M4.0–5.7', data: chartPeriods.map(row => row.medium), borderColor: '#ffae00', backgroundColor: 'rgba(255,174,0,.12)', tension: .12 }
+                    ]
                 },
-                options: baseChartOptions(`${regionLabel} Earthquake Events by Magnitude`)
+                options: baseChartOptions(`${regionLabel}: M3.9 or Less and M4.0–5.7`)
+            });
+            if (regionalQuakeDeepChartInstance) regionalQuakeDeepChartInstance.destroy();
+            regionalQuakeDeepChartInstance = new Chart(document.getElementById('regionalQuakeDeepChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: chartPeriods.map(row => row.period),
+                    datasets: [
+                        { label: 'M5.8+', data: chartPeriods.map(row => row.high), borderColor: '#ff3344', backgroundColor: 'rgba(255,51,68,.12)', tension: .12 },
+                        { label: 'Depth >100 km (all magnitudes)', data: chartPeriods.map(row => row.deep100), borderColor: '#ff00ff', backgroundColor: 'rgba(255,0,255,.12)', borderDash: [7,4], tension: .12 }
+                    ]
+                },
+                options: baseChartOptions(`${regionLabel}: M5.8+ and Deep Earthquakes`)
             });
 
             status.textContent = `Loaded ${formatNumber(deduped.length)} deduplicated events from ${agencySet.join(', ') || 'no agencies'}. ${failures.length ? 'Unavailable feed(s): ' + failures.join('; ') : ''}`;
@@ -865,23 +979,37 @@
         }
 
         async function fetchDonkiEndpoint(endpoint, startDate, endDate) {
+            const chunks = [];
+            let cursor = new Date(`${startDate}T00:00:00Z`);
+            const finalDate = new Date(`${endDate}T00:00:00Z`);
+            while (cursor <= finalDate) {
+                const chunkStart = isoDate(cursor);
+                const chunkEndDate = new Date(Math.min(finalDate.getTime(), cursor.getTime() + 29 * 86400000));
+                chunks.push([chunkStart, isoDate(chunkEndDate)]);
+                cursor = new Date(chunkEndDate.getTime() + 86400000);
+            }
+            const combined = [];
+            const sources = new Set();
             const errors = [];
-            for (const candidate of donkiUrls(endpoint, startDate, endDate)) {
-                try {
-                    const controller = new AbortController();
-                    const timeout = setTimeout(() => controller.abort(), 25000);
-                    const response = await fetch(candidate.url, { signal: controller.signal });
-                    clearTimeout(timeout);
-                    if (!response.ok) throw new Error(`${response.status}`);
-                    const data = await response.json();
-                    if (Array.isArray(data)) return { endpoint, data, source: candidate.label };
-                    if (data && data.error) throw new Error(data.error.message || data.error.code || 'API error');
-                    throw new Error('unexpected response');
-                } catch (error) {
-                    errors.push(`${candidate.label}: ${error.name === 'AbortError' ? 'timed out' : error.message}`);
+            for (const [chunkStart, chunkEnd] of chunks) {
+                for (const candidate of donkiUrls(endpoint, chunkStart, chunkEnd)) {
+                    try {
+                        const controller = new AbortController();
+                        const timeout = setTimeout(() => controller.abort(), 25000);
+                        const response = await fetch(candidate.url, { signal: controller.signal });
+                        clearTimeout(timeout);
+                        if (!response.ok) throw new Error(`${response.status}`);
+                        const data = await response.json();
+                        if (!Array.isArray(data)) throw new Error('unexpected response');
+                        combined.push(...data);
+                        sources.add(candidate.label);
+                        break;
+                    } catch (error) {
+                        errors.push(`${chunkStart}–${chunkEnd} ${candidate.label}: ${error.name === 'AbortError' ? 'timed out' : error.message}`);
+                    }
                 }
             }
-            return { endpoint, data: [], error: errors.join('; ') };
+            return { endpoint, data: combined, source: Array.from(sources).join(', '), error: combined.length ? '' : errors.join('; ') };
         }
 
         function normalizeDonkiFlare(event) {
@@ -926,8 +1054,19 @@
             return cadence === 'month' ? date.toISOString().slice(0, 7) : String(date.getUTCFullYear());
         }
 
-        function summarizeSpaceWeather(events, cadence) {
+        function summarizeSpaceWeather(events, cadence, startDate, endDate) {
             const buckets = new Map();
+            if (cadence === 'month') {
+                const cursor = new Date(`${startDate}T00:00:00Z`);
+                const finish = new Date(`${endDate}T00:00:00Z`);
+                cursor.setUTCDate(1);
+                finish.setUTCDate(1);
+                while (cursor <= finish) {
+                    const key = cursor.toISOString().slice(0, 7);
+                    buckets.set(key, { period: key, x: 0, m: 0, hss: 0 });
+                    cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+                }
+            }
             events.forEach(event => {
                 const key = periodKey(event.date, cadence);
                 if (!buckets.has(key)) buckets.set(key, { period: key, x: 0, m: 0, hss: 0 });
@@ -953,7 +1092,7 @@
             const flares = flareResult.data.map(normalizeDonkiFlare).filter(Boolean);
             const hssEvents = hssResult.data.map(normalizeDonkiHss).filter(event => event.date);
             const events = dedupeSpaceWeather([...flares, ...hssEvents]).sort((a, b) => new Date(b.date) - new Date(a.date));
-            const summary = summarizeSpaceWeather(events, cadence);
+            const summary = summarizeSpaceWeather(events, cadence, startDate, endDate);
             const xCount = events.filter(event => event.type === 'X flare').length;
             const mCount = events.filter(event => event.type === 'M flare').length;
             const hssCount = events.filter(event => event.type === 'Coronal hole HSS').length;
@@ -997,7 +1136,7 @@
                         { label: 'Coronal hole HSS', data: summary.map(row => row.hss), borderColor: '#00ffff', backgroundColor: 'rgba(0, 255, 255, 0.12)', tension: 0.1 }
                     ]
                 },
-                options: baseChartOptions('Space Weather Events')
+                options: baseChartOptions('Monthly Space Weather Events')
             });
 
             const unavailable = [flareResult, hssResult].filter(result => result.error).map(result => `${result.endpoint} (${result.error})`);
@@ -1007,6 +1146,23 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            const selectedView = new URLSearchParams(location.search).get('view');
+            document.querySelectorAll('.history-domain').forEach(section => {
+                section.hidden = !selectedView || section.id !== `${selectedView}-history`;
+            });
+            if (selectedView) {
+                const labels = { solar: 'Solar History', earthquake: 'Earthquake History', volcano: 'Volcano History' };
+                document.title = `${labels[selectedView] || 'Historical Data'} - Frontier Signals`;
+                const banners = {
+                    solar: ['images/solar-history-banner.png', 'Solar History Banner'],
+                    earthquake: ['images/earthquake-history-banner.png', 'Earthquake History Banner'],
+                    volcano: ['images/volcano-history-banner.png', 'Volcano History Banner']
+                };
+                if (banners[selectedView]) {
+                    document.getElementById('historyViewBanner').src = banners[selectedView][0];
+                    document.getElementById('historyViewBanner').alt = banners[selectedView][1];
+                }
+            }
             const today = isoDate(new Date());
             const oneYearAgo = new Date();
             oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
@@ -1016,6 +1172,15 @@
             document.getElementById('spaceEndDate').value = today;
             document.getElementById('loadRegionalQuakes').addEventListener('click', loadRegionalEarthquakes);
             document.getElementById('loadSpaceWeather').addEventListener('click', loadSpaceWeather);
+            ['volcanoYearFrom', 'volcanoYearTo', 'volcanoVeiFilter', 'volcanoMinActive'].forEach(id => document.getElementById(id).addEventListener('input', updateVolcanoExplorer));
+            document.getElementById('resetVolcanoExplorer').addEventListener('click', () => {
+                document.getElementById('volcanoYearFrom').value = 1960;
+                document.getElementById('volcanoYearTo').value = 2025;
+                document.getElementById('volcanoVeiFilter').value = 'all';
+                document.getElementById('volcanoMinActive').value = 0;
+                updateVolcanoExplorer();
+            });
+            updateVolcanoExplorer();
         });
 
         // Chart.js configuration for earthquake data
@@ -1027,19 +1192,19 @@
                     labels: ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'],
                     datasets: [{
                         label: '2.5+ Earthquakes',
-                        data: [26840, 25102, 22666, 41025, 26611, 32105, 28662, 26738, 27153, 25055, 28304],
+                        data: [26778, 25040, 22618, 41154, 26482, 32037, 28607, 26670, 27039, 24954, 28957],
                         borderColor: '#00ffff',
                         backgroundColor: 'rgba(0, 255, 255, 0.1)',
                         tension: 0.1
                     }, {
                         label: '0.0–2.4 Tremors',
-                        data: [93004, 93997, 104673, 135571, 149782, 156171, 125509, 113802, 112454, 112853, 95854],
+                        data: [93158, 93672, 104850, 139333, 151160, 157427, 126272, 114483, 112856, 113304, 98652],
                         borderColor: '#ff00ff',
                         backgroundColor: 'rgba(255, 0, 255, 0.1)',
                         tension: 0.1
                     }, {
                         label: 'TOTAL',
-                        data: [119844, 119099, 127339, 176596, 176393, 188276, 154171, 140540, 139607, 137908, 124158],
+                        data: [119936, 118712, 127468, 180487, 177642, 189464, 154879, 141153, 139895, 138258, 127609],
                         borderColor: '#ff6b35',
                         backgroundColor: 'rgba(255, 107, 53, 0.1)',
                         tension: 0.1
@@ -1099,7 +1264,7 @@
                     labels: ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'],
                     datasets: [{
                         label: 'Deep Earthquakes (400km+ Depth)',
-                        data: [1013, 1050, 981, 1410, 1031, 1073, 1079, 1098, 1100, 1036, 928],
+                        data: [1008, 1048, 981, 1407, 1031, 1072, 1077, 1095, 1098, 1034, 953],
                         backgroundColor: 'rgba(0, 255, 255, 0.6)',
                         borderColor: '#00ffff',
                         borderWidth: 2

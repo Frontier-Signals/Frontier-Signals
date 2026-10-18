@@ -113,7 +113,7 @@
     <main class="tutorial-main">
         <section>
             <h1>Pole Shift Star Chart Tutorial</h1>
-            <p>This tool creates a navigational sky chart from a selected pole model and a selected habitat position. The pole controls define the hypothetical north pole. The habitat controls define where the observer lives relative to that pole. The chart then shows the sky from that habitat view, using the selected date and time for sidereal rotation, moon phase, planet context, and ecliptic placement.</p>
+            <p>This tool creates a navigational sky chart by moving the selected geographic surface pole onto the current North Pole, while keeping the spin axis fixed relative to the stars. Enter the habitat's present geographic coordinates; the habitat moves with the surface, and the chart shows the sky from its shifted position. The selected date and time control sidereal rotation, moon phase, planet context, and ecliptic placement.</p>
             <p><a class="button" href="pole-shift-star-chart.html">Return to Star Chart</a></p>
         </section>
 
@@ -134,7 +134,7 @@
             <div class="tutorial-grid">
                 <div class="tutorial-card">
                     <h3>Pole Guide Star</h3>
-                    <p>The pole guide star is the named reference star closest to the selected pole axis. It may not appear at the center of the chart because the chart center is the habitat zenith, not the pole. Use the angle value as the important clue: smaller angles mean a better pole guide.</p>
+                    <p>Polaris remains the north pole guide star because the celestial spin axis stays fixed. Its height and direction in the habitat sky change as the habitat moves, and it can fall below the horizon in the shifted southern hemisphere. The chart center is the habitat zenith, not the pole; the guide-star angle is its separation from the celestial axis.</p>
                 </div>
                 <div class="tutorial-card">
                     <h3>Directions</h3>
@@ -166,7 +166,8 @@
 
         <section>
             <h2>Reading Shifted Pole Models</h2>
-            <p>The pole model changes the relationship between Earth geography and the sky. The habitat position determines the observer's sky under that pole arrangement. If a preset places the selected pole far from the modern Arctic, a modern location may end up in the opposite shifted hemisphere, changing which stars are visible and which stars become useful guides.</p>
+            <p>The pole model changes the relationship between Earth geography and the sky. The surface undergoes the shortest rigid rotation that brings the selected pole to the modern North Pole, with no additional twist around the final axis. This preserves all angular distances on the surface. The shifted habitat latitude is 90 degrees minus its angular distance from the selected pole. A habitat can move into the opposite hemisphere, changing which stars are visible, while Polaris remains near the north celestial pole.</p>
+            <p>A pole location alone does not determine the final longitude orientation. The no-extra-twist rotation is this tool's convention for computing shifted longitude and local sidereal time. At exactly 180 degrees of surface rotation (a selected pole at 90 degrees south), the selected longitude chooses the flip meridian. At either shifted geographic pole, longitude and compass north are undefined; the chart uses a reference orientation. These are geometric scenarios, not predictions of a displacement path or duration. The current celestial axis and existing approximate astronomical calculations are retained; long-term precession is not simulated.</p>
             <p>The Earth axis model in the sidebar centers the selected pole and marks the chosen habitat, so it is the quickest way to sanity-check the geometry before exporting.</p>
         </section>
 

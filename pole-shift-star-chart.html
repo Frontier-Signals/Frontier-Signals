@@ -69,7 +69,8 @@
                 </div>
                 <div class="pssc-panel-body">
                     <div class="pssc-small-info"><strong>North pole:</strong> <span id="pssc-pole-label">90&deg; N, 0&deg; E</span></div>
-                    <div class="pssc-small-info"><strong>Axis tilt:</strong> <span id="pssc-axis-tilt-label">0&deg; @ 0&deg;</span></div>
+                    <div class="pssc-small-info"><strong>Surface shift:</strong> <span id="pssc-axis-tilt-label">0&deg; along 0&deg; longitude</span></div>
+                    <p class="pssc-small-info">The selected surface pole moves to the current North Pole. The celestial axis stays fixed toward Polaris; the habitat moves with Earth's surface.</p>
                     <div class="pssc-small-info"><strong>Pole guide star:</strong> <span id="pssc-north-star-label">Polaris</span></div>
                 </div>
             </section>
@@ -245,7 +246,7 @@
         <section class="pssc-main-panel">
             <div class="pssc-map-toolbar">
                 <div class="pssc-map-metadata">
-                    <p><strong>Orientation</strong>: <span id="pssc-current-orientation">90&deg; N, 0&deg; E</span></p>
+                    <p><strong>Selected surface pole</strong>: <span id="pssc-current-orientation">90&deg; N, 0&deg; E</span></p>
                     <p><strong>Hemisphere</strong>: <span id="pssc-hemisphere-label">North</span></p>
                     <p><strong>Projection</strong>: <span id="pssc-projection-label">Navigation polar</span></p>
                     <p><strong>LST</strong>: <span id="pssc-toolbar-lst">0h</span></p>
@@ -263,6 +264,7 @@
     </main>
 
     <script src="script.js"></script>
+    <script src="pole-shift-star-chart-assets.js"></script>
     <script src="pole-shift-star-chart.js"></script>
 </body>
 </html>

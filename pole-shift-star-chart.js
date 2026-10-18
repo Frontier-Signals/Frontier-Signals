@@ -6,6 +6,7 @@
     const pi = Math.PI;
     const j2000 = Date.UTC(2000, 0, 1, 12, 0, 0);
     const DEG = '\u00B0';
+    const bundledAssets = globalThis.PSSC_ASSETS;
 
     const controls = {
         lat: document.getElementById('pssc-latitude'),
@@ -226,6 +227,7 @@
     let figureConstellationsLoaded = false;
     let earthImage = null;
     let earthTexture = null;
+    let earthTextureFailed = false;
     let selectedObjectId = '';
 
     const navigationStars = [
@@ -316,8 +318,8 @@
     ];
 
     const constellationLines = [
-        { name: 'Big Dipper', kind: 'asterism', paths: [['dubhe', 'merak', 'phecda', 'megrez', 'alioth', 'mizar', 'alkaid']] },
-        { name: 'Little Dipper', kind: 'asterism', paths: [['polaris', 'yildun', 'epsilon-umi', 'zeta-umi', 'kochab', 'pherkad', 'eta-umi', 'zeta-umi']] },
+        { name: 'Big Dipper', kind: 'asterism', paths: [['dubhe', 'merak', 'phecda', 'megrez', 'alioth', 'mizar', 'alkaid'], ['megrez', 'dubhe']] },
+        { name: 'Little Dipper', kind: 'asterism', paths: [['polaris', 'yildun', 'epsilon-umi', 'zeta-umi', 'eta-umi', 'pherkad', 'kochab', 'epsilon-umi']] },
         { name: 'Cassiopeia', paths: [['caph', 'schedar', 'gamma-cas', 'ruchbah', 'segin']] },
         { name: 'Orion', paths: [['betelgeuse', 'bellatrix', 'mintaka', 'alnilam', 'alnitak', 'saiph', 'rigel', 'mintaka'], ['betelgeuse', 'alnilam'], ['bellatrix', 'alnilam']] },
         { name: 'Summer Triangle', kind: 'asterism', paths: [['vega', 'deneb', 'altair', 'vega']] },
@@ -484,10 +486,20 @@
         };
     }
 
+    function shiftSurfaceVector(vector, poleLat, poleLon) {
+        // Shortest rotation from the selected geographic pole to +Z. The
+        // celestial axis stays fixed; geography moves beneath it, without an
+        // additional twist. At -90 degrees, longitude chooses the flip meridian.
+        const longitude = deg2rad(poleLon);
+        const axis = { x: Math.sin(longitude), y: -Math.cos(longitude), z: 0 };
+        return normalize(rotate(vector, axis, deg2rad(90 - poleLat)));
+    }
+
     function makeBasis(viewPole) {
         const up = normalize(viewPole);
-        let east = normalize(cross({ x: 0, y: 0, z: 1 }, up));
-        if (Math.hypot(east.x, east.y, east.z) < 1e-5) east = { x: 1, y: 0, z: 0 };
+        let east = cross({ x: 0, y: 0, z: 1 }, up);
+        if (Math.hypot(east.x, east.y, east.z) < 1e-12) east = { x: 0, y: 1, z: 0 };
+        else east = normalize(east);
         const north = normalize(cross(up, east));
         return { east, north };
     }
@@ -514,16 +526,28 @@
         const theta = Math.acos(cosTheta);
         const showFullSky = controls.visibleMode && controls.visibleMode.value === 'full';
         const maxTheta = showFullSky ? pi : pi / 2;
-        if (theta > maxTheta) return null;
-        let r = radius * theta / maxTheta;
-        if (!showFullSky && projection === 'orthographic') r = radius * Math.sin(theta);
-        if (!showFullSky && projection === 'stereographic') r = radius * Math.tan(theta / 2);
+        if (theta > maxTheta + 1e-10) return null;
+        const r = projectedRadius(theta, radius, projection, showFullSky);
+        // Tangent components have length sin(theta); normalize them so that
+        // radius represents the actual zenith distance in the chosen projection.
+        const east = dot(v, basis.east);
+        const north = dot(v, basis.north);
+        const tangentLength = Math.hypot(east, north);
+        const directionScale = tangentLength > 1e-12 ? r / tangentLength : 0;
         return {
-            x: center.x + r * dot(v, basis.east),
-            y: center.y - r * dot(v, basis.north),
+            x: center.x + directionScale * east,
+            // At the exact nadir azimuth is undefined; place it on the full-sky rim.
+            y: center.y - (tangentLength > 1e-12 ? directionScale * north : r),
             theta,
             cosTheta,
         };
+    }
+
+    function projectedRadius(theta, radius, projection, fullSky) {
+        if (fullSky) return radius * theta / pi;
+        if (projection === 'orthographic') return radius * Math.sin(theta);
+        if (projection === 'stereographic') return radius * Math.tan(theta / 2);
+        return radius * theta / (pi / 2);
     }
 
     function rotateSeason(vector, seasonDeg, axis = { x: 0, y: 0, z: 1 }) {
@@ -550,8 +574,14 @@
 
     async function loadStarCatalog() {
         try {
-            const response = await fetch('files/BSC.json');
-            const data = await response.json();
+            let data;
+            if (bundledAssets && bundledAssets.stars) {
+                data = bundledAssets.stars.map(([id, RA, DEC, MAG]) => ({ 'harvard_ref_#': id, RA, DEC, MAG }));
+            } else {
+                const response = await fetch('files/BSC.json');
+                if (!response.ok) throw new Error(`Catalogue request failed: ${response.status}`);
+                data = await response.json();
+            }
             starCatalog = data
                 .map((star, index) => ({
                     id: `bsc-${star['harvard_ref_#'] || index}`,
@@ -560,6 +590,7 @@
                     mag: parseFloat(star.MAG),
                 }))
                 .filter(star => Number.isFinite(star.ra) && Number.isFinite(star.dec) && Number.isFinite(star.mag) && star.mag <= 6.6);
+            if (!starCatalog.length) throw new Error('Catalogue contains no usable stars');
             starCatalogLoaded = true;
             drawScene();
         } catch (error) {
@@ -571,15 +602,21 @@
 
     async function loadConstellationFigures() {
         try {
-            const response = await fetch('files/constellation.figures.txt');
-            const text = await response.text();
+            let text = bundledAssets && bundledAssets.constellationFigures;
+            if (!text) {
+                const response = await fetch('files/constellation.figures.txt');
+                if (!response.ok) throw new Error(`Constellation request failed: ${response.status}`);
+                text = await response.text();
+            }
             figureConstellations = parseConstellationFigures(text);
+            if (!figureConstellations.length) throw new Error('No usable constellation figures');
             figureConstellationsLoaded = figureConstellations.length > 0;
             populateObjectSearch();
             drawScene();
         } catch (error) {
             console.error('Failed to load constellation figures:', error);
             figureConstellationsLoaded = false;
+            drawScene();
         }
     }
 
@@ -624,16 +661,27 @@
 
     function loadEarthImage() {
         earthImage = new Image();
-        earthImage.onload = () => {
-            const textureCanvas = document.createElement('canvas');
-            textureCanvas.width = earthImage.width;
-            textureCanvas.height = earthImage.height;
-            const textureCtx = textureCanvas.getContext('2d');
-            textureCtx.drawImage(earthImage, 0, 0);
-            earthTexture = textureCtx.getImageData(0, 0, earthImage.width, earthImage.height);
+        const failed = error => {
+            console.error('Failed to load Earth texture:', error);
+            earthTextureFailed = true;
             drawScene();
         };
-        earthImage.src = 'images/spherical-projection-map.jpeg';
+        earthImage.onload = () => {
+            try {
+                const textureCanvas = document.createElement('canvas');
+                textureCanvas.width = earthImage.width;
+                textureCanvas.height = earthImage.height;
+                const textureCtx = textureCanvas.getContext('2d');
+                textureCtx.drawImage(earthImage, 0, 0);
+                earthTexture = textureCtx.getImageData(0, 0, earthImage.width, earthImage.height);
+                earthTextureFailed = false;
+                drawScene();
+            } catch (error) {
+                failed(error);
+            }
+        };
+        earthImage.onerror = failed;
+        earthImage.src = bundledAssets && bundledAssets.earthImage || 'images/spherical-projection-map.jpeg';
     }
 
     function orbitalPosition(name, d) {
@@ -721,14 +769,20 @@
         const lon = clamp(parseFloat(controls.lon.value) || 0, -180, 180);
         const habitatLat = clamp(parseFloat(controls.habitatLat.value) || 0, -90, 90);
         const habitatLon = clamp(parseFloat(controls.habitatLon.value) || 0, -180, 180);
-        const northPole = normalize(vectorFromLatLon(lat, lon));
+        const geographicPole = normalize(vectorFromLatLon(lat, lon));
+        const northPole = { x: 0, y: 0, z: 1 };
         const habitatVector = normalize(vectorFromLatLon(habitatLat, habitatLon));
-        const shiftedLatitude = 90 - rad2deg(Math.acos(clamp(dot(habitatVector, northPole), -1, 1)));
-        const viewPole = habitatVector;
+        const viewPole = shiftSurfaceVector(habitatVector, lat, lon);
+        const shiftedLatitude = rad2deg(Math.asin(clamp(viewPole.z, -1, 1)));
+        // Longitude (and compass north) is undefined exactly at either pole.
+        const shiftedLongitude = Math.hypot(viewPole.x, viewPole.y) > 1e-12
+            ? rad2deg(Math.atan2(viewPole.y, viewPole.x)) : 0;
         const seasonDeg = seasonAngles[selectedSeason] || 0;
         const observationDate = getObservationDate();
-        const siderealDeg = localSiderealDegrees(observationDate, habitatLon);
-        const skyRotationDeg = wrap360(siderealDeg - 180);
+        const siderealDeg = localSiderealDegrees(observationDate, shiftedLongitude);
+        // Stars in the shifted Earth frame have longitude RA - Greenwich ST.
+        // The observer vector already includes longitude; do not add it twice.
+        const skyRotationDeg = wrap360(-greenwichSiderealDegrees(observationDate));
         const projection = controls.projection ? controls.projection.value : 'equidistant';
         const labelMode = controls.labelMode ? controls.labelMode.value : 'essential';
         const skyFilter = controls.skyFilter ? controls.skyFilter.value : 'all';
@@ -744,6 +798,8 @@
             habitatLat,
             habitatLon,
             shiftedLatitude,
+            shiftedLongitude,
+            geographicPole,
             northPole,
             habitatVector,
             viewPole,
@@ -840,8 +896,8 @@
         target.textAlign = 'left';
         target.textBaseline = 'middle';
         [
-            { alt: 60, r: radius * (30 / 90) },
-            { alt: 30, r: radius * (60 / 90) },
+            { alt: 60, r: projectedRadius(deg2rad(30), radius, controls.projection.value, controls.visibleMode.value === 'full') },
+            { alt: 30, r: projectedRadius(deg2rad(60), radius, controls.projection.value, controls.visibleMode.value === 'full') },
         ].forEach(ring => {
             target.beginPath();
             target.arc(center.x, center.y, ring.r, 0, pi * 2);
@@ -850,7 +906,8 @@
         });
         target.fillText('Zenith', center.x + 8 * scale, center.y - 10 * scale);
         target.textAlign = 'center';
-        target.fillText('Horizon', center.x, center.y + radius - 14 * scale);
+        const horizonRadius = projectedRadius(pi / 2, radius, controls.projection.value, controls.visibleMode.value === 'full');
+        target.fillText('Horizon', center.x, center.y + horizonRadius - 14 * scale);
         target.restore();
     }
 
@@ -910,7 +967,7 @@
     function drawConstellations(target, theme, state, basis, center, radius, labelBoxes, scale = 1) {
         if (!controls.showConstellations.checked) return;
         const byId = new Map(navigationStars.map(star => [star.id, star]));
-        const sourceFigures = (figureConstellationsLoaded ? figureConstellations : constellationLines)
+        const sourceFigures = availableConstellations()
             .filter(constellation => constellationMatchesFilter(constellation, state.skyFilter));
         target.save();
         sourceFigures.forEach(constellation => {
@@ -924,23 +981,20 @@
                 ? constellation.segments.map(segment => [segment.from, segment.to])
                 : constellation.paths.map(path => path.map(id => byId.get(id)));
             paths.forEach(path => {
-                const points = path.map(star => star && projectVector(rotateSeason(vectorFromRaDec(star.ra, star.dec), state.skyRotationDeg, state.northPole), state.viewPole, basis, center, radius));
-                let started = false;
-                target.beginPath();
-                points.forEach(point => {
-                    if (!point) {
-                        started = false;
-                        return;
-                    }
-                    visiblePoints.push(point);
-                    if (!started) {
-                        target.moveTo(point.x, point.y);
-                        started = true;
-                    } else {
-                        target.lineTo(point.x, point.y);
-                    }
-                });
-                target.stroke();
+                const vectors = path.map(star => star && rotateSeason(vectorFromRaDec(star.ra, star.dec), state.skyRotationDeg, state.northPole));
+                for (let i = 1; i < vectors.length; i++) {
+                    if (!vectors[i - 1] || !vectors[i]) continue;
+                    const points = constellationArc(vectors[i - 1], vectors[i], state.viewPole, state.visibleMode === 'full')
+                        .map(vector => projectVector(vector, state.viewPole, basis, center, radius));
+                    target.beginPath();
+                    points.forEach((point, index) => {
+                        if (!point) return;
+                        visiblePoints.push(point);
+                        if (index === 0) target.moveTo(point.x, point.y);
+                        else target.lineTo(point.x, point.y);
+                    });
+                    target.stroke();
+                }
             });
             if (controls.showConstellationLabels.checked) {
                 const labelPoint = averagePoint(visiblePoints);
@@ -958,6 +1012,38 @@
             }
         });
         target.restore();
+    }
+
+    function availableConstellations() {
+        // Keep familiar navigation asterisms alongside all supplied figures.
+        return figureConstellationsLoaded
+            ? [...figureConstellations, ...constellationLines.filter(figure => figure.kind === 'asterism')]
+            : constellationLines;
+    }
+
+    function constellationArc(from, to, up, fullSky) {
+        let a = from, b = to;
+        if (!fullSky) {
+            const altitudeA = dot(a, up), altitudeB = dot(b, up);
+            if (altitudeA < 0 && altitudeB < 0) return [];
+            if (altitudeA < 0 || altitudeB < 0) {
+                // The linear combination intersects the horizon plane exactly.
+                // Normalizing keeps that intersection on the spherical minor arc.
+                const t = altitudeA / (altitudeA - altitudeB);
+                const horizon = normalize({ x: a.x + t * (b.x - a.x), y: a.y + t * (b.y - a.y), z: a.z + t * (b.z - a.z) });
+                if (altitudeA < 0) a = horizon;
+                else b = horizon;
+            }
+        }
+        const angle = Math.acos(clamp(dot(a, b), -1, 1));
+        const steps = Math.max(1, Math.ceil(rad2deg(angle) / 2));
+        const sinAngle = Math.sin(angle);
+        return Array.from({ length: steps + 1 }, (_, index) => {
+            const t = index / steps;
+            const first = angle < 1e-10 ? 1 - t : Math.sin((1 - t) * angle) / sinAngle;
+            const second = angle < 1e-10 ? t : Math.sin(t * angle) / sinAngle;
+            return normalize({ x: first * a.x + second * b.x, y: first * a.y + second * b.y, z: first * a.z + second * b.z });
+        });
     }
 
     function averagePoint(points) {
@@ -1146,7 +1232,7 @@
         target.fillText(`Conditions: ${projectionLabels[state.projection] || state.projection}; ${controls.labelMode.value} labels; ${state.skyFilter}; ${state.visibleMode}; ${constellationState}; ${labelState}; ecliptic/moon path shown`, w / 2, footerY || h - 24 * scale);
         if (!starCatalog.length) {
             target.fillStyle = theme.accent;
-            target.fillText('Loading Bright Star Catalog...', w / 2, h / 2 + 32 * scale);
+            target.fillText(starCatalogLoaded ? 'Bright Star Catalog unavailable; showing navigation stars.' : 'Loading Bright Star Catalog...', w / 2, h / 2 + 32 * scale);
         }
         target.restore();
     }
@@ -1179,7 +1265,7 @@
         target.fillStyle = printFriendly ? '#243d45' : theme.faint;
         target.fillText(`Pole: ${formatCoordinate(state.lat, state.lon)}`, x + 142 * scale, y + 51 * scale);
         target.fillText(`Habitat: ${formatCoordinate(state.habitatLat, state.habitatLon)}`, x + 142 * scale, y + 71 * scale);
-        target.fillText(`Tilt: ${state.axisTilt.toFixed(1)}${DEG} @ ${state.axisAzimuth.toFixed(1)}${DEG} azimuth`, x + 142 * scale, y + 91 * scale);
+        target.fillText(`Surface shift: ${state.axisTilt.toFixed(1)}${DEG}`, x + 142 * scale, y + 91 * scale);
         target.fillText(`Projection: ${projectionLabels[state.projection] || state.projection}`, x + 142 * scale, y + 111 * scale);
         target.fillText(`View: ${state.visibleMode} | ${state.skyFilter} | ${controls.labelMode.value} labels`, x + 142 * scale, y + 131 * scale);
         if (best) target.fillText(`Pole guide: ${best.name} (${rad2deg(best.angle).toFixed(2)}${DEG}, ${best.visible ? 'visible' : 'below horizon'})`, x + 142 * scale, y + 151 * scale);
@@ -1192,7 +1278,7 @@
             'Star-nav tips',
             'Rim = horizon; center = overhead sky.',
             'Use bright stars first, then confirm nearby patterns.',
-            'The pole guide is nearest the selected pole axis.',
+            'Polaris guides the fixed north celestial axis.',
             'Planets and Moon move; fixed stars are the anchor.',
             'Compare exports with and without constellation lines.',
         ];
@@ -1238,7 +1324,7 @@
     }
 
     function drawCalibratedEarth(target, cx, cy, radius, state, scale = 1, showCaption = false) {
-        const view = normalize(state.northPole);
+        const view = state.geographicPole;
         const basis = makeGlobeBasis(view);
         target.save();
         target.beginPath();
@@ -1321,7 +1407,7 @@
             target.fillText(`N pole centered: ${formatCoordinate(state.lat, state.lon)}`, cx, cy + radius + 26 * scale);
             target.fillStyle = 'rgba(216, 233, 255, 0.72)';
             target.font = `${10 * scale}px Arial, sans-serif`;
-            target.fillText('grid and marker are coordinate-calibrated', cx, cy + radius + 42 * scale);
+            target.fillText(earthTextureFailed ? 'Earth texture unavailable; coordinate grid shown' : 'grid and marker are coordinate-calibrated', cx, cy + radius + 42 * scale);
         }
         target.restore();
     }
@@ -1397,11 +1483,11 @@
     function updateLabels(state, longitudes) {
         const best = closestNorthStar(state);
         labelNodes.poleLabel.textContent = formatCoordinate(state.lat, state.lon);
-        if (labelNodes.axisTiltLabel) labelNodes.axisTiltLabel.textContent = `${state.axisTilt.toFixed(2)}${DEG} @ ${state.axisAzimuth.toFixed(2)}${DEG} azimuth`;
+        if (labelNodes.axisTiltLabel) labelNodes.axisTiltLabel.textContent = `${state.axisTilt.toFixed(2)}${DEG} along ${state.axisAzimuth.toFixed(2)}${DEG} longitude`;
         labelNodes.currentOrientation.textContent = formatCoordinate(state.lat, state.lon);
         labelNodes.hemisphereLabel.textContent = state.hemisphere;
         if (labelNodes.habitatLabel) {
-            labelNodes.habitatLabel.textContent = `${formatCoordinate(state.habitatLat, state.habitatLon)} | shifted ${Math.abs(state.shiftedLatitude).toFixed(2)}${DEG} ${state.shiftedLatitude >= 0 ? 'N' : 'S'}`;
+            labelNodes.habitatLabel.textContent = formatCoordinate(state.shiftedLatitude, state.shiftedLongitude);
         }
         if (labelNodes.projectionLabel) labelNodes.projectionLabel.textContent = projectionLabels[state.projection] || state.projection;
         if (labelNodes.lstLabel) labelNodes.lstLabel.textContent = formatSidereal(state.siderealDeg);
@@ -1547,7 +1633,7 @@
         Object.keys(orbitalElements)
             .filter(name => name !== 'Earth')
             .forEach(name => addOption(`planet-${name.toLowerCase()}`, name));
-        const figures = figureConstellationsLoaded ? figureConstellations : constellationLines;
+        const figures = availableConstellations();
         figures
             .slice()
             .sort((a, b) => a.name.localeCompare(b.name))

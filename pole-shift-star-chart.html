@@ -139,17 +139,19 @@
                 </div>
                 <div class="pssc-small-info"><strong>Shifted habitat:</strong> <span id="pssc-habitat-label">40&deg; N, 100&deg; W</span></div>
                 <div class="pssc-datetime-row">
-                    <label for="pssc-observe-date">Date</label>
+                    <label for="pssc-observe-date">UTC date</label>
                     <input id="pssc-observe-date" type="date" />
-                    <label for="pssc-observe-time">Time</label>
+                    <label for="pssc-observe-time">UTC time</label>
                     <input id="pssc-observe-time" type="time" step="900" />
                 </div>
                 <div class="pssc-control-row">
-                    <label for="pssc-time-slider">Time of day</label>
+                    <label for="pssc-time-slider">Time (UTC)</label>
                     <input id="pssc-time-slider" type="range" min="0" max="1439" step="15" value="1320" />
-                    <span id="pssc-time-slider-label" class="pssc-small-info">22:00</span>
+                    <span id="pssc-time-slider-label" class="pssc-small-info">22:00 UTC</span>
                 </div>
                 <div class="pssc-small-info"><strong>Sidereal:</strong> <span id="pssc-lst-label">--</span></div>
+                <div class="pssc-small-info"><strong>Habitat mean solar time:</strong> <span id="pssc-solar-time">--</span></div>
+                <p class="pssc-small-info">Solar time uses the shifted habitat longitude: UTC + 4 minutes per degree east. It has no daylight-saving adjustment and is not a civil time zone or exact sundial time.</p>
                 <div class="pssc-small-info"><strong>Moon phase:</strong> <span id="pssc-moon-age-label">--</span></div>
                 <div class="pssc-segmented" aria-label="Season">
                     <button class="pssc-season-button is-active" type="button" data-season="winter">Winter</button>

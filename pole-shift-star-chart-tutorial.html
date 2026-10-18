@@ -122,7 +122,7 @@
             <ol>
                 <li>Choose a pole model with the preset buttons, or enter your own latitude and longitude.</li>
                 <li>Set the habitat latitude and longitude for the observing location you want to model.</li>
-                <li>Select the date and time. This controls local sidereal time, moon phase, and approximate planet positions.</li>
+                <li>Select the UTC date and time. The time slider also uses UTC, so the same settings represent the same instant on every device. This controls local sidereal time, moon phase, and approximate planet positions.</li>
                 <li>Choose a map style and projection. Navigation polar is the practical default.</li>
                 <li>Use object filters to switch between all constellations, zodiac emphasis, or navigation-star emphasis.</li>
                 <li>Export multiple chart versions for field comparison or catalogue building.</li>
@@ -169,6 +169,7 @@
             <p>The pole model changes the relationship between Earth geography and the sky. The surface undergoes the shortest rigid rotation that brings the selected pole to the modern North Pole, with no additional twist around the final axis. This preserves all angular distances on the surface. The shifted habitat latitude is 90 degrees minus its angular distance from the selected pole. A habitat can move into the opposite hemisphere, changing which stars are visible, while Polaris remains near the north celestial pole.</p>
             <p>A pole location alone does not determine the final longitude orientation. The no-extra-twist rotation is this tool's convention for computing shifted longitude and local sidereal time. At exactly 180 degrees of surface rotation (a selected pole at 90 degrees south), the selected longitude chooses the flip meridian. At either shifted geographic pole, longitude and compass north are undefined; the chart uses a reference orientation. These are geometric scenarios, not predictions of a displacement path or duration. The current celestial axis and existing approximate astronomical calculations are retained; long-term precession is not simulated.</p>
             <p>The Earth axis model in the sidebar centers the selected pole and marks the chosen habitat, so it is the quickest way to sanity-check the geometry before exporting.</p>
+            <p>The habitat mean solar-time readout converts the selected UTC instant using the habitat's shifted longitude: add four minutes per degree east, or subtract four minutes per degree west. Its date can differ from the UTC date. Changing the pole or habitat updates this readout while preserving the selected UTC instant. This is a longitude-based mean solar clock, not a political time zone or a daylight-saving clock; it does not include the equation-of-time correction needed for apparent sundial time. At a geographic pole, longitude and local solar time are undefined. Exports include both UTC and shifted habitat mean solar time.</p>
         </section>
 
         <section>

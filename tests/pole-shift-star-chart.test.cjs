@@ -19,7 +19,9 @@ const api = vm.runInNewContext(source.replace('return { init: initialize };', `r
     shiftSurfaceVector, vectorFromLatLon, vectorFromRaDec, dot, rotateSeason,
     makeShiftedSkyBasis, projectVector, projectedRadius, getViewState,
     closestNorthStar, greenwichSiderealDegrees, controls, drawScene,
-    parseConstellationFigures, constellationArc, constellationLines, parseRA, parseDEC
+    parseConstellationFigures, constellationArc, constellationLines, parseRA, parseDEC,
+    getObservationDate, setObservationDate, setSeasonDate, formatUTCDate,
+    shiftedSolarDate, formatSolarTime, labelNodes, syncTimeSliderFromInput
 };`) + '\nPSSC;', { document, window: { addEventListener() {} }, Date, Math });
 const rad = degrees => degrees * Math.PI / 180;
 const deg = radians => radians * 180 / Math.PI;
@@ -201,4 +203,50 @@ test('both Dipper bowls are closed and reference existing stars', () => {
     assert.ok(big.paths.some(path => path.join(',') === 'megrez,dubhe'));
     const little = api.constellationLines.find(figure => figure.name === 'Little Dipper').paths[0];
     assert.equal(little.slice(2).join(','), 'epsilon-umi,zeta-umi,eta-umi,pherkad,kochab,epsilon-umi');
+});
+
+test('date inputs, initialization, slider labels, and season presets consistently use UTC', () => {
+    state(90, 0, 40, -100);
+    api.controls.observeDate.value = '2026-03-08'; // US daylight-saving transition.
+    api.controls.observeTime.value = '02:30';
+    assert.equal(api.getObservationDate().toISOString(), '2026-03-08T02:30:00.000Z');
+    api.setObservationDate(new Date('2026-01-01T00:15:00Z'));
+    assert.equal(api.controls.observeDate.value, '2026-01-01');
+    assert.equal(api.controls.observeTime.value, '00:15');
+    assert.equal(api.controls.timeSlider.value, '15');
+    assert.equal(api.controls.timeSliderLabel.textContent, '00:15 UTC');
+    api.setSeasonDate('winter');
+    assert.equal(api.getObservationDate().toISOString(), '2026-01-15T22:00:00.000Z');
+    assert.equal(api.formatUTCDate(api.getObservationDate()), '2026-01-15 22:00 UTC');
+});
+
+test('mean solar clock uses shifted longitude and rolls dates in both directions', () => {
+    const midnight = new Date('2026-01-01T00:00:00Z');
+    assert.equal(api.shiftedSolarDate(midnight, -100).toISOString(), '2025-12-31T17:20:00.000Z');
+    assert.equal(api.shiftedSolarDate(midnight, 90).toISOString(), '2026-01-01T06:00:00.000Z');
+    assert.equal(api.shiftedSolarDate(new Date('2026-12-31T23:30:00Z'), 15).toISOString(), '2027-01-01T00:30:00.000Z');
+    assert.equal(api.shiftedSolarDate(midnight, 180).toISOString(), '2026-01-01T12:00:00.000Z');
+    assert.equal(api.shiftedSolarDate(midnight, -180).toISOString(), '2025-12-31T12:00:00.000Z');
+    assert.equal(api.shiftedSolarDate(midnight, 0).getTime(), midnight.getTime());
+    near(api.shiftedSolarDate(midnight, 12.345).getTime() - midnight.getTime(), 12.345 * 240000, 1);
+});
+
+test('changing pole or habitat changes solar time without changing the UTC instant', () => {
+    let s = state(90, 0, 40, -100);
+    api.controls.observeDate.value = '2026-01-01';
+    api.controls.observeTime.value = '00:00';
+    s = api.getViewState();
+    assert.equal(api.formatSolarTime(s), '2025-12-31 17:20:00 (UTC-06:40:00)');
+    const instant = s.observationDate.getTime();
+    api.controls.lat.value = '15';
+    api.controls.lon.value = '90';
+    const davidson = api.getViewState();
+    assert.equal(davidson.observationDate.getTime(), instant);
+    assert.notEqual(api.formatSolarTime(davidson), api.formatSolarTime(s));
+    near(api.shiftedSolarDate(davidson.observationDate, davidson.shiftedLongitude).getTime() - instant, davidson.shiftedLongitude * 240000, 1);
+    api.controls.habitatLat.value = '15';
+    api.controls.habitatLon.value = '90';
+    const pole = api.getViewState();
+    assert.equal(pole.observationDate.getTime(), instant);
+    assert.equal(api.formatSolarTime(pole), 'Undefined at the geographic pole');
 });

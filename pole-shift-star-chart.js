@@ -52,6 +52,7 @@
         moonAgeLabel: document.getElementById('pssc-moon-age-label'),
         sunLongitude: document.getElementById('pssc-sun-longitude'),
         moonLongitude: document.getElementById('pssc-moon-longitude'),
+        solarTime: document.getElementById('pssc-solar-time'),
     };
 
     const themeSettings = {
@@ -394,29 +395,49 @@
     function syncTimeSliderFromInput() {
         if (!controls.timeSlider || !controls.observeTime) return;
         controls.timeSlider.value = String(timeToMinutes(controls.observeTime.value || '22:00'));
-        if (controls.timeSliderLabel) controls.timeSliderLabel.textContent = controls.observeTime.value || '22:00';
+        if (controls.timeSliderLabel) controls.timeSliderLabel.textContent = `${controls.observeTime.value || '22:00'} UTC`;
     }
 
     function setTimeFromSlider() {
         if (!controls.timeSlider || !controls.observeTime) return;
         const time = minutesToTime(controls.timeSlider.value);
         controls.observeTime.value = time;
-        if (controls.timeSliderLabel) controls.timeSliderLabel.textContent = time;
+        if (controls.timeSliderLabel) controls.timeSliderLabel.textContent = `${time} UTC`;
         drawScene();
     }
 
     function getObservationDate() {
         if (!controls.observeDate || !controls.observeTime || !controls.observeDate.value) return new Date();
         const time = controls.observeTime.value || '22:00';
-        const parsed = new Date(`${controls.observeDate.value}T${time}`);
+        const parsed = new Date(`${controls.observeDate.value}T${time}Z`);
         return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
     }
 
     function setObservationDate(date) {
         if (!controls.observeDate || !controls.observeTime) return;
-        controls.observeDate.value = `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
-        controls.observeTime.value = `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+        controls.observeDate.value = date.toISOString().slice(0, 10);
+        controls.observeTime.value = `${pad2(date.getUTCHours())}:${pad2(date.getUTCMinutes())}`;
         syncTimeSliderFromInput();
+    }
+
+    function formatUTCDate(date) {
+        return `${date.toISOString().slice(0, 16).replace('T', ' ')} UTC`;
+    }
+
+    function shiftedSolarDate(date, longitude) {
+        // Mean solar time advances four minutes per degree east. Use the
+        // shifted longitude, with no device time zone or daylight-saving rules.
+        return new Date(date.getTime() + longitude * 240000);
+    }
+
+    function formatSolarTime(state, includeOffset = true) {
+        if (!state.longitudeDefined) return 'Undefined at the geographic pole';
+        const solarDate = shiftedSolarDate(state.observationDate, state.shiftedLongitude);
+        const clock = solarDate.toISOString().slice(0, 19).replace('T', ' ');
+        if (!includeOffset) return clock;
+        const totalSeconds = Math.round(Math.abs(state.shiftedLongitude) * 240);
+        const offset = `${state.shiftedLongitude < 0 ? '-' : '+'}${pad2(Math.floor(totalSeconds / 3600))}:${pad2(Math.floor(totalSeconds / 60) % 60)}:${pad2(totalSeconds % 60)}`;
+        return `${clock} (UTC${offset})`;
     }
 
     function estimateMoonAge(date) {
@@ -775,7 +796,8 @@
         const viewPole = shiftSurfaceVector(habitatVector, lat, lon);
         const shiftedLatitude = rad2deg(Math.asin(clamp(viewPole.z, -1, 1)));
         // Longitude (and compass north) is undefined exactly at either pole.
-        const shiftedLongitude = Math.hypot(viewPole.x, viewPole.y) > 1e-12
+        const longitudeDefined = Math.hypot(viewPole.x, viewPole.y) > 1e-12;
+        const shiftedLongitude = longitudeDefined
             ? rad2deg(Math.atan2(viewPole.y, viewPole.x)) : 0;
         const seasonDeg = seasonAngles[selectedSeason] || 0;
         const observationDate = getObservationDate();
@@ -799,6 +821,7 @@
             habitatLon,
             shiftedLatitude,
             shiftedLongitude,
+            longitudeDefined,
             geographicPole,
             northPole,
             habitatVector,
@@ -1225,9 +1248,10 @@
         target.fillStyle = printFriendly ? '#111719' : theme.faint;
         target.font = `${12 * scale}px Arial, sans-serif`;
         target.textAlign = 'center';
-        const dateText = state.observationDate.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+        const dateText = formatUTCDate(state.observationDate);
         const constellationState = controls.showConstellations.checked ? 'constellations on' : 'constellations off';
         const labelState = controls.showConstellationLabels.checked ? 'labels on' : 'labels off';
+        target.fillText(`Shifted habitat: ${formatCoordinate(state.shiftedLatitude, state.shiftedLongitude)} | Mean solar time: ${formatSolarTime(state, false)}`, w / 2, (footerY || h - 24 * scale) - 32 * scale);
         target.fillText(`${state.hemisphere} habitat sky | pole ${formatCoordinate(state.lat, state.lon)} | habitat ${formatCoordinate(state.habitatLat, state.habitatLon)} | ${dateText}`, w / 2, (footerY || h - 24 * scale) - 16 * scale);
         target.fillText(`Conditions: ${projectionLabels[state.projection] || state.projection}; ${controls.labelMode.value} labels; ${state.skyFilter}; ${state.visibleMode}; ${constellationState}; ${labelState}; ecliptic/moon path shown`, w / 2, footerY || h - 24 * scale);
         if (!starCatalog.length) {
@@ -1239,7 +1263,7 @@
 
     function drawExportInset(target, theme, state, longitudes, w, h, scale = 1, layout = {}, printFriendly = false) {
         const insetW = 382 * scale;
-        const insetH = 190 * scale;
+        const insetH = 230 * scale;
         const x = layout.insetX || 42 * scale;
         const y = layout.insetY || 42 * scale;
         const globeRadius = 52 * scale;
@@ -1270,6 +1294,8 @@
         target.fillText(`View: ${state.visibleMode} | ${state.skyFilter} | ${controls.labelMode.value} labels`, x + 142 * scale, y + 131 * scale);
         if (best) target.fillText(`Pole guide: ${best.name} (${rad2deg(best.angle).toFixed(2)}${DEG}, ${best.visible ? 'visible' : 'below horizon'})`, x + 142 * scale, y + 151 * scale);
         target.fillText(`Sun ${longitudes.sunLongitude.toFixed(1)}${DEG} | Moon ${longitudes.moonLongitude.toFixed(1)}${DEG}`, x + 142 * scale, y + 171 * scale);
+        target.fillText(formatUTCDate(state.observationDate), x + 142 * scale, y + 191 * scale, 230 * scale);
+        target.fillText(`Solar: ${formatSolarTime(state, false)}`, x + 142 * scale, y + 211 * scale, 230 * scale);
         target.restore();
     }
 
@@ -1492,6 +1518,7 @@
         if (labelNodes.projectionLabel) labelNodes.projectionLabel.textContent = projectionLabels[state.projection] || state.projection;
         if (labelNodes.lstLabel) labelNodes.lstLabel.textContent = formatSidereal(state.siderealDeg);
         if (labelNodes.toolbarLst) labelNodes.toolbarLst.textContent = formatSidereal(state.siderealDeg);
+        if (labelNodes.solarTime) labelNodes.solarTime.textContent = formatSolarTime(state);
         if (labelNodes.moonAgeLabel) labelNodes.moonAgeLabel.textContent = `${getMoonPhaseName(state.moonAge)} (${state.moonAge.toFixed(1)} days)`;
         labelNodes.sunLongitude.textContent = `${longitudes.sunLongitude.toFixed(1)}${DEG}`;
         labelNodes.moonLongitude.textContent = `${longitudes.moonLongitude.toFixed(1)}${DEG}`;
@@ -1545,7 +1572,7 @@
         const preset = seasonDatePresets[season];
         if (!preset) return;
         const now = getObservationDate();
-        setObservationDate(new Date(now.getFullYear(), preset.month, preset.day, preset.hour, 0, 0));
+        setObservationDate(new Date(Date.UTC(now.getUTCFullYear(), preset.month, preset.day, preset.hour, 0, 0)));
     }
 
     function createExportCanvas(options = {}) {

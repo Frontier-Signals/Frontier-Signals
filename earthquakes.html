@@ -31,7 +31,7 @@
 
     <title>Earthquake Monitoring - Frontier Signals</title>
 	<!-- Leaflet CSS (Required for Map Styling) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />	
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />	
 	<!-- External Styling Sheet -->
 	<link rel="stylesheet" href="stylesheet.css">	
 	<!-- MarkerCluster CSS -->
@@ -252,9 +252,66 @@ svg .leaflet-draw-guide-line {
   }
 }
 
+.volcano-symbol, .volcano-cluster {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background: #d1d5db;
+  color: #111;
+  border: 2px solid #111;
+  border-radius: 6px;
+  text-shadow: none;
+  font: bold 18px/1 sans-serif;
+  width: 28px;
+  height: 28px;
+}
+.volcano-cluster { width: 48px; height: 32px; font-size: 14px; }
+.volcano-nearby { background: #ff9800; }
+#mapPanel { background: #0b2a3b; }
+#mapPanel .controls { padding: 12px; }
+#mapPanel select { max-width: 100%; }
+#volcanoNote { font-size: 0.9rem; margin: 8px 0; }
+#overlayStatus:empty { display: none; }
+#mapPanel:fullscreen, #mapPanel.map-expanded {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  box-sizing: border-box;
+}
+#mapPanel.map-expanded { position: fixed; inset: 0; z-index: 10000; }
+#mapPanel:fullscreen .controls, #mapPanel.map-expanded .controls {
+  max-height: 35vh;
+  flex: 0 0 auto;
+  overflow-y: auto;
+}
+#mapPanel:fullscreen #map, #mapPanel.map-expanded #map {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+.map-fullscreen-control button {
+  display: block;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  color: #111;
+  border: 0;
+  border-radius: 2px;
+  font: 24px/32px sans-serif;
+  cursor: pointer;
+}
+.map-fullscreen-control button:focus-visible { outline: 3px solid #ff9800; }
 /* Map styling */
 #map {
   border: 2px solid orange;
+  margin: 0 auto;
 }
 .leaflet-layer, .leaflet-overlay-pane {
   border: none !important;
@@ -308,7 +365,8 @@ svg .leaflet-draw-guide-line {
 			<h2 style="text-align:center">Earthquake Monitoring</h2><hr>
 			<h3 style="text-align:center">Quake Tracker + Volcano Display + Measurement Tools</h3>
 			<!-- ===== Selectable Controls ===== -->
-			<div style="background-color: #0b2a3b;" class="controls">
+			<div id="mapPanel">
+<div style="background-color: #0b2a3b;" class="controls">
   <label for="feedSelect">Select Earthquake Feed</label>
   <select id="feedSelect">
     <option value="usgs_week" selected>USGS Past 7 Days - All</option>
@@ -323,12 +381,12 @@ svg .leaflet-draw-guide-line {
   </select> 
   <label for="baseMapSelect">Map Style</label>
   <select id="baseMapSelect">
-    <option value="osm" selected>OpenStreetMap</option>
-    <option value="usgsTopo">USGS Topographic</option>
+    <option value="usgsTopo" selected>USGS Topographic</option>
+    <option value="osm">OpenStreetMap</option>
     <option value="esriWorldImagery">Satellite Imagery</option>
-    <option value="cartoDark">Dark Matter</option>
-    <option value="cartoLight">Light Positron</option>
     <option value="terrain">Terrain</option>
+    <option value="usgsRelief">USGS Shaded Relief (US detail)</option>
+    <option value="usgsImagery">USGS Aerial Imagery (US detail)</option>
   </select>
   <label>
   <input type="checkbox" id="toggleEarthquakeFeed" checked>
@@ -343,22 +401,26 @@ svg .leaflet-draw-guide-line {
 		<!-- ===== Toggle Clusters ===== -->
   <br>
 <label>
-  <input type="checkbox" id="toggleCluster" unchecked>
+  <input type="checkbox" id="toggleCluster">
   Enable Earthquake Clustering
 </label>
 <label>
-      <input type="checkbox" id="togglePlates" />
+      <input type="checkbox" id="togglePlates" checked />
       Show tectonic plate boundaries
     </label>
-<label>
-  <label>
-  <input type="checkbox" id="toggleHolocene" />
-  Show Volcanoes
-</label>
-<p id="feedStatus" class="map-status">Loading earthquake feed...</p>
+<label for="volcanoMode">Volcano Overlay</label>
+<select id="volcanoMode" aria-describedby="volcanoNote">
+  <option value="nearby" selected>Nearby volcanoes (within 50 miles)</option>
+  <option value="all">All volcanoes</option>
+  <option value="off">Volcanoes off</option>
+</select>
+<p id="volcanoNote">Orange volcanoes are within 50 miles (80.5 km) of an earthquake matching the feed and magnitude/age filters, even when earthquake markers are hidden. Proximity only; this does not indicate volcanic activity.</p>
+<p id="overlayStatus" class="map-status" role="status"></p>
+<p id="feedStatus" class="map-status" role="status">Loading earthquake feed...</p>
 </div>
             <!-- Map container -->
-            <center><div id="map" class="leaflet-container" style="height: 400px;"></div></center>
+            <div id="map" style="height: 400px;"></div>
+</div>
 			<br>
 			<hr>
 			<!-- ===== Table for Legend ===== -->
@@ -387,13 +449,17 @@ svg .leaflet-draw-guide-line {
       <td>Earthquake (Magnitude > 5.7)</td>
     </tr>
         <tr>
-            <td class="volcano-icon">&#x1F30B;</td>
-            <td>Volcano (Static Location)</td>
+            <td><span class="volcano-symbol">&#9650;</span></td>
+            <td>Volcano (static location; no matching earthquake within 50 miles)</td>
+        </tr>
+        <tr>
+            <td><span class="volcano-symbol volcano-nearby">&#9650;</span></td>
+            <td>Volcano within 50 miles of a matching earthquake. Orange volcano clusters contain at least one nearby volcano. Proximity only, not volcanic activity.</td>
         </tr>
     </tbody>
 </table></div>
 </div>
-<div class="right-side"><p>Live earthquake data can be loaded from USGS, EMSC, GFZ/GEOFON, or a combined deduplicated multi-agency option. ISC is not listed because its event service does not allow browser-side CORS fetches.<br><br>Important note: The volcano overlay is static and does not update in real time. See the <a href="volcanos.html" class="button">Volcano Monitoring</a> page for current activity. Wildfires, floods, droughts, tropical systems, and Schumann resonance have moved to the <a href="live-earth-monitor.html" class="button">Live Earth Monitor</a>.</p></div>
+<div class="right-side"><p>Live earthquake data can be loaded from USGS, EMSC, GFZ/GEOFON, or a combined deduplicated multi-agency option. ISC is not listed because its event service does not allow browser-side CORS fetches.<br><br>Important note: Volcano locations are static. Orange highlights update with the loaded earthquake feed and magnitude/age filters; they do not indicate volcanic activity or predict an eruption. See the <a href="volcanos.html" class="button">Volcano Monitoring</a> page for current activity. Wildfires, floods, droughts, tropical systems, and Schumann resonance have moved to the <a href="live-earth-monitor.html" class="button">Live Earth Monitor</a>.</p></div>
 </div><br>
         </section>	
 		<br></br>
@@ -414,10 +480,10 @@ svg .leaflet-draw-guide-line {
         </p>
     </footer>
 	
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="earthquake-proximity.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
-<script src="https://unpkg.com/leaflet-geometryutil@0.9.3/index.js"></script>
     <script>
 	// === Initialize Leaflet Map ===
 var map = L.map('map', { worldCopyJump: true }).setView([20, 0], 2);
@@ -436,20 +502,20 @@ const baseLayers = {
     maxZoom: 19,
     attribution: 'Tiles Esri'
   }),
-  cartoDark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19,
-    attribution: 'OpenStreetMap contributors, CARTO'
+  usgsRelief: L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer/tile/{z}/{y}/{x}', {
+    maxNativeZoom: 16, maxZoom: 19,
+    attribution: 'USGS The National Map: 3DEP, EROS / GMTED2010'
   }),
-  cartoLight: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19,
-    attribution: 'OpenStreetMap contributors, CARTO'
+  usgsImagery: L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}', {
+    maxNativeZoom: 16, maxZoom: 19,
+    attribution: 'USDA, USGS The National Map: Orthoimagery'
   }),
   terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
     maxZoom: 17,
     attribution: 'OpenTopoMap contributors'
   })
 };
-let currentBaseLayer = baseLayers.osm.addTo(map);
+let currentBaseLayer = baseLayers.usgsTopo.addTo(map);
 
 document.getElementById('baseMapSelect').addEventListener('change', function() {
   if (currentBaseLayer) map.removeLayer(currentBaseLayer);
@@ -492,94 +558,184 @@ var currentFeedSelection = 'usgs_week';
       opacity: 0.9
     };
 
-    // Layer placeholder
-    let plateLayer = null;
+// Load static overlays once, and honor the latest control state after fetches.
+let plateLayer = null;
+let plateLoading = null;
+let volcanoData = null;
+let volcanoLoading = null;
+let filteredEarthquakes = [];
+const overlayErrors = new Map();
+function overlayError(key, message) {
+  if (message) overlayErrors.set(key, message);
+  else overlayErrors.delete(key);
+  document.getElementById('overlayStatus').textContent = [...overlayErrors.values()].join(' ');
+}
+async function loadStaticJson(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+async function syncPlates() {
+  if (!document.getElementById('togglePlates').checked) {
+    if (plateLayer) map.removeLayer(plateLayer);
+    overlayError('plates', '');
+    return;
+  }
+  try {
+    if (!plateLayer) {
+      if (!plateLoading) plateLoading = loadStaticJson('files/PB2002_boundaries.json')
+        .then(data => { plateLayer = L.geoJSON(data, {
+          style: plateStyle,
+          attribution: '<a href="https://github.com/fraxen/tectonicplates">Plate boundaries: Peter Bird / Hugo Ahlenius, Nordpil</a> · <a href="https://opendatacommons.org/licenses/by/1-0/">ODC-By</a>'
+        }); })
+        .finally(() => { plateLoading = null; });
+      await plateLoading;
+    }
+    if (document.getElementById('togglePlates').checked) plateLayer.addTo(map);
+    overlayError('plates', '');
+  } catch (error) {
+    if (document.getElementById('togglePlates').checked)
+      overlayError('plates', 'Plate boundaries unavailable. Toggle off and on to retry.');
+  }
+}
+document.getElementById('togglePlates').addEventListener('change', syncPlates);
 
-    // Toggle logic
-    document.getElementById('togglePlates').addEventListener('change', async function(e) {
-      const checked = e.target.checked;
-
-      if (checked) {
-        // Load GeoJSON if not already loaded
-        if (!plateLayer) {
-          const response = await fetch(
-            'files/PB2002_boundaries.json'
-          );
-          const data = await response.json();
-
-          plateLayer = L.geoJSON(data, { style: plateStyle });
-        }
-
-        plateLayer.addTo(map);
-      } else {
-        if (plateLayer) {
-          map.removeLayer(plateLayer);
-        }
-      }
+function escapeMapText(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[char]);
+}
+const volcanoClustered = L.markerClusterGroup({
+  disableClusteringAtZoom: 8,
+  maxClusterRadius: 50,
+  spiderfyOnMaxZoom: true,
+  showCoverageOnHover: false,
+  iconCreateFunction(cluster) {
+    const nearby = cluster.getAllChildMarkers().some(marker => marker.options.nearbyEarthquake);
+    return L.divIcon({
+      html: `<span class="volcano-cluster ${nearby ? 'volcano-nearby' : ''}">&#9650; ${cluster.getChildCount()}</span>`,
+      className: '', iconSize: [48, 32], iconAnchor: [24, 16]
     });
-
-    // Combined volcano layer with clustering
-let volcanoLayer = null;
-let volcanoClustered = L.markerClusterGroup({
-    disableClusteringAtZoom: 8,
-    maxClusterRadius: 50,
-    spiderfyOnMaxZoom: true,
-    showCoverageOnHover: false,
-    iconCreateFunction: function(cluster) {
-      var childCount = cluster.getChildCount();
-      var c = ' marker-cluster-';
-      if (childCount < 10) {
-        c += 'small';
-      } else if (childCount < 100) {
-        c += 'medium';
-      } else {
-        c += 'large';
-      }
-      return new L.DivIcon({ 
-        html: '<div class="marker-cluster-custom ' + c + '"><span>' + childCount + '</span></div>',
-        className: 'marker-cluster-group',
-        iconSize: new L.Point(40, 40)
-      });
-    }
-});
-
-document.getElementById('toggleHolocene').addEventListener('change', async function(e) {
-  const checked = e.target.checked;
-
-  if (checked) {
-    if (!volcanoLayer) {
-      const response = await fetch('files/volcano.json');
-      const data = await response.json();
-
-      // Create GeoJSON layer
-      volcanoLayer = L.geoJSON(data, {
-        pointToLayer: function(feature, latlng) {
-          return L.marker(latlng, {
-            icon: L.divIcon({
-              html: '&#x1F30B;',
-              iconSize: [32, 32],
-              className: 'volcano-icon'
-            })
-          }).bindPopup(
-            `<strong>${feature.properties.V_Name || 'Unknown'}</strong><br>
-             Country: ${feature.properties.Country || 'N/A'}<br>
-             Region: ${feature.properties.Region || 'N/A'}<br>
-             VEI (Holocene): ${feature.properties.VEI_Holoce || 'N/A'}`
-          );
-        }
-      });
-
-      // Add all markers to cluster group
-      volcanoClustered.addLayer(volcanoLayer);
-    }
-
-    map.addLayer(volcanoClustered);
-  } else {
-    if (volcanoClustered) {
-      map.removeLayer(volcanoClustered);
-    }
   }
 });
+function renderVolcanoes() {
+  volcanoClustered.clearLayers();
+  const mode = document.getElementById('volcanoMode').value;
+  if (mode === 'off') {
+    map.removeLayer(volcanoClustered);
+    return;
+  }
+  if (!volcanoData) return;
+  const nearby = EarthquakeProximity.createIndex(filteredEarthquakes);
+  const markers = [];
+  volcanoData.features.forEach(feature => {
+    const coords = feature.geometry?.coordinates;
+    if (feature.geometry?.type !== 'Point' || !Array.isArray(coords) ||
+        !Number.isFinite(coords[0]) || !Number.isFinite(coords[1]) || Math.abs(coords[1]) > 90) return;
+    const match = nearby(coords);
+    const isNearby = match.count > 0;
+    if (mode === 'nearby' && !isNearby) return;
+    const props = feature.properties || {};
+    const proximity = isNearby
+      ? `${match.count} matching earthquake(s) within 50 miles.<br>Nearest epicenter: ${(match.nearestKm / 1.609344).toFixed(1)} mi / ${match.nearestKm.toFixed(1)} km.`
+      : 'No matching earthquake within 50 miles.';
+    markers.push(L.marker([coords[1], coords[0]], {
+      nearbyEarthquake: isNearby,
+      title: `${props.V_Name || 'Unknown volcano'}${isNearby ? ' — earthquake within 50 miles' : ''}`,
+      icon: L.divIcon({
+        html: `<span class="volcano-symbol ${isNearby ? 'volcano-nearby' : ''}">&#9650;</span>`,
+        className: 'volcano-icon', iconSize: [28, 28], iconAnchor: [14, 14]
+      })
+    }).bindPopup(`<strong>${escapeMapText(props.V_Name || 'Unknown')}</strong><br>
+      Country: ${escapeMapText(props.Country || 'N/A')}<br>
+      Region: ${escapeMapText(props.Region || 'N/A')}<br>
+      VEI (Holocene): ${escapeMapText(props.VEI_Holoce ?? 'N/A')}<br>
+      ${proximity}<br><strong>Static volcano location. Proximity does not indicate volcanic activity.</strong>`));
+  });
+  volcanoClustered.addLayers(markers);
+  volcanoClustered.addTo(map);
+}
+async function syncVolcanoes() {
+  if (document.getElementById('volcanoMode').value === 'off') {
+    renderVolcanoes();
+    overlayError('volcanoes', '');
+    return;
+  }
+  try {
+    if (!volcanoData) {
+      if (!volcanoLoading) volcanoLoading = loadStaticJson('files/volcano.json')
+        .then(data => {
+          if (!Array.isArray(data.features)) throw new Error('Invalid volcano data');
+          volcanoData = data;
+        }).finally(() => { volcanoLoading = null; });
+      await volcanoLoading;
+    }
+    renderVolcanoes();
+    overlayError('volcanoes', '');
+  } catch (error) {
+    if (document.getElementById('volcanoMode').value !== 'off')
+      overlayError('volcanoes', 'Volcano locations unavailable. Select another overlay option to retry.');
+  }
+}
+document.getElementById('volcanoMode').addEventListener('change', syncVolcanoes);
+
+// Keep feed controls and the proximity explanation available in fullscreen.
+const mapPanel = document.getElementById('mapPanel');
+const fullscreenControl = L.control({ position: 'topleft' });
+let fullscreenButton;
+let previousBodyOverflow = '';
+let fullscreenWasActive = false;
+function fullscreenActive() {
+  return document.fullscreenElement === mapPanel || mapPanel.classList.contains('map-expanded');
+}
+function updateFullscreen() {
+  const active = fullscreenActive();
+  if (active && !fullscreenWasActive) {
+    previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+  } else if (!active && fullscreenWasActive) {
+    document.body.style.overflow = previousBodyOverflow;
+    fullscreenButton.focus();
+  }
+  fullscreenWasActive = active;
+  fullscreenButton.textContent = active ? '⤡' : '⤢';
+  fullscreenButton.title = active ? 'Exit fullscreen (Esc)' : 'Open fullscreen map';
+  fullscreenButton.setAttribute('aria-label', fullscreenButton.title);
+  fullscreenButton.setAttribute('aria-pressed', String(active));
+  requestAnimationFrame(() => map.invalidateSize({ pan: false }));
+}
+fullscreenControl.onAdd = function() {
+  const container = L.DomUtil.create('div', 'leaflet-bar map-fullscreen-control');
+  fullscreenButton = L.DomUtil.create('button', '', container);
+  fullscreenButton.type = 'button';
+  L.DomEvent.disableClickPropagation(container);
+  L.DomEvent.disableScrollPropagation(container);
+  fullscreenButton.addEventListener('click', async () => {
+    if (document.fullscreenElement === mapPanel) {
+      await document.exitFullscreen();
+    } else if (mapPanel.classList.contains('map-expanded')) {
+      mapPanel.classList.remove('map-expanded');
+    } else {
+      try {
+        if (!mapPanel.requestFullscreen) throw new Error('Fullscreen unavailable');
+        await mapPanel.requestFullscreen();
+      } catch (error) {
+        mapPanel.classList.add('map-expanded');
+      }
+    }
+    updateFullscreen();
+  });
+  return container;
+};
+fullscreenControl.addTo(map);
+document.addEventListener('fullscreenchange', updateFullscreen);
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && mapPanel.classList.contains('map-expanded')) {
+    mapPanel.classList.remove('map-expanded');
+    updateFullscreen();
+  }
+});
+updateFullscreen();
 
 // Earthquake feed visibility toggle
 let earthquakeFeedVisible = true;
@@ -837,12 +993,14 @@ function renderMarkers() {
   const maxAgeDays = parseInt(document.getElementById('timeRange').value);
   const now = Date.now();
 
+  filteredEarthquakes = [];
   cachedData.forEach(feature => {
     const mag = feature.properties.mag || 0;
     const time = feature.properties.time || 0;
     const ageDays = (now - time) / (1000 * 60 * 60 * 24);
 
     if (mag >= minMag && ageDays <= maxAgeDays) {
+      filteredEarthquakes.push(feature);
       const marker = createEarthquakeMarker(feature);
       const combinedMode = isCombinedSelection(currentFeedSelection);
       if (mag < 3 || (clusteringEnabled && !combinedMode)) {
@@ -853,18 +1011,24 @@ function renderMarkers() {
     }
   });
   syncEarthquakeLayer();
+  renderVolcanoes();
 }
 
+let feedRequestId = 0;
 async function loadFeed(selection) {
+  const requestId = ++feedRequestId;
   currentFeedSelection = selection;
   const status = document.getElementById('feedStatus');
   earthquakesLayerClustered.clearLayers();
   earthquakesLayerPlain.clearLayers();
   cachedData = [];
+  filteredEarthquakes = [];
+  renderVolcanoes();
   status.textContent = 'Loading earthquake feed...';
 
   const sources = feedSourcesForSelection(selection);
   const settled = await Promise.allSettled(sources.map(source => fetchCatalog(source).then(data => ({ source, data }))));
+  if (requestId !== feedRequestId) return;
   const failures = settled.filter(result => result.status === 'rejected').map(result => result.reason.message);
   const events = settled
     .filter(result => result.status === 'fulfilled')
@@ -908,6 +1072,8 @@ document.getElementById('timeRange').addEventListener('input', function() {
 });
 
 // Initial load
+syncPlates();
+syncVolcanoes();
 loadFeed(document.getElementById('feedSelect').value);
 
 

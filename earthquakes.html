@@ -59,7 +59,31 @@
   color: #fcf2dc;
   font-family: 'Lucida Console', monospace;
   font-weight: 700;
+  text-shadow: none;
+  letter-spacing: normal;
 }
+.leaflet-popup-content a:link {
+  color: #dbd47b;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-shadow: none;
+}
+.leaflet-popup-content a:visited {
+  color: #c9be30;
+}
+.leaflet-popup-content a:hover,
+.leaflet-popup-content a:focus,
+.leaflet-popup-content a:active {
+  color: #ffffff;
+}
+.leaflet-popup-content a:focus-visible {
+  outline: 2px solid #dbd47b;
+  outline-offset: 3px;
+}
+.report-comparison { margin-top: 10px; letter-spacing: normal; }
+.report-comparison summary { cursor: pointer; color: #dbd47b; }
+.report-comparison ul { padding-left: 18px; }
+.report-comparison li { margin-bottom: 10px; overflow-wrap: anywhere; }
 .leaflet-popup-tip {
   background-color: #d10d0d;
 }
@@ -416,6 +440,7 @@ svg .leaflet-draw-guide-line {
 </select>
 <p id="volcanoNote">Orange volcanoes are within 50 miles (80.5 km) of an earthquake matching the feed and magnitude/age filters, even when earthquake markers are hidden. Proximity only; this does not indicate volcanic activity.</p>
 <p id="overlayStatus" class="map-status" role="status"></p>
+<p id="feedPolicy">Combined feeds display the USGS solution when available. Otherwise, human-processed reports take priority, followed by EMSC then GEOFON. Other agency estimates are available in the earthquake popup.</p>
 <p id="feedStatus" class="map-status" role="status">Loading earthquake feed...</p>
 </div>
             <!-- Map container -->
@@ -853,6 +878,36 @@ async function fetchCatalog(source) {
   return source.format === 'xml' ? response.text() : response.json();
 }
 
+function usgsReportUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && url.hostname === 'earthquake.usgs.gov' &&
+      !url.username && !url.password && !url.port &&
+      /^\/earthquakes\/eventpage\/[^/]+/.test(url.pathname) ? url.href : '';
+  } catch (error) {
+    return '';
+  }
+}
+
+function reportTimestamp(value) {
+  if (value == null || value === '') return null;
+  const time = typeof value === 'number' ? value : Date.parse(value);
+  return Number.isFinite(time) ? time : null;
+}
+
+function reportMetadata(event, props, agency) {
+  return {
+    agency,
+    eventId: String(event.id ?? props.eventid ?? props.source_id ?? ''),
+    network: String(props.net ?? props.auth ?? ''),
+    magnitudeType: String(props.magType ?? props.magtype ?? ''),
+    reviewStatus: String(props.status ?? props.evaluationStatus ?? ''),
+    evaluationMode: String(props.evaluationMode ?? ''),
+    updated: reportTimestamp(props.updated ?? props.lastupdate),
+    locationUncertaintyKm: props.horizontalError == null ? null : Number(props.horizontalError)
+  };
+}
+
 function normalizeEarthquakeData(data, agency) {
   if (Array.isArray(data.features)) {
     return data.features.map(feature => {
@@ -860,11 +915,15 @@ function normalizeEarthquakeData(data, agency) {
       const coords = feature.geometry && feature.geometry.coordinates ? feature.geometry.coordinates : [];
       const timeValue = scalarValue(props.time ?? props.time_utc ?? props.datetime ?? props.timestamp);
       return {
+        ...reportMetadata(feature, props, agency),
         mag: Number(scalarValue(props.mag ?? props.magnitude ?? props.mag_value)),
         place: props.place || props.flynn_region || props.description || props.region || 'Unknown Location',
         time: typeof timeValue === 'number' ? timeValue : Date.parse(timeValue),
-        coordinates: [Number(coords[0]), Number(coords[1]), Number(scalarValue(coords[2] ?? props.depth ?? 0))],
-        agencies: [agency]
+        coordinates: [Number(coords[0]), Number(coords[1]), Number(scalarValue(
+          agency === 'EMSC' ? (props.depth ?? (coords[2] == null ? 0 : -coords[2])) : (coords[2] ?? props.depth ?? 0)
+        ))],
+        agencies: [agency],
+        usgsReportUrl: agency === 'USGS' ? usgsReportUrl(props.url) : ''
       };
     });
   }
@@ -875,15 +934,18 @@ function normalizeEarthquakeData(data, agency) {
     const geom = event.geometry && event.geometry.coordinates ? event.geometry.coordinates : [];
     const timeValue = scalarValue(props.time ?? props.time_utc ?? props.datetime ?? props.timestamp);
     return {
+      ...reportMetadata(event, props, agency),
       mag: Number(scalarValue(props.mag ?? props.magnitude ?? props.mag_value)),
       place: props.flynn_region || props.region || props.place || props.description || props.location || 'Unknown Location',
       time: typeof timeValue === 'number' ? timeValue : Date.parse(timeValue),
       coordinates: [
         Number(geom[0] ?? props.lon ?? props.longitude ?? props.lng),
         Number(geom[1] ?? props.lat ?? props.latitude),
-        Number(scalarValue(geom[2] ?? props.depth ?? 0))
+        Number(scalarValue(agency === 'EMSC'
+          ? (props.depth ?? (geom[2] == null ? 0 : -geom[2])) : (geom[2] ?? props.depth ?? 0)))
       ],
-      agencies: [agency]
+      agencies: [agency],
+      usgsReportUrl: agency === 'USGS' ? usgsReportUrl(props.url) : ''
     };
   });
 }
@@ -901,11 +963,23 @@ function nestedValue(node, name) {
 function normalizeQuakeMl(xmlText, agency) {
   const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
   return Array.from(doc.getElementsByTagNameNS('*', 'event')).map(eventNode => {
-    const origin = eventNode.getElementsByTagNameNS('*', 'origin')[0];
-    const magnitude = eventNode.getElementsByTagNameNS('*', 'magnitude')[0];
+    const origins = Array.from(eventNode.getElementsByTagNameNS('*', 'origin'));
+    const magnitudes = Array.from(eventNode.getElementsByTagNameNS('*', 'magnitude'));
+    const preferredOrigin = childText(eventNode, 'preferredOriginID');
+    const preferredMagnitude = childText(eventNode, 'preferredMagnitudeID');
+    const origin = origins.find(node => node.getAttribute('publicID') === preferredOrigin) || origins[0];
+    const magnitude = magnitudes.find(node => node.getAttribute('publicID') === preferredMagnitude) || magnitudes[0];
     const description = eventNode.getElementsByTagNameNS('*', 'description')[0];
     const place = description ? childText(description, 'text') : 'Unknown Location';
     return {
+      agency,
+      eventId: eventNode.getAttribute('publicID') || '',
+      magnitudeType: childText(magnitude, 'type'),
+      reviewStatus: childText(origin, 'evaluationStatus'),
+      evaluationMode: childText(origin, 'evaluationMode'),
+      updated: reportTimestamp(childText(origin, 'creationTime')),
+      locationUncertaintyKm: childText(origin, 'horizontalUncertainty')
+        ? Number(childText(origin, 'horizontalUncertainty')) / 1000 : null,
       mag: Number(nestedValue(magnitude, 'mag')),
       place,
       time: Date.parse(nestedValue(origin, 'time')),
@@ -927,37 +1001,103 @@ function distanceKm(a, b) {
   const lat1 = toRad(a.coordinates[1]);
   const lat2 = toRad(b.coordinates[1]);
   const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-  return 2 * earthRadius * Math.asin(Math.sqrt(h));
+  return 2 * earthRadius * Math.asin(Math.sqrt(Math.min(1, Math.max(0, h))));
+}
+
+function reportReviewed(report) {
+  return report.reviewStatus?.toLowerCase() === 'reviewed' || report.evaluationMode?.toLowerCase() === 'manual';
+}
+
+function reportReviewLabel(report) {
+  if (report.reviewStatus?.toLowerCase() === 'reviewed') return 'Reviewed';
+  if (report.evaluationMode?.toLowerCase() === 'manual') return 'Manually processed';
+  if (report.evaluationMode?.toLowerCase() === 'automatic' || report.reviewStatus?.toLowerCase() === 'automatic') return 'Automatic';
+  return 'Review status not supplied';
+}
+
+function compareReportPreference(a, b) {
+  // USGS supplies the primary solution. With no USGS match, prefer human-processed
+  // solutions, then EMSC before GEOFON. This is a display policy, not an accuracy score.
+  const agencyRank = { USGS: 0, EMSC: 1, 'GFZ/GEOFON': 2 };
+  return Number(b.agency === 'USGS') - Number(a.agency === 'USGS') ||
+    Number(reportReviewed(b)) - Number(reportReviewed(a)) ||
+    (agencyRank[a.agency] ?? 3) - (agencyRank[b.agency] ?? 3) ||
+    (b.updated ?? 0) - (a.updated ?? 0) ||
+    String(a.eventId).localeCompare(String(b.eventId)) || b.time - a.time ||
+    a.coordinates[0] - b.coordinates[0] || a.coordinates[1] - b.coordinates[1] || a.mag - b.mag;
 }
 
 function dedupeEarthquakes(events) {
+  // Match reports separately from choosing the displayed solution. Never combine
+  // two distinct reports from one agency or bridge a chain of loose matches.
+  const timeTolerance = 20000;
+  const sameEvent = (a, b) => Math.abs(a.time - b.time) <= timeTolerance &&
+    Math.abs(a.mag - b.mag) <= 0.6 + 1e-9 && distanceKm(a, b) <= 50;
   const clean = events
-    .filter(event => Number.isFinite(event.time) && Number.isFinite(event.mag) && Number.isFinite(event.coordinates[0]) && Number.isFinite(event.coordinates[1]))
-    .sort((a, b) => b.time - a.time);
-
-  return clean.reduce((merged, event) => {
-    const duplicate = merged.find(existing =>
-      Math.abs(existing.time - event.time) <= 90000 &&
-      Math.abs(existing.mag - event.mag) <= 0.35 &&
-      distanceKm(existing, event) <= 75
-    );
-
-    if (duplicate) {
-      duplicate.agencies = Array.from(new Set([...duplicate.agencies, ...event.agencies])).sort();
-      if (event.mag > duplicate.mag) {
-        duplicate.mag = event.mag;
-      }
-      if ((event.place || '').length > (duplicate.place || '').length) duplicate.place = event.place;
-    } else {
-      merged.push(event);
+    .filter(event => Number.isFinite(event.time) && Number.isFinite(event.mag) &&
+      Array.isArray(event.coordinates) && Number.isFinite(event.coordinates[0]) &&
+      Number.isFinite(event.coordinates[1]) && Math.abs(event.coordinates[1]) <= 90)
+    .map(event => ({ ...event, agency: event.agency || event.agencies[0] }));
+  const unique = new Map();
+  const withoutIds = [];
+  clean.forEach(report => {
+    if (!report.eventId) { withoutIds.push(report); return; }
+    const key = `${report.agency}:${report.eventId}`;
+    const existing = unique.get(key);
+    if (!existing || (report.updated ?? 0) > (existing.updated ?? 0) ||
+        ((report.updated ?? 0) === (existing.updated ?? 0) && compareReportPreference(report, existing) < 0)) {
+      unique.set(key, report);
     }
-    return merged;
-  }, []);
+  });
+  const reports = [...unique.values(), ...withoutIds].sort(compareReportPreference);
+  const groups = [];
+  const timeBuckets = new Map();
+  reports.forEach(report => {
+    const bucket = Math.floor(report.time / timeTolerance);
+    const candidates = [];
+    for (let offset = -1; offset <= 1; offset++) {
+      for (const group of timeBuckets.get(bucket + offset) || []) {
+        if (group.reports.every(other => other.agency !== report.agency && sameEvent(other, report))) candidates.push(group);
+      }
+    }
+    // Several plausible matches means association is uncertain: retain a separate marker.
+    if (candidates.length === 1) candidates[0].reports.push(report);
+    else {
+      const group = { reports: [report] };
+      groups.push(group);
+      if (!timeBuckets.has(bucket)) timeBuckets.set(bucket, []);
+      timeBuckets.get(bucket).push(group);
+    }
+  });
+  return groups.map(group => ({
+    ...group.reports[0],
+    displayedAgency: group.reports[0].agency,
+    agencies: group.reports.map(report => report.agency).sort(),
+    reports: group.reports
+  })).sort((a, b) => b.time - a.time || compareReportPreference(a, b));
 }
 
 function createEarthquakeMarker(event) {
   const mag = Number(event.properties.mag || 0);
   const coords = event.geometry.coordinates;
+  const reportUrl = usgsReportUrl(event.properties.usgsReportUrl);
+  const agencyLabels = event.properties.agencies.map(agency =>
+    agency === 'USGS' && reportUrl
+      ? `<a href="${escapeMapText(reportUrl)}" target="_blank" rel="noopener noreferrer">USGS</a>`
+      : escapeMapText(agency)
+  ).join(', ');
+  const props = event.properties;
+  const displayedAgency = props.displayedAgency || props.agency || props.agencies[0];
+  const alternatives = (props.reports || []).filter(report => report.agency !== displayedAgency);
+  const comparison = alternatives.length ? `<details class="report-comparison"><summary>Other agency reports (${alternatives.length})</summary>
+    <p>Separate estimates of this earthquake, not a revision history.</p>
+    <ul>${alternatives.map(report => `<li><strong>${escapeMapText(report.agency)}</strong>: M ${report.mag.toFixed(1)} ${escapeMapText(report.magnitudeType || '')};
+      ${escapeMapText(reportReviewLabel(report))}<br>
+      Location: ${report.coordinates[1].toFixed(4)}, ${report.coordinates[0].toFixed(4)};
+      ${distanceKm({ coordinates: coords }, report).toFixed(1)} km from displayed epicenter<br>
+      Depth: ${Number(report.coordinates[2] || 0).toFixed(1)} km<br>
+      Origin time: ${new Date(report.time).toISOString()}<br>
+      Event ID: ${escapeMapText(report.eventId || 'Not supplied')}</li>`).join('')}</ul></details>` : '';
   const marker = L.circleMarker([coords[1], coords[0]], {
     radius: mag < 3 ? Math.max(3, mag + 2) : Math.max(5, Math.min(18, mag * 2.2)),
     fillColor: getColorByMagnitude(mag),
@@ -967,12 +1107,27 @@ function createEarthquakeMarker(event) {
     fillOpacity: 0.9,
     quakeMag: mag
   }).bindPopup(
-    `<strong>${event.properties.place}</strong><br>
-     Magnitude: ${mag.toFixed(1)}<br>
+    `<strong>${escapeMapText(props.place)}</strong><br>
+     Displayed solution: ${escapeMapText(displayedAgency)} · ${escapeMapText(reportReviewLabel(props))}<br>
+     Magnitude: ${mag.toFixed(1)} ${escapeMapText(props.magnitudeType || '')}<br>
      Depth: ${Number(coords[2] || 0).toFixed(1)} km<br>
-     Agencies: ${event.properties.agencies.join(', ')}<br>
-     Time: ${new Date(event.properties.time).toLocaleString()}`
+     Location: ${coords[1].toFixed(4)}, ${coords[0].toFixed(4)}<br>
+     ${Number.isFinite(props.locationUncertaintyKm) ? `Reported horizontal uncertainty: ${props.locationUncertaintyKm.toFixed(1)} km<br>` : ''}
+     Agencies: ${agencyLabels}<br>
+     Time: ${new Date(props.time).toLocaleString()}
+     ${Number.isFinite(props.updated) ? `<br>Solution updated: ${new Date(props.updated).toLocaleString()}` : ''}
+     ${comparison}`,
+    { maxHeight: 260 }
   );
+  marker.on('popupopen', ({ popup }) => {
+    if (typeof popup.getContent() !== 'string') return;
+    // A DOM node preserves the open comparison while Leaflet resizes and pans
+    // the popup. String content would recreate and close <details> on update.
+    const content = document.createElement('div');
+    content.innerHTML = popup.getContent();
+    popup.setContent(content);
+    content.querySelector('details')?.addEventListener('toggle', () => popup.update());
+  });
 
   if ((coords[2] || 0) > 200) {
     marker.bindTooltip('D', {
@@ -1041,7 +1196,15 @@ async function loadFeed(selection) {
       mag: event.mag,
       place: event.place,
       time: event.time,
-      agencies: event.agencies
+      agencies: event.agencies,
+      usgsReportUrl: event.usgsReportUrl,
+      displayedAgency: event.displayedAgency,
+      magnitudeType: event.magnitudeType,
+      reviewStatus: event.reviewStatus,
+      evaluationMode: event.evaluationMode,
+      updated: event.updated,
+      locationUncertaintyKm: event.locationUncertaintyKm,
+      reports: event.reports
     },
     geometry: { coordinates: event.coordinates }
   }));

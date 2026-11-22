@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Volcano status feed</title></head><body>
+<script>
+// Executed in an allow-scripts sandbox without access to the parent document.
+var map = {}, volcanoInfo = [], volcanoesShown = 0, volcanoesLoaded = 0;
+var records = [];
+function hideMarker() {}
+function addToMap(id, lat, lng, label, html, iconUrl) {
+  records.push({ id, lat, lng, label, html, iconUrl });
+}
+const feed = document.createElement('script');
+feed.src = 'https://www.volcanoesandearthquakes.com/widget/volcanoInfo0.js';
+feed.onload = function() {
+  try {
+    if (!records.length && typeof addVolcanoesToMap === 'function') addVolcanoesToMap();
+    if (!records.length) throw new Error('Empty feed');
+    const times = new Map(volcanoInfo.map(row => [String(row[0]), Number(row[2])]));
+    records.forEach(record => { record.updatedSeconds = times.get(String(record.id).replace(/^volcano-/, '')) || null; });
+    parent.postMessage({ type: 'frontier-volcano-feed', records }, '*');
+  } catch (error) {
+    parent.postMessage({ type: 'frontier-volcano-feed', error: 'Invalid volcano status feed' }, '*');
+  }
+};
+feed.onerror = function() {
+  parent.postMessage({ type: 'frontier-volcano-feed', error: 'Volcano status feed unavailable' }, '*');
+};
+document.body.appendChild(feed);
+</script></body></html>

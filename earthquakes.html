@@ -172,9 +172,6 @@ svg .leaflet-draw-guide-line {
   background: transparent;
   border: 0;
 }
-.quake-low { background: green; }
-.quake-mid { background: orange; }
-.quake-high { background: red; color: #fcf2dc; }
 .earthquake-cluster {
   align-items: center;
   background: rgba(0, 128, 0, 0.88);
@@ -191,6 +188,12 @@ svg .leaflet-draw-guide-line {
   text-shadow: none;
   width: 34px;
 }
+.earthquake-cluster.quake-green, .circle.quake-green { background: #2eae4e; color: #111; }
+.earthquake-cluster.quake-blue, .circle.quake-blue { background: #2166d1; color: #fff; }
+.earthquake-cluster.quake-yellow, .circle.quake-yellow { background: #ffe14a; color: #111; }
+.earthquake-cluster.quake-orange, .circle.quake-orange { background: #ff9800; color: #111; }
+.earthquake-cluster.quake-red, .circle.quake-red { background: #e53935; color: #111; }
+.earthquake-cluster.quake-purple, .circle.quake-purple { background: #9227cb; color: #fff; }
 .hazard-marker {
   background: #0b2a3b;
   border: 2px solid #ff6b35;
@@ -292,6 +295,7 @@ svg .leaflet-draw-guide-line {
 }
 .volcano-cluster { width: 48px; height: 32px; font-size: 14px; }
 .volcano-nearby { background: #ff9800; }
+.volcano-active { background: #e53935; color: #111; }
 #mapPanel { background: #0b2a3b; }
 #mapPanel .controls { padding: 12px; }
 #mapPanel select { max-width: 100%; }
@@ -416,6 +420,10 @@ svg .leaflet-draw-guide-line {
   <input type="checkbox" id="toggleEarthquakeFeed" checked>
   Show Earthquake Feed
 </label> 
+<label>
+  <input type="checkbox" id="toggleDeepEarthquakes">
+  Show deep earthquakes only (D: deeper than 200 km)
+</label>
   		<!-- ===== Sliders ===== -->
   <label for="magRange">Min Magnitude: <span id="magValue">0</span></label>
   <input type="range" id="magRange" min="0" max="10" step="0.1" value="0">
@@ -434,11 +442,15 @@ svg .leaflet-draw-guide-line {
     </label>
 <label for="volcanoMode">Volcano Overlay</label>
 <select id="volcanoMode" aria-describedby="volcanoNote">
-  <option value="nearby" selected>Nearby volcanoes (within 50 miles)</option>
+  <option value="activeNearby" selected>Active + proximity volcanoes</option>
+  <option value="active">Active volcanoes only</option>
+  <option value="nearby">Proximity only (orange markers)</option>
   <option value="all">All volcanoes</option>
   <option value="off">Volcanoes off</option>
 </select>
-<p id="volcanoNote">Orange volcanoes are within 50 miles (80.5 km) of an earthquake matching the feed and magnitude/age filters, even when earthquake markers are hidden. Proximity only; this does not indicate volcanic activity.</p>
+<button type="button" id="refreshVolcanoActivity" class="button">Refresh volcano activity</button>
+<p id="volcanoNote">Red: reported eruption, eruption warning, or unrest. Orange: earthquake within 50 miles (80.5 km), without an activity flag. Gray: neither condition identified; not proof of inactivity. Red takes priority when both apply. Proximity follows the feed and magnitude/age/depth filters, even when earthquake markers are hidden; it does not indicate volcanic activity. Report dates may be old. These map colors are not official aviation alert codes.</p>
+<p id="volcanoActivityStatus" class="map-status" role="status">Loading volcano activity status...</p>
 <p id="overlayStatus" class="map-status" role="status"></p>
 <p id="feedPolicy">Combined feeds display the USGS solution when available. Otherwise, human-processed reports take priority, followed by EMSC then GEOFON. Other agency estimates are available in the earthquake popup.</p>
 <p id="feedStatus" class="map-status" role="status">Loading earthquake feed...</p>
@@ -462,29 +474,45 @@ svg .leaflet-draw-guide-line {
     </thead>
     <tbody id="table-body">
         <tr>
-      <td><span class="circle green"></span></td>
-      <td>Earthquake (Magnitude < 3)</td>
+      <td><span class="circle quake-green"></span></td>
+      <td>Earthquake (M2.5 or less)</td>
     </tr>
     <tr>
-      <td><span class="circle orange"></span></td>
-      <td>Earthquake (Magnitude 3 to 5.7)</td>
+      <td><span class="circle quake-blue"></span></td>
+      <td>Earthquake (M2.6–3.4)</td>
     </tr>
     <tr>
-      <td><span class="circle red"></span></td>
-      <td>Earthquake (Magnitude > 5.7)</td>
+      <td><span class="circle quake-yellow"></span></td>
+      <td>Earthquake (M3.5–4.4)</td>
+    </tr>
+    <tr>
+      <td><span class="circle quake-orange"></span></td>
+      <td>Earthquake (M4.5–5.6)</td>
+    </tr>
+    <tr>
+      <td><span class="circle quake-red"></span></td>
+      <td>Earthquake (M5.7–6.9)</td>
+    </tr>
+    <tr>
+      <td><span class="circle quake-purple"></span></td>
+      <td>Earthquake (M7.0 or greater). Cluster color follows its largest earthquake.</td>
     </tr>
         <tr>
             <td><span class="volcano-symbol">&#9650;</span></td>
-            <td>Volcano (static location; no matching earthquake within 50 miles)</td>
+            <td>Volcano: neither activity nor proximity identified in available data. Activity may be unknown; gray does not mean inactive.</td>
         </tr>
         <tr>
             <td><span class="volcano-symbol volcano-nearby">&#9650;</span></td>
-            <td>Volcano within 50 miles of a matching earthquake. Orange volcano clusters contain at least one nearby volcano. Proximity only, not volcanic activity.</td>
+            <td>Volcano within 50 miles of a matching earthquake, without an activity flag. Proximity only, not volcanic activity.</td>
+        </tr>
+        <tr>
+            <td><span class="volcano-symbol volcano-active">&#9650;</span></td>
+            <td>Reported eruption, eruption warning, or unrest. Volcano clusters prioritize red, then orange, then gray.</td>
         </tr>
     </tbody>
 </table></div>
 </div>
-<div class="right-side"><p>Live earthquake data can be loaded from USGS, EMSC, GFZ/GEOFON, or a combined deduplicated multi-agency option. ISC is not listed because its event service does not allow browser-side CORS fetches.<br><br>Important note: Volcano locations are static. Orange highlights update with the loaded earthquake feed and magnitude/age filters; they do not indicate volcanic activity or predict an eruption. See the <a href="volcanos.html" class="button">Volcano Monitoring</a> page for current activity. Wildfires, floods, droughts, tropical systems, and Schumann resonance have moved to the <a href="live-earth-monitor.html" class="button">Live Earth Monitor</a>.</p></div>
+<div class="right-side"><p>Live earthquake data can be loaded from USGS, EMSC, GFZ/GEOFON, or a combined deduplicated multi-agency option. ISC is not listed because its event service does not allow browser-side CORS fetches.<br><br>VolcanoDiscovery supplies reported volcano activity flags. Red volcano markers indicate reported eruption, eruption warning, or unrest; check the report date and source. Orange markers show earthquake proximity only and do not predict an eruption. Gray markers do not establish inactivity. Static volcano locations are supplemented by source coordinates where matched. See the <a href="volcanos.html" class="button">Volcano Monitoring</a> page for detailed reports. Wildfires, floods, droughts, tropical systems, and Schumann resonance have moved to the <a href="live-earth-monitor.html" class="button">Live Earth Monitor</a>.</p></div>
 </div><br>
         </section>	
 		<br></br>
@@ -506,6 +534,7 @@ svg .leaflet-draw-guide-line {
     </footer>
 	
 <script src="earthquake-proximity.js"></script>
+<script src="volcano-activity.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
@@ -556,7 +585,7 @@ var earthquakesLayerClustered = L.markerClusterGroup({
     showCoverageOnHover: false,
     iconCreateFunction: function(cluster) {
       const maxMag = Math.max(...cluster.getAllChildMarkers().map(marker => marker.options.quakeMag || 0));
-      const clusterClass = maxMag >= 5.8 ? 'quake-high' : (maxMag >= 3 ? 'quake-mid' : 'quake-low');
+      const clusterClass = getMagnitudeClass(maxMag);
       return L.divIcon({
         html: `<span class="earthquake-cluster ${clusterClass}">${cluster.getChildCount()}</span>`,
         className: '',
@@ -588,6 +617,11 @@ let plateLayer = null;
 let plateLoading = null;
 let volcanoData = null;
 let volcanoLoading = null;
+let volcanoActivityReports = [];
+let volcanoActivityLoading = null;
+let volcanoActivityState = 'idle';
+let volcanoActivityRetrievedAt = null;
+let volcanoEntries = null;
 let filteredEarthquakes = [];
 const overlayErrors = new Map();
 function overlayError(key, message) {
@@ -636,9 +670,11 @@ const volcanoClustered = L.markerClusterGroup({
   spiderfyOnMaxZoom: true,
   showCoverageOnHover: false,
   iconCreateFunction(cluster) {
-    const nearby = cluster.getAllChildMarkers().some(marker => marker.options.nearbyEarthquake);
+    const children = cluster.getAllChildMarkers();
+    const active = children.some(marker => marker.options.activeVolcano);
+    const nearby = children.some(marker => marker.options.nearbyEarthquake);
     return L.divIcon({
-      html: `<span class="volcano-cluster ${nearby ? 'volcano-nearby' : ''}">&#9650; ${cluster.getChildCount()}</span>`,
+      html: `<span class="volcano-cluster ${active ? 'volcano-active' : nearby ? 'volcano-nearby' : ''}">&#9650; ${cluster.getChildCount()}</span>`,
       className: '', iconSize: [48, 32], iconAnchor: [24, 16]
     });
   }
@@ -650,35 +686,75 @@ function renderVolcanoes() {
     map.removeLayer(volcanoClustered);
     return;
   }
-  if (!volcanoData) return;
+  if (!volcanoData && !volcanoActivityReports.length) return;
+  if (!volcanoEntries) volcanoEntries = VolcanoActivity.mergeFeatures(
+    volcanoData?.features || [], volcanoActivityReports, EarthquakeProximity.distanceKm);
   const nearby = EarthquakeProximity.createIndex(filteredEarthquakes);
   const markers = [];
-  volcanoData.features.forEach(feature => {
-    const coords = feature.geometry?.coordinates;
+  volcanoEntries.forEach(({ feature, activity }) => {
+    const coords = activity ? [activity.lng, activity.lat] : feature.geometry?.coordinates;
     if (feature.geometry?.type !== 'Point' || !Array.isArray(coords) ||
         !Number.isFinite(coords[0]) || !Number.isFinite(coords[1]) || Math.abs(coords[1]) > 90) return;
     const match = nearby(coords);
     const isNearby = match.count > 0;
-    if (mode === 'nearby' && !isNearby) return;
+    const isActive = Boolean(activity?.active);
+    const state = VolcanoActivity.markerState(isActive, isNearby);
+    if (!VolcanoActivity.visible(mode, state)) return;
     const props = feature.properties || {};
     const proximity = isNearby
       ? `${match.count} matching earthquake(s) within 50 miles.<br>Nearest epicenter: ${(match.nearestKm / 1.609344).toFixed(1)} mi / ${match.nearestKm.toFixed(1)} km.`
       : 'No matching earthquake within 50 miles.';
     markers.push(L.marker([coords[1], coords[0]], {
       nearbyEarthquake: isNearby,
-      title: `${props.V_Name || 'Unknown volcano'}${isNearby ? ' — earthquake within 50 miles' : ''}`,
+      activeVolcano: isActive,
+      title: `${props.V_Name || 'Unknown volcano'} — ${isActive ? 'reported activity / unrest' : isNearby ? 'earthquake proximity only' : 'no activity or proximity flag'}`,
       icon: L.divIcon({
-        html: `<span class="volcano-symbol ${isNearby ? 'volcano-nearby' : ''}">&#9650;</span>`,
+        html: `<span class="volcano-symbol ${isActive ? 'volcano-active' : isNearby ? 'volcano-nearby' : ''}">&#9650;</span>`,
         className: 'volcano-icon', iconSize: [28, 28], iconAnchor: [14, 14]
       })
     }).bindPopup(`<strong>${escapeMapText(props.V_Name || 'Unknown')}</strong><br>
       Country: ${escapeMapText(props.Country || 'N/A')}<br>
       Region: ${escapeMapText(props.Region || 'N/A')}<br>
       VEI (Holocene): ${escapeMapText(props.VEI_Holoce ?? 'N/A')}<br>
-      ${proximity}<br><strong>Static volcano location. Proximity does not indicate volcanic activity.</strong>`));
+      ${volcanoActivityPopup(activity)}<br>
+      ${proximity}<br><strong>Proximity does not indicate volcanic activity. No activity flag does not establish inactivity.</strong>`, { maxHeight: 260 }));
   });
   volcanoClustered.addLayers(markers);
   volcanoClustered.addTo(map);
+}
+function volcanoActivityPopup(activity) {
+  if (volcanoActivityState === 'error') return 'Activity status unavailable; proximity is still calculated.';
+  if (!activity) return volcanoActivityState === 'loading'
+    ? 'Activity status loading; proximity is still calculated.' : 'No matching activity report. Activity status unknown.';
+  const statuses = ['Status unknown', 'No elevated activity flag', 'Volcanic unrest', 'Eruption warning', 'Erupting'];
+  const old = Number.isFinite(activity.updated) && Date.now() - activity.updated > 30 * 86400000;
+  return `Source: <a href="https://www.volcanodiscovery.com/volcanoes/today.html" target="_blank" rel="noopener noreferrer">VolcanoDiscovery</a><br>
+    Reported status: ${statuses[activity.level] || 'Status unknown'}<br>
+    Source status updated: ${activity.updated ? new Date(activity.updated).toLocaleString() : 'Not supplied'}<br>
+    ${old ? '<strong>Source status date is over 30 days old. Check the source for current conditions.</strong><br>' : ''}
+    Feed retrieved: ${volcanoActivityRetrievedAt ? new Date(volcanoActivityRetrievedAt).toLocaleString() : 'Not available'}`;
+}
+async function syncVolcanoActivity(force = false) {
+  if (volcanoActivityLoading) return volcanoActivityLoading;
+  if (volcanoActivityState === 'loaded' && !force) return;
+  volcanoActivityState = 'loading';
+  const status = document.getElementById('volcanoActivityStatus');
+  status.textContent = 'Loading volcano activity status from VolcanoDiscovery...';
+  volcanoActivityLoading = VolcanoActivity.load().then(({ reports, retrievedAt }) => {
+    volcanoActivityReports = reports;
+    volcanoActivityRetrievedAt = retrievedAt;
+    volcanoActivityState = 'loaded';
+    status.textContent = `VolcanoDiscovery status retrieved ${new Date(retrievedAt).toLocaleString()}. ${reports.filter(report => report.active).length} source activity flags; individual status dates may be older. Refreshes every 5 minutes while this page is visible.`;
+  }).catch(() => {
+    volcanoActivityReports = [];
+    volcanoActivityState = 'error';
+    status.textContent = 'Volcano activity status unavailable. Earthquake proximity remains available. Use Refresh volcano activity to retry.';
+  }).finally(() => {
+    volcanoEntries = null;
+    volcanoActivityLoading = null;
+    renderVolcanoes();
+  });
+  return volcanoActivityLoading;
 }
 async function syncVolcanoes() {
   if (document.getElementById('volcanoMode').value === 'off') {
@@ -686,12 +762,14 @@ async function syncVolcanoes() {
     overlayError('volcanoes', '');
     return;
   }
+  syncVolcanoActivity();
   try {
     if (!volcanoData) {
       if (!volcanoLoading) volcanoLoading = loadStaticJson('files/volcano.json')
         .then(data => {
           if (!Array.isArray(data.features)) throw new Error('Invalid volcano data');
           volcanoData = data;
+          volcanoEntries = null;
         }).finally(() => { volcanoLoading = null; });
       await volcanoLoading;
     }
@@ -703,6 +781,10 @@ async function syncVolcanoes() {
   }
 }
 document.getElementById('volcanoMode').addEventListener('change', syncVolcanoes);
+document.getElementById('refreshVolcanoActivity').addEventListener('click', () => syncVolcanoActivity(true));
+setInterval(() => {
+  if (document.visibilityState === 'visible' && document.getElementById('volcanoMode').value !== 'off') syncVolcanoActivity(true);
+}, 5 * 60 * 1000);
 
 // Keep feed controls and the proximity explanation available in fullscreen.
 const mapPanel = document.getElementById('mapPanel');
@@ -802,16 +884,23 @@ function setClustering(enabled) {
   renderMarkers();
 }
 
+function magnitudeBand(mag) {
+  // Use the same one-decimal rounding as the magnitude shown in the popup.
+  const displayed = Number(Number(mag).toFixed(1));
+  if (displayed <= 2.5) return { name: 'green', color: '#2eae4e' };
+  if (displayed <= 3.4) return { name: 'blue', color: '#2166d1' };
+  if (displayed <= 4.4) return { name: 'yellow', color: '#ffe14a' };
+  if (displayed <= 5.6) return { name: 'orange', color: '#ff9800' };
+  if (displayed <= 6.9) return { name: 'red', color: '#e53935' };
+  return { name: 'purple', color: '#9227cb' };
+}
+
 function getColorByMagnitude(mag) {
-  if (mag < 3) return "green";
-  else if (mag < 5.8) return "orange";
-  else return "red";
+  return magnitudeBand(mag).color;
 }
 
 function getMagnitudeClass(mag) {
-  if (mag < 3) return 'quake-low';
-  if (mag < 5.8) return 'quake-mid';
-  return 'quake-high';
+  return `quake-${magnitudeBand(mag).name}`;
 }
 
 function formatDateParam(date) {
@@ -1077,6 +1166,10 @@ function dedupeEarthquakes(events) {
   })).sort((a, b) => b.time - a.time || compareReportPreference(a, b));
 }
 
+function isDeepEarthquake(coordinates) {
+  return Number(coordinates[2] || 0) > 200;
+}
+
 function createEarthquakeMarker(event) {
   const mag = Number(event.properties.mag || 0);
   const coords = event.geometry.coordinates;
@@ -1129,7 +1222,7 @@ function createEarthquakeMarker(event) {
     content.querySelector('details')?.addEventListener('toggle', () => popup.update());
   });
 
-  if ((coords[2] || 0) > 200) {
+  if (isDeepEarthquake(coords)) {
     marker.bindTooltip('D', {
       permanent: true,
       direction: 'top',
@@ -1146,6 +1239,7 @@ function renderMarkers() {
 
   const minMag = parseFloat(document.getElementById('magRange').value);
   const maxAgeDays = parseInt(document.getElementById('timeRange').value);
+  const deepOnly = document.getElementById('toggleDeepEarthquakes').checked;
   const now = Date.now();
 
   filteredEarthquakes = [];
@@ -1154,7 +1248,7 @@ function renderMarkers() {
     const time = feature.properties.time || 0;
     const ageDays = (now - time) / (1000 * 60 * 60 * 24);
 
-    if (mag >= minMag && ageDays <= maxAgeDays) {
+    if (mag >= minMag && ageDays <= maxAgeDays && (!deepOnly || isDeepEarthquake(feature.geometry.coordinates))) {
       filteredEarthquakes.push(feature);
       const marker = createEarthquakeMarker(feature);
       const combinedMode = isCombinedSelection(currentFeedSelection);
@@ -1233,6 +1327,7 @@ document.getElementById('timeRange').addEventListener('input', function() {
   document.getElementById('timeValue').textContent = this.value;
   renderMarkers();
 });
+document.getElementById('toggleDeepEarthquakes').addEventListener('change', renderMarkers);
 
 // Initial load
 syncPlates();

@@ -491,6 +491,7 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="volcano-activity.js"></script>
     <script>
         (function() {
             const listContainer = document.getElementById('live-volcano-list');
@@ -978,28 +979,17 @@
                 volcanoCards[key] = volcano;
             };
 
-            function loadVolcanoFeed() {
+            async function loadVolcanoFeed() {
                 if (!listContainer) return;
-                const script = document.createElement('script');
-                script.src = 'https://www.volcanoesandearthquakes.com/widget/volcanoInfo0.js';
-                script.async = true;
-                script.onload = function() {
-                    if (typeof window.addVolcanoesToMap === 'function') {
-                        try {
-                            window.addVolcanoesToMap();
-                        } catch (error) {
-                            console.error('VolcanoDiscovery widget script loaded, but addVolcanoesToMap() failed.', error);
-                        }
-                        renderVolcanoList();
-                        updateFilterButtons();
-                    } else {
-                        listContainer.innerHTML = '<p style="text-align:center; color:#ccc;">Live volcano feed loaded, but the remote data function is unavailable.</p>';
-                    }
-                };
-                script.onerror = function() {
+                try {
+                    const { reports } = await VolcanoActivity.load();
+                    reports.forEach(report => window.addToMap(report.id, report.lat, report.lng,
+                        report.label, report.html, report.iconUrl));
+                    renderVolcanoList();
+                    updateFilterButtons();
+                } catch (error) {
                     listContainer.innerHTML = '<p style="text-align:center; color:#ccc;">Unable to load live volcano status from VolcanoDiscovery.</p>';
-                };
-                document.body.appendChild(script);
+                }
             }
 
             function setupFilterControls() {

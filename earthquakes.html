@@ -84,6 +84,34 @@
 .report-comparison summary { cursor: pointer; color: #dbd47b; }
 .report-comparison ul { padding-left: 18px; }
 .report-comparison li { margin-bottom: 10px; overflow-wrap: anywhere; }
+.antipode-icon { background: transparent; border: 0; }
+.antipode-symbol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #07151f;
+  border-radius: 50%;
+  background: #0b2a3b;
+  color: #fff;
+  font: bold 22px/1 sans-serif;
+  letter-spacing: normal;
+  text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+  box-shadow: 0 0 6px #00ffff, 0 0 14px rgba(0, 255, 255, 0.7);
+}
+.antipode-action {
+  margin: 8px 5px 0 0;
+  padding: 5px 9px;
+  border: 1px solid #dbd47b;
+  border-radius: 4px;
+  background: #0b2a3b;
+  color: #dbd47b;
+  font: inherit;
+  cursor: pointer;
+}
+.antipode-action:hover, .antipode-action:focus-visible { color: #fff; outline: 2px solid #dbd47b; outline-offset: 2px; }
 .leaflet-popup-tip {
   background-color: #d10d0d;
 }
@@ -299,6 +327,8 @@ svg .leaflet-draw-guide-line {
 #mapPanel { background: #0b2a3b; }
 #mapPanel .controls { padding: 12px; }
 #mapPanel select { max-width: 100%; }
+.dutchsinse-raster-pane .leaflet-tile { filter: none; }
+#mapStyleStatus:empty { display: none; }
 #volcanoNote { font-size: 0.9rem; margin: 8px 0; }
 #overlayStatus:empty { display: none; }
 #mapPanel:fullscreen, #mapPanel.map-expanded {
@@ -409,13 +439,15 @@ svg .leaflet-draw-guide-line {
   </select> 
   <label for="baseMapSelect">Map Style</label>
   <select id="baseMapSelect">
-    <option value="usgsTopo" selected>USGS Topographic</option>
+    <option value="dutchsinse" selected>Dutchsinse Overlay</option>
+    <option value="usgsTopo">USGS Topographic</option>
     <option value="osm">OpenStreetMap</option>
     <option value="esriWorldImagery">Satellite Imagery</option>
     <option value="terrain">Terrain</option>
     <option value="usgsRelief">USGS Shaded Relief (US detail)</option>
     <option value="usgsImagery">USGS Aerial Imagery (US detail)</option>
   </select>
+<p id="mapStyleStatus" class="map-status" role="status"></p>
   <label>
   <input type="checkbox" id="toggleEarthquakeFeed" checked>
   Show Earthquake Feed
@@ -473,6 +505,10 @@ svg .leaflet-draw-guide-line {
         </tr>
     </thead>
     <tbody id="table-body">
+    <tr>
+      <td><span class="antipode-symbol">A</span></td>
+      <td>Antipode of the selected earthquake: its opposite surface location. Select an earthquake, then choose “View antipode” in its popup.</td>
+    </tr>
         <tr>
       <td><span class="circle quake-green"></span></td>
       <td>Earthquake (M2.5 or less)</td>
@@ -535,6 +571,7 @@ svg .leaflet-draw-guide-line {
 	
 <script src="earthquake-proximity.js"></script>
 <script src="volcano-activity.js"></script>
+<script src="dutchsinse-overlay.js?v=20261125-final"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
@@ -570,12 +607,32 @@ const baseLayers = {
   })
 };
 let currentBaseLayer = baseLayers.usgsTopo.addTo(map);
+let baseMapRequestId = 0;
+var dutchsinseStyle = typeof window.DutchsinseOverlay?.createStyle === 'function' ? DutchsinseOverlay.createStyle(map, L) : null;
 
-document.getElementById('baseMapSelect').addEventListener('change', function() {
+async function selectBaseMap(style) {
+  const requestId = ++baseMapRequestId;
+  const status = document.getElementById('mapStyleStatus');
   if (currentBaseLayer) map.removeLayer(currentBaseLayer);
-  currentBaseLayer = baseLayers[this.value] || baseLayers.usgsTopo;
-  currentBaseLayer.addTo(map);
+  currentBaseLayer = (baseLayers[style] || baseLayers.usgsTopo).addTo(map);
+  status.textContent = '';
+  if (style !== 'dutchsinse') return;
+  status.textContent = 'Loading Dutchsinse Overlay...';
+  try {
+    if (!dutchsinseStyle) throw new Error('Overlay module unavailable');
+    const layer = await dutchsinseStyle.load();
+    if (requestId !== baseMapRequestId) return;
+    map.removeLayer(currentBaseLayer);
+    currentBaseLayer = layer.addTo(map);
+    status.textContent = '';
+  } catch (error) {
+    if (requestId === baseMapRequestId) status.textContent = 'Dutchsinse Overlay unavailable. Showing USGS Topographic; select Dutchsinse Overlay again to retry.';
+  }
+}
+document.getElementById('baseMapSelect').addEventListener('change', function() {
+  selectBaseMap(this.value);
 });
+selectBaseMap(document.getElementById('baseMapSelect').value);
 
 // Clustered layer
 var earthquakesLayerClustered = L.markerClusterGroup({
@@ -603,6 +660,7 @@ map.addLayer(earthquakesLayerPlain);
 
 // Data cache
 var cachedData = [];
+let selectedAntipode = null;
 var clusteringEnabled = false; // tracks state
 var currentFeedSelection = 'usgs_week';
     // Define plate styling
@@ -849,6 +907,7 @@ let earthquakeFeedVisible = true;
 
 document.getElementById('toggleEarthquakeFeed').addEventListener('change', function() {
   earthquakeFeedVisible = this.checked;
+  if (!earthquakeFeedVisible) clearAntipode();
 
   if (earthquakeFeedVisible) {
     syncEarthquakeLayer();
@@ -1170,6 +1229,64 @@ function isDeepEarthquake(coordinates) {
   return Number(coordinates[2] || 0) > 200;
 }
 
+function getAntipodeCoordinates(coordinates) {
+  const [longitude, latitude] = coordinates;
+  if (!Number.isFinite(longitude) || !Number.isFinite(latitude) || Math.abs(latitude) > 90) return null;
+  return { lat: -latitude, lng: ((longitude % 360 + 360) % 360) - 180 };
+}
+
+function nearestWorldLongitude(longitude) {
+  return longitude + 360 * Math.round((map.getCenter().lng - longitude) / 360);
+}
+
+function clearAntipode() {
+  if (selectedAntipode) map.removeLayer(selectedAntipode.marker);
+  selectedAntipode = null;
+}
+
+function selectEarthquakeAntipode(feature, sourceMarker) {
+  if (selectedAntipode?.feature === feature) {
+    selectedAntipode.sourceMarker = sourceMarker;
+    return;
+  }
+  clearAntipode();
+  const point = getAntipodeCoordinates(feature.geometry.coordinates);
+  if (!point) return;
+  const marker = L.marker([point.lat, nearestWorldLongitude(point.lng)], {
+    icon: L.divIcon({ html: '<span class="antipode-symbol">A</span>',
+      className: 'antipode-icon', iconSize: [32, 32], iconAnchor: [16, 16] }),
+    title: 'Antipode of selected earthquake',
+    alt: 'Antipode of selected earthquake',
+    zIndexOffset: 2000
+  }).bindPopup(`<strong>Antipode of selected earthquake</strong><br>
+    ${escapeMapText(feature.properties.place)}<br>
+    Latitude: ${point.lat.toFixed(4)}<br>Longitude: ${point.lng.toFixed(4)}<br>
+    Opposite surface location, independent of earthquake depth.
+    ${Math.abs(point.lat) > 85.05112878 ? '<br>This location is beyond the basemap’s polar coverage.' : ''}<br>
+    <button type="button" class="antipode-action" data-return-earthquake>Return to earthquake</button>
+    <button type="button" class="antipode-action" data-clear-antipode>Clear antipode</button>`);
+  const selection = { feature, sourceMarker, marker, point, zoom: map.getZoom() };
+  selectedAntipode = selection;
+  marker.on('popupopen', ({ popup }) => {
+    popup.getElement().querySelector('[data-return-earthquake]').onclick = () => {
+      const coords = selection.feature.geometry.coordinates;
+      map.setView([coords[1], nearestWorldLongitude(coords[0])], selection.zoom, { animate: false });
+      selection.sourceMarker.openPopup();
+    };
+    popup.getElement().querySelector('[data-clear-antipode]').onclick = clearAntipode;
+  });
+  marker.addTo(map);
+}
+
+function viewSelectedAntipode() {
+  if (!selectedAntipode) return;
+  const { point, marker } = selectedAntipode;
+  const location = [point.lat, nearestWorldLongitude(point.lng)];
+  marker.setLatLng(location);
+  map.setView(location, map.getZoom(), { animate: false });
+  marker.openPopup();
+}
+
 function createEarthquakeMarker(event) {
   const mag = Number(event.properties.mag || 0);
   const coords = event.geometry.coordinates;
@@ -1209,17 +1326,21 @@ function createEarthquakeMarker(event) {
      Agencies: ${agencyLabels}<br>
      Time: ${new Date(props.time).toLocaleString()}
      ${Number.isFinite(props.updated) ? `<br>Solution updated: ${new Date(props.updated).toLocaleString()}` : ''}
+     <br><button type="button" class="antipode-action" data-view-antipode>View antipode</button>
      ${comparison}`,
     { maxHeight: 260 }
   );
   marker.on('popupopen', ({ popup }) => {
-    if (typeof popup.getContent() !== 'string') return;
+    selectEarthquakeAntipode(event, marker);
     // A DOM node preserves the open comparison while Leaflet resizes and pans
     // the popup. String content would recreate and close <details> on update.
-    const content = document.createElement('div');
-    content.innerHTML = popup.getContent();
-    popup.setContent(content);
-    content.querySelector('details')?.addEventListener('toggle', () => popup.update());
+    if (typeof popup.getContent() === 'string') {
+      const content = document.createElement('div');
+      content.innerHTML = popup.getContent();
+      popup.setContent(content);
+      content.querySelector('details')?.addEventListener('toggle', () => popup.update());
+    }
+    popup.getElement().querySelector('[data-view-antipode]').onclick = viewSelectedAntipode;
   });
 
   if (isDeepEarthquake(coords)) {
@@ -1251,6 +1372,7 @@ function renderMarkers() {
     if (mag >= minMag && ageDays <= maxAgeDays && (!deepOnly || isDeepEarthquake(feature.geometry.coordinates))) {
       filteredEarthquakes.push(feature);
       const marker = createEarthquakeMarker(feature);
+      if (selectedAntipode?.feature === feature) selectedAntipode.sourceMarker = marker;
       const combinedMode = isCombinedSelection(currentFeedSelection);
       if (mag < 3 || (clusteringEnabled && !combinedMode)) {
         earthquakesLayerClustered.addLayer(marker);
@@ -1259,6 +1381,7 @@ function renderMarkers() {
       }
     }
   });
+  if (selectedAntipode && (!earthquakeFeedVisible || !filteredEarthquakes.includes(selectedAntipode.feature))) clearAntipode();
   syncEarthquakeLayer();
   renderVolcanoes();
 }
@@ -1271,6 +1394,7 @@ async function loadFeed(selection) {
   earthquakesLayerClustered.clearLayers();
   earthquakesLayerPlain.clearLayers();
   cachedData = [];
+  clearAntipode();
   filteredEarthquakes = [];
   renderVolcanoes();
   status.textContent = 'Loading earthquake feed...';
